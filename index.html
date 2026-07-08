@@ -33,23 +33,13 @@
         .clickable:active { transform: scale(0.95) !important; filter: brightness(0.8); }
         .disabled { filter: grayscale(100%) brightness(0.5); pointer-events: none; }
 
-        /* 상태 바 */
-        #hp-gauge, #mp-gauge { transform-origin: left center; transition: transform 0.2s ease-out; }
+        /* 상태 바 (체력/마나/몬스터체력) - 왼쪽부터 깎임 */
+        #hp-gauge, #mp-gauge, #monster-hp-gauge { transform-origin: left center; transition: transform 0.2s ease-out; }
+        
+        /* 몬스터 공격 게이지 (붉은 필터 밑에서부터) */
         #monster-gauge-img {
             z-index: 5; filter: sepia(1) hue-rotate(320deg) saturate(5) brightness(0.6);
             clip-path: inset(100% 0 0 0); pointer-events: none;
-        }
-
-        /* 내 텍스트 입력 말풍선 */
-        #my-chat-input {
-            position: absolute; left: 440px; top: 443px; z-index: 20;
-            width: 400px; height: 60px; /* DR_Mychat.png 이미지 크기에 맞춰 조절 필요 */
-            display: flex; justify-content: center; align-items: center;
-        }
-        #typing-input {
-            background: transparent; border: none; color: #fff;
-            font-size: 30px; font-family: 'DungGeunMo', sans-serif;
-            text-align: center; outline: none; width: 100%;
         }
 
         /* 몬스터 말풍선 */
@@ -63,15 +53,30 @@
             border-width: 15px 15px 0; border-style: solid; border-color: #fff transparent transparent transparent;
         }
 
+        /* 중앙 타이핑 입력 창 (중심점 641, 610) */
+        #typing-input {
+            position: absolute; left: 641px; top: 610px; transform: translate(-50%, -50%);
+            background: transparent; border: none; color: #fff;
+            font-size: 30px; font-family: 'DungGeunMo', sans-serif;
+            text-align: center; outline: none; width: 350px; z-index: 20;
+        }
+
+        /* 주인공 대사 텍스트 (DR_Mychat 위) */
+        #player-chat-text {
+            position: absolute; left: 440px; top: 443px; width: 400px; height: 60px;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 24px; color: #fff; z-index: 20; display: none; /* 일단 숨김 */
+        }
+
         /* 팝업 UI */
         #popup-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.7); z-index: 100; display: none;
         }
         .popup-text {
-            position: absolute; left: 461px; top: 220px; width: 358px; height: 200px; /* 팝업 크기 임의지정 */
+            position: absolute; left: 461px; top: 220px; width: 358px; height: 200px;
             display: flex; justify-content: center; align-items: center; text-align: center;
-            font-size: 30px; color: #fff; z-index: 102;
+            font-size: 30px; color: #fff; z-index: 102; pointer-events: none;
         }
 
         /* 스킬 텍스트 */
@@ -84,7 +89,7 @@
 
         /* 물리 스킬 */
         #py-1 { left: 249px; top: 580px; }
-        #py-1-extra { left: 350px; top: 580px; display: none; } /* 연속 베기 */
+        #py-1-extra { left: 350px; top: 580px; display: none; }
         #py-2 { left: 249px; top: 610px; }
         #py-3 { left: 249px; top: 640px; }
         /* 마법 스킬 */
@@ -105,7 +110,7 @@
         <!-- 1. 시작 화면 -->
         <div id="start-screen" class="screen active">
             <img src="Data/DR_Logo.png" class="ui-element" style="left: 332px; top: 58px;" alt="Logo">
-            <img src="Data/DR_Start_Button.png" class="ui-element clickable" style="left: 530.5px; top: 567px;" onclick="switchScreen('diff-screen')" alt="Start">
+            <img src="Data/DR_Start_Button.png" class="ui-element clickable" style="left: 531px; top: 567px;" onclick="switchScreen('diff-screen')" alt="Start">
         </div>
 
         <!-- 2. 난이도 선택 화면 -->
@@ -123,28 +128,36 @@
             
             <div style="position:absolute; left:40px; top:120px; font-size:30px; color:#ffd700; z-index:10;">Gold: <span id="gold-val">0</span></div>
 
+            <!-- 몬스터 체력 바 및 이름표 -->
+            <img id="monster-hp-bg" src="Data/DR_Monster_Hp_Bg.png" class="ui-element" style="left: 547px; top: 119px; z-index: 6;">
+            <img id="monster-hp-gauge" src="Data/DR_Monster_Hp_Gauge.png" class="ui-element" style="left: 550px; top: 122px; z-index: 6;">
+            <img id="monster-name-tag" src="Data/DR_Monster_Kobold_Name.png" class="ui-element" style="left: 579px; top: 140px; z-index: 6;">
+
             <!-- 몬스터 영역 -->
             <img id="monster-img" src="" class="ui-element" style="left: 479px; top: 193px; z-index: 4;">
             <img id="monster-gauge-img" src="" class="ui-element" style="left: 479px; top: 193px;">
             <div id="monster-chat"></div>
 
-            <!-- 상태 UI -->
-            <img src="Data/DR_HP_Bg.png" class="ui-element" style="left: 170px; top: 459px; z-index: 1;">
+            <!-- 플레이어 상태 UI -->
+            <img src="Data/DR_HP_Bg.png" class="ui-element" style="left: 100px; top: 439px; z-index: 1;">
             <img src="Data/DR_MP_Bg.png" class="ui-element" style="left: 880px; top: 439px; z-index: 1;">
+            
             <img id="hp-gauge" src="Data/DR_HP_Gauge.png" class="ui-element" style="left: 269.5px; top: 470px; z-index: 2;">
             <img id="mp-gauge" src="Data/DR_MP_Gauge.png" class="ui-element" style="left: 947px; top: 459px; z-index: 2;">
 
-            <!-- 스킬 UI 배경 -->
+            <!-- 스킬 UI 및 내 대사창 -->
             <img src="Data/DR_Py_Attack_Bg.png" class="ui-element" style="left: 120px; top: 494px; z-index: 1;">
             <img src="Data/DR_Mp_Attack_Bg.png" class="ui-element" style="left: 900px; top: 493px; z-index: 1;">
             
-            <!-- 내 입력창 (Mychat 배경) -->
+            <img src="Data/DR_Text_Attack_Bg.png" class="ui-element" style="left: 446px; top: 495px; z-index: 1;">
+            
             <img src="Data/DR_Mychat.png" class="ui-element" style="left: 440px; top: 443px; z-index: 1;">
-            <div id="my-chat-input">
-                <input type="text" id="typing-input" autocomplete="off" spellcheck="false" placeholder="스킬 입력">
-            </div>
+            <div id="player-chat-text"></div> <!-- 주인공 대사용 (현재 미사용) -->
 
             <img src="Data/DR_Attack_Time.png" class="ui-element" style="left: 473px; top: 668px; z-index: 1;">
+
+            <!-- 중앙 타이핑 입력창 (타이핑 배경 위) -->
+            <input type="text" id="typing-input" autocomplete="off" spellcheck="false" placeholder="스킬 입력">
 
             <!-- 스킬 텍스트 -->
             <div id="py-1" class="skill-text">베기</div>
@@ -155,14 +168,14 @@
             <div id="mp-1" class="skill-text">매직 애로우</div>
             <div id="mp-2" class="skill-text locked-skill">???</div>
             <div id="mp-3" class="skill-text">쉴드</div>
-            <!-- 라이트닝은 추후 위치 지정 시 추가 -->
         </div>
 
-        <!-- 4. 팝업 레이어 -->
-        <div id="popup-layer">
-            <img src="Data/DR_Item_Popup.png" class="ui-element" style="left: 461px; top: 220px; z-index: 101;">
-            <div id="popup-text" class="popup-text">골드 +1 획득!</div>
-            <img src="Data/DR_Next_Button.png" class="ui-element clickable" style="left: 531px; top: 428px; z-index: 102;" onclick="nextStage()" alt="Next">
+        <!-- 4. 팝업 레이어 (배경 클릭 시 handlePopupClick 실행) -->
+        <div id="popup-layer" onclick="handlePopupClick(event)">
+            <img src="Data/DR_Item_Popup.png" class="ui-element" style="left: 461px; top: 220px; z-index: 101; pointer-events: none;">
+            <div id="popup-text" class="popup-text"></div>
+            <!-- 아이템 획득 시 나오는 넥스트 버튼 -->
+            <img id="popup-next-btn" src="Data/DR_Next_Button.png" class="ui-element clickable" style="left: 531px; top: 428px; z-index: 103; display: none;" onclick="nextStage(event)" alt="Next">
         </div>
 
     </div>
@@ -188,38 +201,19 @@
             '방어': { type: 'py', dmg: 0, cd: 2000, mp: 0, el: 'py-3' },
             '매직 애로우': { type: 'mp', dmg: 2, cd: 2000, mp: 2, el: 'mp-1' },
             '파이어볼': { type: 'mp', dmg: 3, cd: 3000, mp: 3, el: 'mp-2', reqFlag: 'fireballActive' },
-            '라이트닝': { type: 'mp', dmg: 5, cd: 5000, mp: 5, el: null }, // UI 위치 할당 전
             '쉴드': { type: 'mp', dmg: 0, cd: 2000, mp: 2, el: 'mp-3' }
         };
 
-        // 몬스터 DB 세팅
         const STAGE_DATA = {
-            1: [ // Easy
-                { id: 'kobold', name: '코볼트', img: 'DR_Monster_Kobold.png', hp: 5, atk: 1, cd: 5000, bgIdx: 0 },
-                { id: 'goblin', name: '고블린', img: 'DR_Monster_Goblin.png', hp: 7, atk: 1, cd: 4000, bgIdx: 0 },
-                { id: 'orc', name: '오크', img: 'DR_Monster_Orc.png', hp: 9, atk: 1, cd: 4000, bgIdx: 0 },
-                { id: 'highorc', name: '하이오크', img: 'DR_Monster_High Orc.png', hp: 12, atk: 2, cd: 4000, isBoss: true, bgIdx: 0 },
-                { id: 'slime', name: '슬라임', img: 'DR_Monster_Slime.png', hp: 5, atk: 1, cd: 5000, bgIdx: 1 },
-                { id: 'swarm1', name: '거대 모기 벌레', img: 'DR_Monster_Swarm.png', hp: 5, atk: 2, cd: 4000, bgIdx: 1 },
-                { id: 'ghoul', name: '구울', img: 'DR_Monster_Ghoul.png', hp: 9, atk: 1, cd: 4000, dropItem: '마법 지팡이', bgIdx: 1 },
-                { id: 'troll', name: '트롤', img: 'DR_Monster_Troll.png', hp: 20, atk: 2, cd: 3000, isBoss: true, bgIdx: 1 }
-            ],
-            2: [ // Normal
-                { id: 'swarm2', name: '박쥐 떼', img: 'DR_Monster_Swarm.png', hp: 8, atk: 3, cd: 4000, bgIdx: 0 },
-                { id: 'golem', name: '바위 골렘', img: 'DR_Monster_Golem.png', hp: 15, atk: 2, cd: 4000, bgIdx: 0 },
-                { id: 'spider', name: '거대 독거미', img: 'DR_Monster_Spider.png', hp: 10, atk: 1, cd: 3000, bgIdx: 0 },
-                { id: 'scorpion', name: '크리스탈 스콜피온', img: 'DR_Monster_Spider.png', hp: 25, atk: 3, cd: 3000, isBoss: true, bgIdx: 0 },
-                { id: 'wolf', name: '늑대', img: 'DR_Monster_Scorpion.png', hp: 10, atk: 2, cd: 4000, bgIdx: 1 },
-                { id: 'harpy', name: '하피', img: 'DR_Monster_Harpy.png', hp: 15, atk: 3, cd: 3000, bgIdx: 1 },
-                { id: 'mandragora', name: '만드라고라', img: 'DR_Monster_Mandragora.png', hp: 10, atk: 4, cd: 3000, bgIdx: 1 },
-                { id: 'griffin', name: '그리핀', img: 'DR_Monster_Griffin.png', hp: 15, atk: 2, cd: 3000, isBoss: true, bgIdx: 1 }
-            ],
-            3: [ // Hard
-                { id: 'skeleton', name: '해골 병사', img: 'DR_Monster_Skeleton.png', hp: 15, atk: 2, cd: 2000, bgIdx: 0 },
-                { id: 'gargoyle', name: '가고일', img: 'DR_Monster_Gargoyle.png', hp: 15, atk: 5, cd: 3000, bgIdx: 0 },
-                { id: 'dullahan', name: '듀라한', img: 'DR_Monster_Dullahan.png', hp: 30, atk: 3, cd: 3000, isBoss: true, bgIdx: 0 },
-                { id: 'succubus', name: '서큐버스', img: 'DR_Monster_Succubus.png', hp: 20, atk: 5, cd: 3000, bgIdx: 1 },
-                { id: 'demon', name: '마왕', img: 'DR_Monster_Demon.png', hp: 40, atk: 10, cd: 3000, isBoss: true, bgIdx: 1 }
+            1: [ 
+                { id: 'kobold', hp: 5, atk: 1, cd: 5000, img: 'DR_Monster_Kobold.png', bgIdx: 0 },
+                { id: 'goblin', hp: 7, atk: 1, cd: 4000, img: 'DR_Monster_Goblin.png', bgIdx: 0 },
+                { id: 'orc', hp: 9, atk: 1, cd: 4000, img: 'DR_Monster_Orc.png', bgIdx: 0 },
+                { id: 'highorc', hp: 12, atk: 2, cd: 4000, img: 'DR_Monster_High Orc.png', isBoss: true, bgIdx: 0 },
+                { id: 'slime', hp: 5, atk: 1, cd: 5000, img: 'DR_Monster_Slime.png', bgIdx: 1 },
+                { id: 'swarm1', hp: 5, atk: 2, cd: 4000, img: 'DR_Monster_Swarm.png', bgIdx: 1 },
+                { id: 'ghoul', hp: 9, atk: 1, cd: 4000, img: 'DR_Monster_Ghoul.png', dropItem: '마법 지팡이', bgIdx: 1 },
+                { id: 'troll', hp: 20, atk: 2, cd: 3000, img: 'DR_Monster_Troll.png', isBoss: true, bgIdx: 1 }
             ]
         };
 
@@ -228,10 +222,7 @@
         let selectedDiff = 1;
         let monsterIdx = 0;
         
-        let player = {
-            maxHp: 10, hp: 10, maxMp: 10, mp: 10, gold: 0,
-            cooldowns: {}, flags: {}, isDefending: false, stunTimer: 0
-        };
+        let player = { maxHp: 10, hp: 10, maxMp: 10, mp: 10, gold: 0, cooldowns: {}, flags: {}, isDefending: false, stunTimer: 0 };
         let monster = null;
         
         let lastTime = 0;
@@ -258,12 +249,12 @@
                 gameState = 'START'; container.style.backgroundImage = BG_MAP.main;
             } else if (screenId === 'diff-screen') {
                 gameState = 'DIFF'; container.style.backgroundImage = BG_MAP.select;
-                selectDiff(selectedDiff); // 초기화
+                selectDiff(selectedDiff);
             }
         }
 
         function selectDiff(diff) {
-            if (diff === 4) return; // Extreme 막음
+            if (diff === 4) return;
             selectedDiff = diff;
             for(let i=1; i<=3; i++) {
                 document.getElementById(`diff-${i}`).style.filter = (i === diff) ? 'brightness(1.2) drop-shadow(0 0 10px #ff0)' : 'none';
@@ -279,14 +270,19 @@
             if (gameState === 'GAME') {
                 gameState = 'PAUSE';
                 document.getElementById('popup-layer').style.display = 'block';
-                document.getElementById('popup-text').innerText = '일시 정지';
-                document.querySelector('#popup-layer img[onclick="nextStage()"]').style.display = 'none'; // 다음 버튼 숨김
-            } else if (gameState === 'PAUSE') {
+                document.getElementById('popup-text').innerText = '일시 정지\n\n(아무 곳이나 눌러 재개)';
+                document.getElementById('popup-next-btn').style.display = 'none';
+            } 
+        }
+
+        // 팝업 배경 클릭 시 일시정지 해제
+        function handlePopupClick(e) {
+            if (gameState === 'PAUSE') {
                 gameState = 'GAME';
                 document.getElementById('popup-layer').style.display = 'none';
-                document.querySelector('#popup-layer img[onclick="nextStage()"]').style.display = 'block';
                 lastTime = performance.now();
                 requestAnimationFrame(gameLoop);
+                inputEl.focus();
             }
         }
 
@@ -296,12 +292,9 @@
         function startGame() {
             currentDiff = selectedDiff;
             monsterIdx = 0;
-            
-            // 플레이어 난이도 클리어 스탯 적용 (임시로 클리어 횟수를 방어적으로 1번만 적용한다 가정)
-            // 실제 로직에선 localStorage 등으로 클리어 데이터를 불러옴
             player.hp = player.maxHp;
             player.mp = player.maxMp;
-            player.flags = { ...player.flags, blockCount: 0, dullahanBlock: 0, griffinHits: 0 };
+            player.flags = { blockCount: 0, dullahanBlock: 0, griffinHits: 0 };
             
             Object.keys(SKILLS).forEach(k => player.cooldowns[k] = 0);
             updateStatusUI();
@@ -315,22 +308,32 @@
         }
 
         function loadMonster() {
-            let mData = STAGE_DATA[currentDiff][monsterIdx];
+            let mData = STAGE_DATA[currentDiff] ? STAGE_DATA[currentDiff][monsterIdx] : null;
             if (!mData) { alert('스테이지 클리어!'); goBack(); return; }
             
-            monster = { ...mData }; // 복사
+            monster = { ...mData, maxHp: mData.hp }; 
             monsterAttackTimer = 0;
             monsterStunTimer = 0;
             
+            // 몬스터 이미지 및 이름표 다시 보이게 설정
+            document.getElementById('monster-img').style.display = 'block';
+            document.getElementById('monster-gauge-img').style.display = 'block';
+            document.getElementById('monster-hp-bg').style.display = 'block';
+            document.getElementById('monster-hp-gauge').style.display = 'block';
+            document.getElementById('monster-name-tag').style.display = 'block';
+
             document.getElementById('monster-img').src = `Data/${monster.img}`;
             document.getElementById('monster-gauge-img').src = `Data/${monster.img}`;
             container.style.backgroundImage = BG_MAP.bgList[currentDiff][monster.bgIdx];
             
             updateSkillUI();
+            updateMonsterHpUI();
         }
 
-        function nextStage() {
+        function nextStage(e) {
+            if(e) e.stopPropagation(); // 팝업 닫힘 이벤트 방지
             document.getElementById('popup-layer').style.display = 'none';
+            document.getElementById('popup-next-btn').style.display = 'none';
             monsterIdx++;
             loadMonster();
             gameState = 'GAME';
@@ -340,19 +343,18 @@
         }
 
         /* =================================================================
-           게임 루프 & 전투 로직
+           전투 로직
         ================================================================= */
         function gameLoop(currentTime) {
             if (gameState !== 'GAME') return;
             const dt = currentTime - lastTime;
             lastTime = currentTime;
 
-            // 스턴 타이머 처리
             if (player.stunTimer > 0) player.stunTimer -= dt;
             if (monsterStunTimer > 0) monsterStunTimer -= dt;
 
-            // 몬스터 공격 진행
-            if (monsterStunTimer <= 0) {
+            // 몬스터 공격 타이머
+            if (monsterStunTimer <= 0 && monster.hp > 0) {
                 monsterAttackTimer += dt;
                 let ratio = Math.min(1, monsterAttackTimer / monster.cd);
                 document.getElementById('monster-gauge-img').style.clipPath = `inset(${100 - (ratio * 100)}% 0 0 0)`;
@@ -363,7 +365,7 @@
                 }
             }
 
-            // MP 리젠 (1초당 1)
+            // MP 리젠
             mpRegenTimer += dt;
             if (mpRegenTimer >= 1000) {
                 player.mp = Math.min(player.maxMp, player.mp + 1);
@@ -371,7 +373,7 @@
                 mpRegenTimer -= 1000;
             }
 
-            // 쿨타임 UI 업데이트
+            // 스킬 쿨타임 UI
             for (const [sName, sData] of Object.entries(SKILLS)) {
                 if (!sData.el) continue;
                 let timePassed = currentTime - player.cooldowns[sName];
@@ -388,17 +390,16 @@
             if (gameState === 'GAME' && e.key === 'Enter') {
                 const word = e.target.value.trim();
                 const now = performance.now();
-                if (player.stunTimer > 0) { e.target.value = ''; return; } // 스턴 시 입력 불가
+                if (player.stunTimer > 0) { e.target.value = ''; return; }
 
                 if (SKILLS[word]) {
                     let s = SKILLS[word];
-                    // 스킬 잠금 해제 확인
                     if (s.reqFlag && !player.flags[s.reqFlag]) return;
                     
                     if (now - player.cooldowns[word] >= s.cd && player.mp >= s.mp) {
                         player.cooldowns[word] = now;
                         player.mp -= s.mp;
-                        player.isDefending = false; // 공격 시 방어 풀림
+                        player.isDefending = false;
                         
                         if (word === '방어' || word === '쉴드') {
                             player.isDefending = true;
@@ -416,89 +417,35 @@
         function playerAttacksMonster(skillName, skillData) {
             let dmg = skillData.dmg;
 
-            // --- 몬스터 기믹 처리 (방어/회피) ---
-            if (monster.id === 'golem' && skillData.type === 'py' && Math.random() < 0.5) dmg = 1;
-            if (monster.id === 'golem' && skillData.type === 'mp' && Math.random() < 0.5) dmg *= 2;
-            if (monster.id === 'harpy' && skillData.type === 'mp') dmg *= 2;
-            if (monster.id === 'griffin' && Math.random() < 0.5) dmg = 0; // 50% 회피
-            if (monster.id === 'dullahan') {
-                if (skillName === '연속 베기') dmg = skillData.dmg;
-                else if (skillData.type === 'mp') dmg = 1;
-                else dmg = 0;
-            }
-            if (monster.id === 'succubus') {
-                if (skillData.type === 'py' && Math.random() < 0.5) dmg = 0;
-                if (skillData.type === 'mp') dmg = 2;
-            }
-            if (monster.id === 'demon') {
-                if (skillData.type === 'py' && Math.random() < 0.8) dmg = 0;
-                if (skillData.type === 'mp') dmg = 1;
-            }
-            if (monster.id === 'troll' && player.flags.trollDebuff && skillData.type === 'py') dmg *= 2;
-
-            // 특수 스킬 효과
-            if (monster.id === 'swarm2' && skillName === '파이어볼') dmg = monster.hp;
-            if (monster.id === 'troll' && skillName === '파이어볼') player.flags.trollDebuff = true;
-            if (monster.id === 'highorc' && skillName === '연속 베기') monsterStunTimer = 3000;
-            if (monster.id === 'scorpion' && skillName === '연속 베기') {
-                player.flags.scorpHits = (player.flags.scorpHits || 0) + 1;
-                if (player.flags.scorpHits >= 2) { monsterStunTimer = 3000; player.flags.scorpHits = 0; }
-            }
-            if (monster.id === 'succubus' && skillName === '라이트닝' && Math.random() < 0.5) monsterStunTimer = 3000;
-            if (monster.id === 'demon' && skillName === '매직 애로우' && Math.random() < 0.5) monsterStunTimer = 2000;
-
-            // 그리핀 특수 처치
-            if (monster.id === 'griffin' && skillName === '매직 애로우' && dmg > 0) {
-                player.flags.griffinHits++;
-                if (player.flags.griffinHits >= 3) dmg = monster.hp; else dmg = 0;
-            }
+            // 몬스터 피격 대사
+            const hitLines = ["크악!", "아프다!", "이놈이!", "제법이군.."];
+            showMonsterChat(hitLines[Math.floor(Math.random() * hitLines.length)]);
 
             monster.hp -= dmg;
-            if (monster.hp <= 0) monsterDeath();
+            updateMonsterHpUI();
+
+            if (monster.hp <= 0) {
+                monsterDeath();
+            }
         }
 
         function monsterAttacksPlayer() {
             let dmg = monster.atk;
-            let isBlocked = player.isDefending;
-
-            // 방어 기믹
-            if (isBlocked) {
-                if (monster.id === 'gargoyle') dmg = 1; // 가고일 관통
-                else if (monster.id === 'succubus') dmg = 2; // 서큐버스 관통
-                else if (monster.id === 'demon' && player.currentDefSkill !== '쉴드') dmg = monster.atk; // 마왕은 쉴드만 가능
-                else {
-                    dmg = 0; // 완벽 방어
-                    if (monster.id === 'wolf') {
-                        player.flags.blockCount++;
-                        if (player.flags.blockCount >= 2) monsterDeath('도망침');
-                    }
-                    if (monster.id === 'dullahan') {
-                        player.flags.dullahanBlock++;
-                        const dLines = ["오호? 내 공격을 막다니!", "어디 이 공격도 막아보시지!", "쥐새끼 같은놈!", "언제까지 막기만 할것이냐!", "내가 졌다.."];
-                        showMonsterChat(dLines[player.flags.dullahanBlock - 1]);
-                        if (player.flags.dullahanBlock >= 5) setTimeout(() => monsterDeath('스스로 무너짐'), 1500);
-                    }
-                }
-                player.isDefending = false; // 1회 방어 후 풀림
+            if (player.isDefending) {
+                dmg = 0;
+                player.isDefending = false; 
             }
 
             if (dmg > 0) {
                 player.hp -= dmg;
-                // 플레이어 피격 시 기믹 트리거
-                if (monster.id === 'spider' && !isBlocked) player.hp -= 1; // 독뎀
-                if (monster.id === 'mandragora') player.stunTimer = 1000;
+                updateStatusUI();
                 
                 if (monster.id === 'highorc' && !player.flags.hasCombo) {
                     player.flags.hasCombo = true;
                     showMonsterChat("크하하! 겨우 그정도냐!");
                     updateSkillUI();
                 }
-                if (monster.id === 'troll' && player.flags.hasStaff && !player.flags.fireballActive) {
-                    player.flags.fireballActive = true;
-                    updateSkillUI();
-                }
 
-                updateStatusUI();
                 if (player.hp <= 0) {
                     alert("게임 오버!");
                     goBack();
@@ -506,11 +453,17 @@
             }
         }
 
-        function monsterDeath(reason = '') {
+        function monsterDeath() {
+            // 죽으면 이미지 숨김
+            document.getElementById('monster-img').style.display = 'none';
+            document.getElementById('monster-gauge-img').style.display = 'none';
+            document.getElementById('monster-hp-bg').style.display = 'none';
+            document.getElementById('monster-hp-gauge').style.display = 'none';
+            document.getElementById('monster-name-tag').style.display = 'none';
+
             player.gold += 1;
             document.getElementById('gold-val').innerText = player.gold;
             
-            // 아이템 드롭 체크
             let popText = `골드 +1 획득!`;
             if (monster.dropItem) {
                 popText += `\n${monster.dropItem} 획득!`;
@@ -519,11 +472,11 @@
                     updateSkillUI();
                 }
             }
-            if (reason) popText = `${reason}\n${popText}`;
 
             gameState = 'POPUP';
             document.getElementById('popup-layer').style.display = 'block';
             document.getElementById('popup-text').innerText = popText;
+            document.getElementById('popup-next-btn').style.display = 'block';
         }
 
         function updateStatusUI() {
@@ -531,15 +484,17 @@
             document.getElementById('mp-gauge').style.transform = `scaleX(${Math.max(0, player.mp / player.maxMp)})`;
         }
 
+        function updateMonsterHpUI() {
+            document.getElementById('monster-hp-gauge').style.transform = `scaleX(${Math.max(0, monster.hp / monster.maxHp)})`;
+        }
+
         function updateSkillUI() {
             if (player.flags.hasCombo) document.getElementById('py-1-extra').style.display = 'block';
             
             let fbEl = document.getElementById('mp-2');
-            if (player.flags.fireballActive) {
+            if (player.flags.fireballActive || player.flags.hasStaff) {
                 fbEl.innerText = '파이어볼';
                 fbEl.classList.remove('locked-skill');
-            } else if (player.flags.hasStaff) {
-                fbEl.innerText = '파이어볼'; // 지팡이 얻었으나 비활성화 상태
             }
         }
 
@@ -547,7 +502,7 @@
             const chatBox = document.getElementById('monster-chat');
             chatBox.style.display = 'block';
             chatBox.innerText = text;
-            setTimeout(() => chatBox.style.display = 'none', 2000);
+            setTimeout(() => chatBox.style.display = 'none', 1500);
         }
     </script>
 </body>
