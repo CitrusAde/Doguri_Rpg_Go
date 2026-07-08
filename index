@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doguri's Adventure - Game Screen</title>
+    <style>
+        /* 1. 폰트 세팅 (Data 폴더 안의 폰트 파일 연결) */
+        /* 파일명(font.ttf)은 실제 Data 폴더에 있는 폰트 파일명으로 수정해 주세요 */
+        @font-face {
+            font-family: 'GameFont';
+            src: url('Data/font.ttf') format('truetype'); 
+            /* OTF일 경우: url('Data/font.otf') format('opentype'); */
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #111;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'GameFont', sans-serif;
+            overflow: hidden;
+        }
+
+        /* 2. 메인 게임 화면 컨테이너 (1280x720 고정) */
+        #game-container {
+            position: relative;
+            width: 1280px;
+            height: 720px;
+            /* 배경 이미지 역시 Data 폴더에서 불러옵니다 */
+            background-image: url('Data/DR_Stage_1_bg.png');
+            background-size: cover;
+            background-position: center;
+            background-color: #222; /* 배경 이미지 누락 시 대체 색상 */
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        /* 3. 절대 좌표 UI 요소 공통 클래스 */
+        .ui-element {
+            position: absolute;
+            /* 이미지가 찌그러지지 않고 원본 크기대로 나오도록 설정 */
+            object-fit: none; 
+        }
+
+        /* * [참고] 나중에 JS로 HP/MP 게이지를 조절하기 쉽도록 
+         * 게이지 이미지들은 왼쪽을 기준으로 줄어들게 설정(transform-origin)할 수 있습니다. 
+         */
+        #hp-gauge, #mp-gauge {
+            transform-origin: left center;
+            transition: transform 0.2s ease-out;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <img src="Data/DR_Monster_Kobold.png" class="ui-element" style="left: 479px; top: 193px;" alt="Kobold">
+        <img src="Data/DR_Monster_Kobold_Name.png" class="ui-element" style="left: 530px; top: 138px;" alt="Kobold Name">
+
+        <img src="Data/DR_HP_Bg.png" class="ui-element" style="left: 100px; top: 439px;" alt="HP Background">
+        <img id="hp-gauge" src="Data/DR_HP_Gauge.png" class="ui-element" style="left: 269.5px; top: 470px;" alt="HP Gauge">
+
+        <img src="Data/DR_MP_Bg.png" class="ui-element" style="left: 880px; top: 439px;" alt="MP Background">
+        <img id="mp-gauge" src="Data/DR_MP_Gauge.png" class="ui-element" style="left: 947px; top: 459px;" alt="MP Gauge">
+
+        <img src="Data/DR_Py_Attack_Bg.png" class="ui-element" style="left: 120px; top: 494px;" alt="Physical Attack Background">
+        
+        <img src="Data/DR_Mp_Attack_Bg.png" class="ui-element" style="left: 900px; top: 493px;" alt="Magic Attack Background">
+        
+        <img src="Data/DR_Text_Attack_Bg.png" class="ui-element" style="left: 640px; top: 596px;" alt="Text Attack Background">
+        
+        <img src="Data/DR_Attack_Time.png" class="ui-element" style="left: 473px; top: 668px;" alt="Attack Time">
+    </div>
+
+    <script>
+        // 추후 이 곳에 HP/MP 게이지 깎이는 로직이나 타이핑 로직을 추가하시면 됩니다.
+        // 예시: 체력을 50%로 깎고 싶을 때
+        // document.getElementById('hp-gauge').style.transform = 'scaleX(0.5)';
+    </script>
+</body>
+</html>
