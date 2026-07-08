@@ -27,19 +27,24 @@
         .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; }
         .screen.active { display: block; }
         
-        /* 모든 UI 요소의 기준점을 정중앙으로 설정 */
         .ui-element { position: absolute; object-fit: none; transform: translate(-50%, -50%); }
         
-        /* 버튼 클릭 애니메이션 (정중앙 기준 스케일 축소) */
         .clickable { cursor: pointer; transition: transform 0.1s ease; }
         .clickable:active { transform: translate(-50%, -50%) scale(0.95) !important; filter: brightness(0.8); }
         
         .disabled { filter: grayscale(100%) brightness(0.5); pointer-events: none; }
 
-        /* 게이지 바 (오른쪽에서부터 깎여나가도록 clip-path 사용 - 중심점 변동 없음) */
+        /* 게이지 바 */
         #hp-gauge, #mp-gauge, #monster-hp-gauge { transition: clip-path 0.2s ease-out; }
         
-        /* 몬스터 공격 타이머 게이지 (아래에서 위로) */
+        /* 상태 텍스트 (체력/마나/타이머) */
+        .status-text {
+            position: absolute; transform: translate(-50%, -50%);
+            font-size: 20px; font-weight: bold; color: #fff; z-index: 3;
+            text-shadow: 1.5px 1.5px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+        }
+
+        /* 몬스터 공격 타이머 게이지 */
         #monster-gauge-img {
             z-index: 5; filter: sepia(1) hue-rotate(320deg) saturate(5) brightness(0.6);
             clip-path: inset(100% 0 0 0); pointer-events: none;
@@ -57,20 +62,12 @@
             border-width: 15px 15px 0; border-style: solid; border-color: #fff transparent transparent transparent;
         }
 
-        /* 중앙 타이핑 입력 창 (중심점 640, 639.5) */
+        /* 타이핑 입력 창 */
         #typing-input {
             position: absolute; left: 640px; top: 639.5px; transform: translate(-50%, -50%);
             background: transparent; border: none; color: #fff;
             font-size: 30px; font-family: 'DungGeunMo', sans-serif;
             text-align: center; outline: none; width: 350px; z-index: 20;
-        }
-
-        /* 주인공 대사 텍스트 */
-        #player-chat-text {
-            position: absolute; left: 640px; top: 524.5px; width: 400px; height: 60px;
-            transform: translate(-50%, -50%);
-            display: flex; justify-content: center; align-items: center;
-            font-size: 24px; color: #fff; z-index: 20; display: none;
         }
 
         /* 팝업 UI */
@@ -90,20 +87,40 @@
             position: absolute; transform: translate(-50%, -50%); font-size: 26px; font-weight: bold; z-index: 10;
             background: linear-gradient(to top, #fff var(--fill, 100%), #444 var(--fill, 100%));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            transition: left 0.3s ease; /* 텍스트 이동 시 부드러운 애니메이션 */
+            transition: left 0.3s ease; 
         }
         .locked-skill { color: #555 !important; background: none !important; -webkit-text-fill-color: #555 !important; }
 
-        /* 물리 스킬 (Py 배경 중심 x:250 기준) */
+        /* 물리 스킬 */
         #py-1 { left: 250px; top: 580.5px; }
-        #py-1-extra { left: 310px; top: 580.5px; display: none; } /* 연속 베기 */
+        #py-1-extra { left: 310px; top: 580.5px; display: none; }
         #py-2 { left: 250px; top: 610.5px; }
         #py-3 { left: 250px; top: 640.5px; }
 
-        /* 마법 스킬 (중심 x:1030) */
+        /* 마법 스킬 */
         #mp-1 { left: 1030px; top: 580.5px; }
         #mp-2 { left: 1030px; top: 610.5px; }
         #mp-3 { left: 1030px; top: 640.5px; }
+
+        /* 흔들림 애니메이션 */
+        @keyframes shake-monster-anim {
+            0% { transform: translate(-50%, -50%) translate(0, 0); }
+            20% { transform: translate(-50%, -50%) translate(-10px, 0); }
+            40% { transform: translate(-50%, -50%) translate(10px, 0); }
+            60% { transform: translate(-50%, -50%) translate(-10px, 0); }
+            80% { transform: translate(-50%, -50%) translate(10px, 0); }
+            100% { transform: translate(-50%, -50%) translate(0, 0); }
+        }
+        @keyframes shake-screen-anim {
+            0% { transform: translate(0, 0); }
+            20% { transform: translate(-5px, 5px); }
+            40% { transform: translate(5px, -5px); }
+            60% { transform: translate(-5px, -5px); }
+            80% { transform: translate(5px, 5px); }
+            100% { transform: translate(0, 0); }
+        }
+        .shake-monster { animation: shake-monster-anim 0.2s ease-in-out; }
+        .shake-screen { animation: shake-screen-anim 0.2s ease-in-out; }
 
     </style>
 </head>
@@ -121,12 +138,12 @@
             <img src="Data/DR_Start_Button.png" class="ui-element clickable" style="left: 640px; top: 567px;" onclick="switchScreen('diff-screen')" alt="Start">
         </div>
 
-        <!-- 2. 난이도 선택 화면 (버튼들은 임의의 중앙 정렬 기준점 배분) -->
+        <!-- 2. 난이도 선택 화면 -->
         <div id="diff-screen" class="screen">
-            <img src="Data/DR_Easy_Button.png" id="diff-1" class="ui-element clickable" style="left: 220px; top: 250px;" onclick="selectDiff(1)" alt="Easy">
-            <img src="Data/DR_Normal_Button.png" id="diff-2" class="ui-element clickable" style="left: 500px; top: 250px;" onclick="selectDiff(2)" alt="Normal">
-            <img src="Data/DR_Hard_Button.png" id="diff-3" class="ui-element clickable" style="left: 780px; top: 250px;" onclick="selectDiff(3)" alt="Hard">
-            <img src="Data/DR_Extreme_Button.png" id="diff-4" class="ui-element disabled" style="left: 1060px; top: 250px;" alt="Extreme">
+            <img src="Data/DR_Easy_Button.png" id="diff-1" class="ui-element clickable" style="left: 220px; top: 280px;" onclick="selectDiff(1)" alt="Easy">
+            <img src="Data/DR_Normal_Button.png" id="diff-2" class="ui-element clickable" style="left: 500px; top: 280px;" onclick="selectDiff(2)" alt="Normal">
+            <img src="Data/DR_Hard_Button.png" id="diff-3" class="ui-element clickable" style="left: 780px; top: 280px;" onclick="selectDiff(3)" alt="Hard">
+            <img src="Data/DR_Extreme_Button.png" id="diff-4" class="ui-element disabled" style="left: 1060px; top: 280px;" alt="Extreme">
             
             <img src="Data/DR_Play_Button.png" class="ui-element clickable" style="left: 640px; top: 567px;" onclick="startGame()" alt="Play">
         </div>
@@ -141,17 +158,20 @@
             <img id="monster-hp-gauge" src="Data/DR_Monster_Hp_Gauge.png" class="ui-element" style="left: 640px; top: 126px; z-index: 6;">
             <img id="monster-name-tag" src="Data/DR_Monster_Kobold_Name.png" class="ui-element" style="left: 640px; top: 160px; z-index: 6;">
 
-            <!-- 몬스터 영역 -->
+            <!-- 몬스터 영역 및 그림자 -->
+            <img id="monster-shadow" src="Data/DR_Monster_Shadow.png" class="ui-element" style="left: 645.5px; top: 440px; z-index: 3;">
             <img id="monster-img" src="" class="ui-element" style="left: 640px; top: 337px; z-index: 4;">
             <img id="monster-gauge-img" src="" class="ui-element" style="left: 640px; top: 337px;">
             <div id="monster-chat"></div>
 
-            <!-- 플레이어 상태 UI -->
+            <!-- 플레이어 상태 UI 배경/게이지/텍스트 -->
             <img src="Data/DR_HP_Bg.png" class="ui-element" style="left: 250px; top: 470.5px; z-index: 1;">
             <img id="hp-gauge" src="Data/DR_HP_Gauge.png" class="ui-element" style="left: 269.5px; top: 470px; z-index: 2;">
+            <div id="hp-text" class="status-text" style="left: 269.5px; top: 470px;">10/10</div>
             
             <img src="Data/DR_MP_Bg.png" class="ui-element" style="left: 1030px; top: 470px; z-index: 1;">
             <img id="mp-gauge" src="Data/DR_MP_Gauge.png" class="ui-element" style="left: 1047.5px; top: 470.5px; z-index: 2;">
+            <div id="mp-text" class="status-text" style="left: 1047.5px; top: 470.5px;">10/10</div>
 
             <!-- 스킬 UI 배경 -->
             <img src="Data/DR_Py_Attack_Bg.png" class="ui-element" style="left: 250px; top: 595px; z-index: 1;">
@@ -160,7 +180,10 @@
             <img src="Data/DR_Text_Attack_Bg.png" class="ui-element" style="left: 640px; top: 624.5px; z-index: 1;">
             <img src="Data/DR_Mychat.png" class="ui-element" style="left: 640px; top: 524.5px; z-index: 1;">
             <div id="player-chat-text"></div> 
+            
+            <!-- 타이머 영역 -->
             <img src="Data/DR_Attack_Time.png" class="ui-element" style="left: 640.5px; top: 671px; z-index: 1;">
+            <div id="timer-text" class="status-text" style="left: 640.5px; top: 671px; font-size: 24px; color: #ff5555; z-index: 2;">01:00</div>
 
             <!-- 중앙 타이핑 입력창 -->
             <input type="text" id="typing-input" autocomplete="off" spellcheck="false" placeholder="스킬 입력">
@@ -212,13 +235,12 @@
             '쉴드': { type: 'mp', dmg: 0, cd: 2000, mp: 2, el: 'mp-3' }
         };
 
-        // 전체 몬스터 데이터 완벽 복구
         const STAGE_DATA = {
             1: [ 
                 { id: 'kobold', hp: 5, atk: 1, cd: 5000, img: 'DR_Monster_Kobold.png', bgIdx: 0 },
                 { id: 'goblin', hp: 7, atk: 1, cd: 4000, img: 'DR_Monster_Goblin.png', bgIdx: 0 },
                 { id: 'orc', hp: 9, atk: 1, cd: 4000, img: 'DR_Monster_Orc.png', bgIdx: 0 },
-                { id: 'highorc', hp: 12, atk: 2, cd: 4000, img: 'DR_Monster_High Orc.png', isBoss: true, bgIdx: 0 },
+                { id: 'highorc', hp: 12, atk: 2, cd: 4000, img: 'DR_Monster_High_Orc.png', isBoss: true, bgIdx: 0 },
                 { id: 'slime', hp: 5, atk: 1, cd: 5000, img: 'DR_Monster_Slime.png', bgIdx: 1 },
                 { id: 'swarm1', hp: 5, atk: 2, cd: 4000, img: 'DR_Monster_Swarm.png', bgIdx: 1 },
                 { id: 'ghoul', hp: 9, atk: 1, cd: 4000, img: 'DR_Monster_Ghoul.png', dropItem: '마법 지팡이', bgIdx: 1 },
@@ -244,6 +266,7 @@
         };
 
         let gameState = 'START'; 
+        let unlockedDiff = 1; // 클리어하여 해금된 난이도 (1: 쉬움부터 시작)
         let currentDiff = 1;
         let selectedDiff = 1;
         let monsterIdx = 0;
@@ -255,6 +278,7 @@
         let monsterAttackTimer = 0;
         let mpRegenTimer = 0;
         let monsterStunTimer = 0;
+        let stageTimer = 60000; // 1분
         let gameLoopId = null;
 
         const container = document.getElementById('game-container');
@@ -272,7 +296,12 @@
                     startGame();
                 } else if (gameState === 'POPUP') {
                     if (document.getElementById('popup-next-btn').style.display === 'block') nextStage();
-                    else if (document.getElementById('popup-gameover-btn').style.display === 'block') goBack();
+                } else if (gameState === 'GAMEOVER') {
+                    if (document.getElementById('popup-gameover-btn').style.display === 'block') goBack();
+                } else if (gameState === 'DIFF_ALERT') {
+                    // 경고 팝업 닫기
+                    gameState = 'DIFF';
+                    document.getElementById('popup-layer').style.display = 'none';
                 }
             } 
             else if (gameState === 'DIFF') {
@@ -292,6 +321,8 @@
             document.getElementById('back-btn').style.display = (screenId === 'start-screen') ? 'none' : 'block';
             document.getElementById('stop-btn').style.display = (screenId === 'game-screen') ? 'block' : 'none';
 
+            inputEl.value = ''; // 입력창 초기화
+
             if (screenId === 'start-screen') {
                 gameState = 'START'; container.style.backgroundImage = BG_MAP.main;
             } else if (screenId === 'diff-screen') {
@@ -310,6 +341,8 @@
 
         function goBack(e) {
             if(e) e.stopPropagation();
+            inputEl.value = ''; // 타이핑 리셋
+            inputEl.blur();
             if (gameState === 'DIFF') switchScreen('start-screen');
             else if (['GAME', 'PAUSE', 'GAMEOVER', 'POPUP'].includes(gameState)) { 
                 stopGameLoop(); 
@@ -321,7 +354,7 @@
         function togglePause() {
             if (gameState === 'GAME') {
                 gameState = 'PAUSE';
-                showPopup('일시 정지\n\n(아무 곳이나 눌러 재개)');
+                showPopup('일시 정지\n\n(아무 곳이나 눌러 재개)', 'PAUSE');
             } 
         }
 
@@ -332,6 +365,9 @@
                 lastTime = performance.now();
                 requestAnimationFrame(gameLoop);
                 inputEl.focus();
+            } else if (gameState === 'DIFF_ALERT') {
+                gameState = 'DIFF';
+                document.getElementById('popup-layer').style.display = 'none';
             }
         }
 
@@ -343,10 +379,38 @@
             document.getElementById('popup-gameover-btn').style.display = (type === 'GAMEOVER') ? 'block' : 'none';
         }
 
+        function triggerMonsterShake() {
+            const mImg = document.getElementById('monster-img');
+            const mGauge = document.getElementById('monster-gauge-img');
+            mImg.classList.remove('shake-monster'); mGauge.classList.remove('shake-monster');
+            void mImg.offsetWidth; 
+            mImg.classList.add('shake-monster'); mGauge.classList.add('shake-monster');
+        }
+        function triggerScreenShake() {
+            const screen = document.getElementById('game-container');
+            screen.classList.remove('shake-screen');
+            void screen.offsetWidth;
+            screen.classList.add('shake-screen');
+        }
+
+        function updateTimerUI() {
+            let totalSeconds = Math.ceil(Math.max(0, stageTimer) / 1000);
+            let m = Math.floor(totalSeconds / 60);
+            let s = totalSeconds % 60;
+            document.getElementById('timer-text').innerText = `0${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
         /* =================================================================
            게임 흐름 로직
         ================================================================= */
         function startGame() {
+            if (selectedDiff > unlockedDiff) {
+                gameState = 'DIFF_ALERT';
+                showPopup('이전 난이도 클리어 해야 가능', 'PAUSE'); // 버튼 없는 경고 팝업
+                return;
+            }
+
+            inputEl.value = ''; // 입력창 초기화
             currentDiff = selectedDiff;
             monsterIdx = 0;
             player.hp = player.maxHp;
@@ -367,17 +431,21 @@
         function loadMonster() {
             let mData = STAGE_DATA[currentDiff] ? STAGE_DATA[currentDiff][monsterIdx] : null;
             if (!mData) { 
-                gameState = 'POPUP';
-                showPopup('스테이지 클리어!', 'GAMEOVER'); 
+                unlockedDiff = Math.max(unlockedDiff, currentDiff + 1); // 난이도 해금
+                gameState = 'GAMEOVER'; 
+                showPopup('난이도 클리어!', 'GAMEOVER'); 
+                inputEl.blur();
                 return; 
             }
             
             monster = { ...mData, maxHp: mData.hp }; 
             monsterAttackTimer = 0;
             monsterStunTimer = 0;
+            stageTimer = 60000; // 스테이지 당 1분 리셋
             
             document.getElementById('monster-img').style.display = 'block';
             document.getElementById('monster-gauge-img').style.display = 'block';
+            document.getElementById('monster-shadow').style.display = 'block';
             document.getElementById('monster-hp-bg').style.display = 'block';
             document.getElementById('monster-hp-gauge').style.display = 'block';
             document.getElementById('monster-name-tag').style.display = 'block';
@@ -388,6 +456,7 @@
             
             updateSkillUI();
             updateMonsterHpUI();
+            updateTimerUI();
         }
 
         function nextStage(e) {
@@ -395,7 +464,7 @@
             document.getElementById('popup-layer').style.display = 'none';
             monsterIdx++;
             loadMonster();
-            if(gameState !== 'POPUP') return; // 게임오버 상태 등 예외처리
+            if(gameState !== 'POPUP') return;
             gameState = 'GAME';
             lastTime = performance.now();
             requestAnimationFrame(gameLoop);
@@ -413,6 +482,16 @@
             if (gameState !== 'GAME') return;
             const dt = currentTime - lastTime;
             lastTime = currentTime;
+
+            // 1분 타이머 처리
+            stageTimer -= dt;
+            updateTimerUI();
+            if (stageTimer <= 0) {
+                gameState = 'GAMEOVER';
+                inputEl.blur();
+                showPopup('시간 초과! 게임 오버!', 'GAMEOVER');
+                return;
+            }
 
             if (player.stunTimer > 0) player.stunTimer -= dt;
             if (monsterStunTimer > 0) monsterStunTimer -= dt;
@@ -447,11 +526,17 @@
             }
 
             if(document.activeElement !== inputEl) inputEl.focus();
+            
             gameLoopId = requestAnimationFrame(gameLoop);
         }
 
         inputEl.addEventListener('keydown', (e) => {
-            if (gameState === 'GAME' && e.key === 'Enter') {
+            if (gameState !== 'GAME') {
+                e.preventDefault(); 
+                return; 
+            }
+
+            if (e.key === 'Enter') {
                 const word = e.target.value.trim();
                 const now = performance.now();
                 if (player.stunTimer > 0) { e.target.value = ''; return; }
@@ -459,7 +544,6 @@
                 if (SKILLS[word]) {
                     let s = SKILLS[word];
                     
-                    // 쉬움 난이도는 마법 원천 차단 / 지팡이 획득 조건 체크
                     if (s.type === 'mp' && currentDiff === 1) { e.target.value = ''; return; }
                     if (s.reqFlag && !player.flags[s.reqFlag]) { e.target.value = ''; return; }
                     
@@ -483,6 +567,8 @@
 
         function playerAttacksMonster(skillName, skillData) {
             let dmg = skillData.dmg;
+            
+            triggerMonsterShake();
             const hitLines = ["크악!", "아프다!", "이놈이!", "제법이군.."];
             showMonsterChat(hitLines[Math.floor(Math.random() * hitLines.length)]);
 
@@ -502,6 +588,7 @@
             if (dmg > 0) {
                 player.hp -= dmg;
                 updateStatusUI();
+                triggerScreenShake(); 
                 
                 if (monster.id === 'highorc' && !player.flags.hasCombo) {
                     player.flags.hasCombo = true;
@@ -511,6 +598,7 @@
 
                 if (player.hp <= 0) {
                     gameState = 'GAMEOVER';
+                    inputEl.blur(); 
                     showPopup('게임 오버!', 'GAMEOVER');
                 }
             }
@@ -519,6 +607,7 @@
         function monsterDeath() {
             document.getElementById('monster-img').style.display = 'none';
             document.getElementById('monster-gauge-img').style.display = 'none';
+            document.getElementById('monster-shadow').style.display = 'none';
             document.getElementById('monster-hp-bg').style.display = 'none';
             document.getElementById('monster-hp-gauge').style.display = 'none';
             document.getElementById('monster-name-tag').style.display = 'none';
@@ -540,12 +629,13 @@
            UI 렌더링 업데이트 함수들
         ================================================================= */
         function updateStatusUI() {
-            // clip-path를 이용하여 게이지 우측부터 깎음
             let hpRatio = Math.max(0, player.hp / player.maxHp);
             document.getElementById('hp-gauge').style.clipPath = `inset(0 ${100 - hpRatio * 100}% 0 0)`;
+            document.getElementById('hp-text').innerText = `${player.hp}/${player.maxHp}`;
             
             let mpRatio = Math.max(0, player.mp / player.maxMp);
             document.getElementById('mp-gauge').style.clipPath = `inset(0 ${100 - mpRatio * 100}% 0 0)`;
+            document.getElementById('mp-text').innerText = `${player.mp}/${player.maxMp}`;
         }
 
         function updateMonsterHpUI() {
@@ -554,7 +644,6 @@
         }
 
         function updateSkillUI() {
-            // 연속 베기 해금 시 기존 '베기' 텍스트를 좌측으로 밀어냄
             if (player.flags.hasCombo) {
                 document.getElementById('py-1').style.left = '190px';
                 document.getElementById('py-1-extra').style.display = 'block';
@@ -563,7 +652,6 @@
                 document.getElementById('py-1-extra').style.display = 'none';
             }
             
-            // 난이도 쉬움(1)일 때는 마법 텍스트를 모두 ???로 강제 고정
             if (currentDiff === 1) {
                 ['mp-1', 'mp-2', 'mp-3'].forEach(id => {
                     let el = document.getElementById(id);
@@ -573,11 +661,9 @@
             } else {
                 document.getElementById('mp-1').innerText = '매직 애로우';
                 document.getElementById('mp-1').classList.remove('locked-skill');
-                
                 document.getElementById('mp-3').innerText = '쉴드';
                 document.getElementById('mp-3').classList.remove('locked-skill');
                 
-                // 파이어볼 활성화 조건
                 let fbEl = document.getElementById('mp-2');
                 if (player.flags.fireballActive || player.flags.hasStaff) {
                     fbEl.innerText = '파이어볼';
