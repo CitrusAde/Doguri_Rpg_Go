@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Doguri's Adventure</title>
     <style>
-        /* 1. 둥근모 폰트 설정 (Data 폴더) */
+        /* 1. 폰트 세팅 */
         @font-face {
             font-family: 'DungGeunMo';
             src: url('Data/DungGeunMo.ttf') format('truetype');
@@ -24,12 +24,12 @@
             color: #fff;
         }
 
-        /* 2. 메인 게임 화면 컨테이너 (1280x720 16:9 고정) */
+        /* 2. 메인 컨테이너 (1280x720) 및 배경 동적 변경 */
         #game-container {
             position: relative;
             width: 1280px;
             height: 720px;
-            background-image: url('Data/DR_Stage_1_bg.png');
+            /* 초기 배경은 JS에서 설정 */
             background-size: cover;
             background-position: center;
             background-color: #222;
@@ -37,57 +37,35 @@
             box-shadow: 0 0 20px rgba(0,0,0,0.8);
         }
 
-        /* 공통 화면 숨김/표시 클래스 */
+        /* 화면 상태 숨김/표시 */
         .screen {
-            position: absolute;
-            top: 0; left: 0;
+            position: absolute; top: 0; left: 0;
             width: 100%; height: 100%;
-            display: none; /* 기본적으로 숨김 */
+            display: none;
         }
-        .screen.active {
-            display: block; /* 활성화 시 표시 */
-        }
+        .screen.active { display: block; }
 
-        /* 3. 절대 좌표 UI 요소 공통 클래스 */
+        /* 3. 절대 좌표 UI 요소 공통 */
         .ui-element {
             position: absolute;
             object-fit: none; 
         }
 
-        /* UI 버튼들에 마우스 올렸을 때 커서 변경 */
+        /* 4. 클릭 가능한 버튼 + 눌림(Active) 애니메이션 */
         .clickable {
             cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+        .clickable:active {
+            transform: scale(0.95) !important; /* 클릭 시 살짝 작아짐 */
+            filter: brightness(0.8);
         }
 
-        /* 4. 뒤로가기 버튼 (시작 화면 제외하고 항상 표시) */
-        #back-btn {
-            z-index: 100;
-            display: none;
-        }
-
-        /* ================= START SCREEN ================= */
-        #start-screen {
-            background: rgba(0, 0, 0, 0.6);
-        }
-        .logo-text {
-            position: absolute;
-            top: 250px; left: 50%;
-            transform: translateX(-50%);
-            font-size: 80px;
-            text-shadow: 4px 4px 0px #000;
-            text-align: center;
-        }
+        #back-btn { display: none; z-index: 100; }
 
         /* ================= DIFFICULTY SCREEN ================= */
-        #diff-screen {
-            background: rgba(0, 0, 0, 0.8);
-        }
-        .diff-title {
-            position: absolute; top: 150px; left: 50%;
-            transform: translateX(-50%); font-size: 50px;
-        }
         .diff-container {
-            position: absolute; top: 300px; left: 50%;
+            position: absolute; top: 350px; left: 50%;
             transform: translateX(-50%);
             display: flex; gap: 30px;
         }
@@ -95,63 +73,90 @@
             width: 180px; height: 250px;
             border: 3px solid #777; border-radius: 10px;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            font-size: 30px; background: rgba(255,255,255,0.1);
+            font-size: 30px; background: rgba(0,0,0,0.6); cursor: pointer;
+            transition: all 0.2s;
         }
+        .diff-card:hover { border-color: #fff; background: rgba(255,255,255,0.2); }
+        .diff-card:active { transform: scale(0.95); }
 
-        /* ================= GAME SCREEN ================= */
-        /* 게이지가 왼쪽부터 줄어들도록 설정 */
+        /* ================= GAME SCREEN (HP/MP) ================= */
+        /* 게이지가 깎일 때 왼쪽 기준으로 줄어들도록 origin 설정 */
         #hp-gauge, #mp-gauge {
             transform-origin: left center;
             transition: transform 0.2s ease-out;
         }
 
-        /* 몬스터 공격 게이지 (아래에서 위로 차오르는 붉은 반투명 효과) */
-        #monster-attack-gauge {
-            position: absolute;
-            left: 479px; top: 193px;
-            width: 300px; /* 몬스터 이미지 크기에 맞게 추후 조절 필요 */
-            height: 300px;
-            background: rgba(255, 0, 0, 0.4);
-            transform-origin: bottom center;
-            transform: scaleY(0); /* 0에서 시작 */
+        /* 몬스터 자체 공격 게이지 (붉은색 필터가 적용된 복제 이미지) */
+        #monster-gauge-img {
             z-index: 5;
+            /* 붉고 어둡게 만드는 필터 */
+            filter: sepia(1) hue-rotate(320deg) saturate(5) brightness(0.6);
+            /* 초기 상태: 전체가 잘려 안 보임 (아래부터 차오름) */
+            clip-path: inset(100% 0 0 0);
             pointer-events: none;
-            mix-blend-mode: overlay;
         }
 
-        /* 타이핑 입력 창 (중심점 기준 641, 610) */
+        /* 몬스터 말풍선 UI */
+        #monster-chat {
+            position: absolute;
+            left: 700px; /* 몬스터 우측 상단 */
+            top: 100px;
+            background: #fff;
+            color: #000;
+            padding: 15px 25px;
+            border-radius: 20px;
+            font-size: 24px;
+            max-width: 300px;
+            z-index: 10;
+            display: none; /* 평소엔 숨김 */
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+        }
+        /* 말풍선 꼬리 */
+        #monster-chat::before {
+            content: '';
+            position: absolute;
+            bottom: -15px; left: 30px;
+            border-width: 15px 15px 0;
+            border-style: solid;
+            border-color: #fff transparent transparent transparent;
+        }
+
+        /* 중앙 타이핑 입력 창 */
         #typing-input {
             position: absolute;
             left: 641px; top: 610px;
             transform: translate(-50%, -50%);
-            background: transparent;
-            border: none;
-            color: #fff;
-            font-size: 36px;
-            font-family: 'DungGeunMo', sans-serif;
-            text-align: center;
-            outline: none;
-            width: 350px;
-            z-index: 20;
+            background: transparent; border: none; color: #fff;
+            font-size: 36px; font-family: 'DungGeunMo', sans-serif;
+            text-align: center; outline: none; width: 350px; z-index: 20;
         }
-        #typing-input::placeholder { color: rgba(255,255,255,0.5); }
 
-        /* 스킬 텍스트 목록 영역 (배경 이미지 위에 텍스트 배치) */
-        .skill-list {
+        /* 스킬 텍스트 쿨타임 효과 (글자 색상 차오르기) */
+        .skill-text {
             position: absolute;
-            font-size: 24px;
-            line-height: 1.8;
+            transform: translate(-50%, -50%); /* 중심점 정렬 */
+            font-size: 26px;
+            font-weight: bold;
             z-index: 10;
+            /* 쿨타임 그라디언트 텍스트 마스크 */
+            background: linear-gradient(to top, #fff var(--fill, 100%), #444 var(--fill, 100%));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        #py-skills { left: 140px; top: 540px; }
-        #mp-skills { left: 920px; top: 540px; text-align: right; width: 220px; }
 
-        /* 골드 표시 UI (임시 텍스트) */
+        /* 물리 스킬 (Py) */
+        #py-1 { left: 249px; top: 580px; }
+        #py-2 { left: 249px; top: 610px; }
+        #py-3 { left: 249px; top: 640px; }
+
+        /* 마법 스킬 (Mp) */
+        #mp-1 { left: 1030px; top: 580px; }
+        #mp-2 { left: 1030px; top: 610px; }
+        #mp-3 { left: 1030px; top: 640px; }
+
         #gold-display {
             position: absolute; left: 40px; top: 30px;
-            font-size: 30px; color: #ffd700;
-            text-shadow: 2px 2px 0px #000;
-            z-index: 10;
+            font-size: 30px; color: #ffd700; text-shadow: 2px 2px 0px #000; z-index: 10;
         }
     </style>
 </head>
@@ -159,49 +164,67 @@
 
     <div id="game-container">
         
+        <!-- 공통 뒤로가기 버튼 -->
         <img id="back-btn" src="Data/DR_Back_Button.png" class="ui-element clickable" style="left: 1084px; top: 31px;" onclick="goBack()" alt="Back">
 
+        <!-- 1. 시작 화면 -->
         <div id="start-screen" class="screen active">
-            <div class="logo-text">Doguri's<br>Adventure</div>
+            <!-- 로고 -->
+            <img src="Data/DR_Logo.png" class="ui-element" style="left: 332px; top: 58px;" alt="Logo">
+            <!-- 시작 버튼 -->
             <img src="Data/DR_Start_Button.png" class="ui-element clickable" style="left: 530.5px; top: 567px;" onclick="switchScreen('diff-screen')" alt="Start">
         </div>
 
+        <!-- 2. 난이도 선택 화면 -->
         <div id="diff-screen" class="screen">
-            <div class="diff-title">난이도 선택</div>
             <div class="diff-container">
-                <div class="diff-card">쉬움<br><span style="font-size:20px; color:#aaa; margin-top:10px;">[1] 키</span></div>
-                <div class="diff-card">보통<br><span style="font-size:20px; color:#aaa; margin-top:10px;">[2] 키</span></div>
-                <div class="diff-card">어려움<br><span style="font-size:20px; color:#aaa; margin-top:10px;">[3] 키</span></div>
-                <div class="diff-card">매우어려움<br><span style="font-size:20px; color:#aaa; margin-top:10px;">[4] 키</span></div>
+                <div class="diff-card" onclick="startGame(1)">쉬움<br><span style="font-size:20px; color:#aaa; margin-top:10px;">[1] 키</span></div>
+                <div class="diff-card" onclick="startGame(2)">보통<br><span style="font-size:20px; color:#aaa; margin-top:10px;">[2] 키</span></div>
+                <div class="diff-card" onclick="startGame(3)">어려움<br><span style="font-size:20px; color:#aaa; margin-top:10px;">[3] 키</span></div>
+                <div class="diff-card" onclick="startGame(4)">최상<br><span style="font-size:20px; color:#aaa; margin-top:10px;">[4] 키</span></div>
             </div>
         </div>
 
+        <!-- 3. 게임 플레이 화면 -->
         <div id="game-screen" class="screen">
             
             <div id="gold-display">Gold: <span id="gold-val">0</span></div>
 
+            <!-- 몬스터 영역 -->
+            <!-- 원본 몬스터 -->
             <img id="monster-img" src="Data/DR_Monster_Kobold.png" class="ui-element" style="left: 479px; top: 193px; z-index: 4;" alt="Kobold">
-            <div id="monster-attack-gauge"></div> <img src="Data/DR_Monster_Kobold_Name.png" class="ui-element" style="left: 579px; top: 140px; z-index: 6;" alt="Kobold Name">
+            <!-- 붉은 게이지용 몬스터 복제본 -->
+            <img id="monster-gauge-img" src="Data/DR_Monster_Kobold.png" class="ui-element" style="left: 479px; top: 193px;" alt="Kobold Gauge">
+            
+            <img src="Data/DR_Monster_Kobold_Name.png" class="ui-element" style="left: 579px; top: 140px; z-index: 6;" alt="Kobold Name">
 
+            <!-- 몬스터 말풍선 -->
+            <div id="monster-chat"></div>
+
+            <!-- HP/MP 배경 및 게이지 (좌표 확인 및 재적용) -->
             <img src="Data/DR_HP_Bg.png" class="ui-element" style="left: 170px; top: 459px; z-index: 1;" alt="HP Background">
             <img src="Data/DR_MP_Bg.png" class="ui-element" style="left: 880px; top: 439px; z-index: 1;" alt="MP Background">
 
             <img id="hp-gauge" src="Data/DR_HP_Gauge.png" class="ui-element" style="left: 269.5px; top: 470px; z-index: 2;" alt="HP Gauge">
             <img id="mp-gauge" src="Data/DR_MP_Gauge.png" class="ui-element" style="left: 947px; top: 459px; z-index: 2;" alt="MP Gauge">
 
-            <img src="Data/DR_Py_Attack_Bg.png" class="ui-element" style="left: 120px; top: 494px; z-index: 1;" alt="Physical Background">
-            <img src="Data/DR_Mp_Attack_Bg.png" class="ui-element" style="left: 900px; top: 493px; z-index: 1;" alt="Magic Background">
+            <!-- 스킬 UI 배경 -->
+            <img src="Data/DR_Py_Attack_Bg.png" class="ui-element" style="left: 120px; top: 494px; z-index: 1;" alt="Physical">
+            <img src="Data/DR_Mp_Attack_Bg.png" class="ui-element" style="left: 900px; top: 493px; z-index: 1;" alt="Magic">
             
-            <img src="Data/DR_Text_Attack_Bg.png" class="ui-element" style="left: 446px; top: 495px; z-index: 1;" alt="Text Input Background">
-            <img src="Data/DR_Attack_Time.png" class="ui-element" style="left: 473px; top: 668px; z-index: 1;" alt="Attack Time">
+            <img src="Data/DR_Text_Attack_Bg.png" class="ui-element" style="left: 446px; top: 495px; z-index: 1;" alt="Text Input">
+            <img src="Data/DR_Attack_Time.png" class="ui-element" style="left: 473px; top: 668px; z-index: 1;" alt="Time">
 
-            <div id="py-skills" class="skill-list">
-                찌르기<br>베기
-            </div>
-            <div id="mp-skills" class="skill-list">
-                파이어볼<br>아이스볼
-            </div>
+            <!-- 스킬 텍스트 (쿨타임 게이지 적용) -->
+            <div id="py-1" class="skill-text">베기</div>
+            <div id="py-2" class="skill-text">찌르기</div>
+            <div id="py-3" class="skill-text">방어</div>
 
+            <div id="mp-1" class="skill-text">매직에로우</div>
+            <div id="mp-2" class="skill-text">파이어볼</div>
+            <div id="mp-3" class="skill-text">쉴드</div>
+
+            <!-- 중앙 타이핑 입력창 -->
             <input type="text" id="typing-input" autocomplete="off" spellcheck="false" placeholder="스킬 입력">
 
         </div>
@@ -209,33 +232,67 @@
 
     <script>
         /* =================================================================
-           데이터 및 설정 관리 (추후 수정 용이)
+           데이터 및 설정
         ================================================================= */
+        // 배경 이미지 매핑 리스트
+        const BG_MAP = {
+            main: 'url("Data/DR_Main_Bg.png")',
+            select: 'url("Data/DR_Game_Select_Bg.png")',
+            stages: {
+                1: ['url("Data/DR_Easy_stage_1_Bg.png")', 'url("Data/DR_Easy_stage_2_Bg.png")', 'url("Data/DR_Easy_stage_3_Bg.png")'],
+                2: ['url("Data/DR_Normal_stage_1_Bg.png")', 'url("Data/DR_Normal_stage_2_Bg.png")', 'url("Data/DR_Normal_stage_3_Bg.png")'],
+                3: ['url("Data/DR_Hard_stage_1_Bg.png")', 'url("Data/DR_Hard_stage_2_Bg.png")', 'url("Data/DR_Hard_stage_3_Bg.png")'],
+                4: ['url("Data/DR_Extreme_stage_1_Bg.png")', 'url("Data/DR_Extreme_stage_2_Bg.png")', 'url("Data/DR_Extreme_stage_3_Bg.png")']
+            }
+        };
+
         const CONFIG = {
             playerMaxHp: 10,
             monsterMaxHp: 3,
-            monsterAttackInterval: 3000, // 3000ms = 3초
+            monsterAttackInterval: 3000, 
             monsterDamage: 1,
             goldDrop: 1
         };
 
         const SKILLS = {
-            '찌르기': { dmg: 1 },
-            '베기':   { dmg: 1 },
-            '파이어볼': { dmg: 2 },
-            '아이스볼': { dmg: 2 }
+            '베기': { dmg: 1, cd: 2000, elementId: 'py-1' },
+            '찌르기': { dmg: 1, cd: 2000, elementId: 'py-2' },
+            '방어': { dmg: 0, cd: 3000, elementId: 'py-3' },
+            '매직에로우': { dmg: 1, cd: 1500, elementId: 'mp-1' },
+            '파이어볼': { dmg: 2, cd: 2500, elementId: 'mp-2' },
+            '쉴드': { dmg: 0, cd: 3000, elementId: 'mp-3' }
         };
 
-        let gameState = 'START'; // START, DIFF, GAME
-        let player = { hp: CONFIG.playerMaxHp, gold: 0 };
+        const MONSTER_LINES = [
+            "'플레이어' 널 죽이러 왔다.",
+            "크아악! 제법이군.",
+            "내 공격을 받아봐라!",
+            "겨우 그정도냐?",
+            "도구리의 힘을 보여주마!"
+        ];
+
+        let gameState = 'START';
+        let currentDiff = 1;
+        let currentStage = 0; // 0, 1, 2
+        
+        let player = { hp: CONFIG.playerMaxHp, gold: 0, cooldowns: {} };
         let monster = { hp: CONFIG.monsterMaxHp };
         
         let lastTime = 0;
         let monsterAttackTimer = 0;
         let gameLoopId = null;
 
+        // 게임 컨테이너 
+        const container = document.getElementById('game-container');
+        
+        // 초기 쿨타임 세팅
+        Object.keys(SKILLS).forEach(key => player.cooldowns[key] = 0);
+
+        // 초기 화면 배경 렌더링
+        container.style.backgroundImage = BG_MAP.main;
+
         /* =================================================================
-           화면 전환 및 UI 컨트롤 로직
+           상태 전환 (State Machine)
         ================================================================= */
         function switchScreen(screenId) {
             document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
@@ -245,60 +302,76 @@
 
             if (screenId === 'start-screen') {
                 gameState = 'START';
+                container.style.backgroundImage = BG_MAP.main;
                 backBtn.style.display = 'none';
                 stopGameLoop();
             } 
             else if (screenId === 'diff-screen') {
                 gameState = 'DIFF';
+                container.style.backgroundImage = BG_MAP.select;
                 backBtn.style.display = 'block';
-            } 
-            else if (screenId === 'game-screen') {
-                gameState = 'GAME';
-                backBtn.style.display = 'block';
-                initGame();
             }
+        }
+
+        function startGame(difficulty) {
+            currentDiff = difficulty;
+            currentStage = 0; // 스테이지 1
+            gameState = 'GAME';
+            
+            document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+            document.getElementById('game-screen').classList.add('active');
+            
+            // 난이도에 맞는 배경 설정
+            container.style.backgroundImage = BG_MAP.stages[currentDiff][currentStage];
+
+            // 쿨타임 초기화
+            const now = performance.now();
+            Object.keys(SKILLS).forEach(key => player.cooldowns[key] = now - SKILLS[key].cd);
+
+            initGame();
         }
 
         function goBack() {
             if (gameState === 'DIFF') {
                 switchScreen('start-screen');
             } else if (gameState === 'GAME') {
-                // 게임 진행 중 뒤로가기 시 경고창 추가 가능, 지금은 바로 시작화면으로
-                switchScreen('start-screen'); 
+                switchScreen('diff-screen'); 
             }
         }
 
-        /* =================================================================
-           입력(키보드) 이벤트 핸들러
-        ================================================================= */
         document.addEventListener('keydown', (e) => {
-            // 난이도 화면에서 1, 2, 3, 4 키 입력 처리
-            if (gameState === 'DIFF') {
-                if (['1', '2', '3', '4'].includes(e.key)) {
-                    // 난이도 데이터 저장 로직 추가 가능 (ex: 1=쉬움, 2=보통...)
-                    console.log(`난이도 ${e.key} 선택됨`);
-                    switchScreen('game-screen');
-                }
+            if (gameState === 'DIFF' && ['1','2','3','4'].includes(e.key)) {
+                startGame(parseInt(e.key));
             }
         });
 
-        // 타이핑 공격 로직
+        /* =================================================================
+           게임 핵심 로직 & 쿨타임/게이지 루프
+        ================================================================= */
         const inputEl = document.getElementById('typing-input');
+        
         inputEl.addEventListener('keydown', (e) => {
             if (gameState === 'GAME' && e.key === 'Enter') {
                 const word = e.target.value.trim();
+                const now = performance.now();
+                
                 if (SKILLS[word]) {
-                    attackMonster(SKILLS[word].dmg);
+                    const skill = SKILLS[word];
+                    // 쿨타임 체크
+                    if (now - player.cooldowns[word] >= skill.cd) {
+                        player.cooldowns[word] = now; // 쿨타임 리셋
+                        if (skill.dmg > 0) attackMonster(skill.dmg);
+                    } else {
+                        // 쿨타임 중 입력 시 인풋창 흔들림 연출 (옵션)
+                        inputEl.style.transform = 'translate(-50%, -50%) translateX(10px)';
+                        setTimeout(() => inputEl.style.transform = 'translate(-50%, -50%)', 100);
+                    }
                 }
-                e.target.value = ''; // 입력창 비우기
+                e.target.value = '';
             }
         });
 
-        /* =================================================================
-           게임 플레이 핵심 로직 (루프, 공격, 체력 관리)
-        ================================================================= */
         function initGame() {
-            // 초기화
             player.hp = CONFIG.playerMaxHp;
             monster.hp = CONFIG.monsterMaxHp;
             monsterAttackTimer = 0;
@@ -306,11 +379,11 @@
             
             updateHpUI();
             document.getElementById('gold-val').innerText = player.gold;
+            document.getElementById('monster-chat').style.display = 'none';
             
             inputEl.value = '';
             inputEl.focus();
 
-            // 게임 루프 시작
             gameLoopId = requestAnimationFrame(gameLoop);
         }
 
@@ -323,60 +396,101 @@
 
         function gameLoop(currentTime) {
             if (gameState !== 'GAME') return;
-
             const deltaTime = currentTime - lastTime;
             lastTime = currentTime;
 
-            // 몬스터 공격 타이머 누적
+            // 1. 몬스터 공격 타이머 시각화 (이미지 자체 게이지)
             monsterAttackTimer += deltaTime;
-            
-            // 시각화 (0 ~ 1 사이의 비율로 스케일 증가)
             let ratio = monsterAttackTimer / CONFIG.monsterAttackInterval;
             if (ratio > 1) ratio = 1;
-            document.getElementById('monster-attack-gauge').style.transform = `scaleY(${ratio})`;
+            
+            // clip-path를 이용해 위에서부터 아래로 깎아내림 (100%면 안보이고 0%면 다보임)
+            const insetPercent = 100 - (ratio * 100);
+            document.getElementById('monster-gauge-img').style.clipPath = `inset(${insetPercent}% 0 0 0)`;
 
-            // 3초(3000ms) 도달 시 플레이어 피격
+            // 몬스터 타격
             if (monsterAttackTimer >= CONFIG.monsterAttackInterval) {
                 monsterAttackTimer = 0;
                 playerTakesDamage(CONFIG.monsterDamage);
             }
 
-            // 인풋창 포커스 유지
-            if(document.activeElement !== inputEl) inputEl.focus();
+            // 2. 텍스트 스킬 쿨타임 시각화
+            for (const [skillName, skillData] of Object.entries(SKILLS)) {
+                const timePassed = currentTime - player.cooldowns[skillName];
+                let cdPercent = (timePassed / skillData.cd) * 100;
+                if (cdPercent > 100) cdPercent = 100;
+                
+                const skillEl = document.getElementById(skillData.elementId);
+                if (skillEl) {
+                    skillEl.style.setProperty('--fill', `${cdPercent}%`);
+                }
+            }
 
+            if(document.activeElement !== inputEl) inputEl.focus();
             gameLoopId = requestAnimationFrame(gameLoop);
         }
 
+        /* =================================================================
+           전투 상호작용 및 말풍선 연출
+        ================================================================= */
+        let typeWriterTimeout = null;
+        
         function attackMonster(dmg) {
             monster.hp -= dmg;
             
-            // 몬스터 사망 처리
+            // 말풍선 연출
+            showMonsterChat(MONSTER_LINES[Math.floor(Math.random() * MONSTER_LINES.length)]);
+            
             if (monster.hp <= 0) {
                 player.gold += CONFIG.goldDrop;
                 document.getElementById('gold-val').innerText = player.gold;
                 
-                // 임시: 즉시 부활 및 타이머 초기화 (나중에 연출 추가 가능)
+                // 스테이지 배경 임시 전환 (1, 2, 3 순환)
+                currentStage = (currentStage + 1) % 3;
+                container.style.backgroundImage = BG_MAP.stages[currentDiff][currentStage];
+
                 monster.hp = CONFIG.monsterMaxHp;
                 monsterAttackTimer = 0; 
-                console.log("몬스터 처치! +1 골드");
             }
         }
 
         function playerTakesDamage(dmg) {
             player.hp -= dmg;
             updateHpUI();
-
             if (player.hp <= 0) {
-                alert("게임 오버! 시작 화면으로 돌아갑니다.");
-                player.gold = 0; // 골드 초기화
-                switchScreen('start-screen');
+                alert("게임 오버! 난이도 선택 화면으로 돌아갑니다.");
+                player.gold = 0; 
+                switchScreen('diff-screen');
             }
         }
 
         function updateHpUI() {
             const hpRatio = Math.max(0, player.hp / CONFIG.playerMaxHp);
-            // 게이지 이미지를 스케일로 줄임
             document.getElementById('hp-gauge').style.transform = `scaleX(${hpRatio})`;
+        }
+
+        // 말풍선 타이핑 연출
+        function showMonsterChat(text) {
+            const chatBox = document.getElementById('monster-chat');
+            chatBox.style.display = 'block';
+            chatBox.innerText = '';
+            
+            if(typeWriterTimeout) clearTimeout(typeWriterTimeout);
+            
+            let i = 0;
+            function typing() {
+                if (i < text.length) {
+                    chatBox.innerText += text.charAt(i);
+                    i++;
+                    typeWriterTimeout = setTimeout(typing, 50); // 타이핑 속도
+                } else {
+                    // 대사 출력이 끝나고 2초 뒤 사라짐
+                    typeWriterTimeout = setTimeout(() => {
+                        chatBox.style.display = 'none';
+                    }, 2000);
+                }
+            }
+            typing();
         }
     </script>
 </body>
