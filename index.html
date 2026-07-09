@@ -438,6 +438,15 @@
            키보드 조작
         ================================================================= */
         document.addEventListener('keydown', (e) => {
+            // [추가된 치트키] 숫자 0을 누르면 몬스터 즉사
+            if (e.key === '0') {
+                if (gameState === 'GAME' && monster && monster.hp > 0) {
+                    monster.hp = 0;
+                    updateMonsterHpUI();
+                    triggerMonsterDeath();
+                }
+            }
+
             if (e.code === 'Space') {
                 if (gameState === 'START') { switchScreen('diff-screen'); } 
                 else if (gameState === 'DIFF') { checkAndStartGame(); } 
@@ -463,7 +472,6 @@
                 if (e.key === '2') closeMarketInfo();
             }
         });
-
         /* =================================================================
            UI 및 화면 전환 컨트롤
         ================================================================= */
