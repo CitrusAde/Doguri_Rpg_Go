@@ -65,14 +65,13 @@
         }
 
         /* 몬스터 사망 효과 */
-        .monster-dead {
-            filter: brightness(0) !important;
-            opacity: 0;
-            transition: all 0.5s ease;
-        }
+        .monster-dead { filter: brightness(0) !important; opacity: 0; transition: all 0.5s ease; }
 
         #hp-gauge, #mp-gauge, #monster-hp-gauge, #attack-time-gauge { transition: clip-path 0.2s ease-out; }
         
+        /* 독 상태이상 게이지 색상 변경 */
+        .poisoned-hp { filter: hue-rotate(90deg) saturate(200%) brightness(0.8); }
+
         .status-text {
             position: absolute; transform: translate(-50%, -50%);
             font-size: 20px; font-weight: bold; color: #fff; z-index: 3;
@@ -84,7 +83,7 @@
             clip-path: inset(100% 0 0 0); pointer-events: none;
         }
 
-        /* 대사 폰트 5px 감소 및 굵게 유지 */
+        /* 몬스터/플레이어 대사 폰트 */
         #monster-chat {
             position: absolute; left: 700px; top: 250px; background: #fff; color: #000;
             padding: 15px 25px; border-radius: 20px; font-size: 19px; max-width: 300px;
@@ -117,6 +116,17 @@
             white-space: pre-wrap; line-height: 1.5;
         }
 
+        /* 엔딩 크레딧 레이어 */
+        #credits-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 300; display: none; flex-direction: column;
+            justify-content: center; align-items: center;
+        }
+        #credits-text {
+            font-size: 30px; color: #fff; text-align: center; white-space: pre-wrap; line-height: 2;
+        }
+
+        /* 스킬 텍스트 공통 */
         .skill-text {
             position: absolute; transform: translate(-50%, -50%); font-size: 26px; font-weight: bold; z-index: 10;
             background: linear-gradient(to top, #fff var(--fill, 100%), #444 var(--fill, 100%));
@@ -125,13 +135,16 @@
         }
         .locked-skill { color: #555 !important; background: none !important; -webkit-text-fill-color: #555 !important; }
 
+        /* 물리 스킬 */
         #py-1 { left: 250px; top: 580.5px; }
         #py-1-extra { left: 310px; top: 580.5px; display: none; }
         #py-2 { left: 250px; top: 610.5px; }
         #py-3 { left: 250px; top: 640.5px; }
+        /* 마법 스킬 */
         #mp-1 { left: 1030px; top: 580.5px; }
         #mp-2 { left: 1030px; top: 610.5px; }
         #mp-3 { left: 1030px; top: 640.5px; }
+        #mp-3-extra { left: 1110px; top: 640.5px; display: none; } /* 라이트닝 */
 
         /* 흔들림 애니메이션 */
         @keyframes shake-anim {
@@ -159,7 +172,6 @@
 </head>
 <body>
 
-    <!-- 오디오 엘리먼트 (더미 소스, 실제 환경에서 연결) -->
     <audio id="bgm" src="Data/bgm.mp3" loop></audio>
     <audio id="sfx-atk" src="Data/attack.mp3"></audio>
     <audio id="sfx-hit" src="Data/hit.mp3"></audio>
@@ -242,6 +254,7 @@
             <div id="mp-1" class="skill-text">매직 애로우</div>
             <div id="mp-2" class="skill-text">파이어볼</div>
             <div id="mp-3" class="skill-text">쉴드</div>
+            <div id="mp-3-extra" class="skill-text">라이트닝</div>
         </div>
 
         <!-- 4. 팝업 레이어 -->
@@ -260,7 +273,7 @@
             <img id="market-next-btn" src="Data/DR_Next_Button.png" class="ui-element clickable" style="left: 640px; top: 460px;" onclick="closeMarketAndNext(event)" alt="Next">
         </div>
 
-        <!-- 6. 아이템 정보 팝업 레이어 (상점 위) -->
+        <!-- 6. 아이템 정보 팝업 레이어 -->
         <div id="market-info-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 160; display: none;">
             <img src="Data/DR_Item_info_popup.png" class="ui-element" style="left: 640px; top: 321px;">
             <img id="info-item-img" src="" class="ui-element" style="left: 479px; top: 281px;">
@@ -269,6 +282,12 @@
             
             <img src="Data/DR_Item_buy.png" class="ui-element clickable" style="left: 520px; top: 396px;" onclick="buyItem(event)" alt="Buy">
             <img src="Data/DR_Item_cancel.png" class="ui-element clickable" style="left: 760px; top: 396px;" onclick="closeMarketInfo(event)" alt="Cancel">
+        </div>
+        
+        <!-- 7. 엔딩 크레딧 레이어 -->
+        <div id="credits-layer">
+            <div id="credits-text"></div>
+            <img id="credits-next-btn" src="Data/DR_Next_Button.png" class="ui-element clickable" style="left: 640px; top: 600px; display:none;" onclick="goBack(event)" alt="Next">
         </div>
 
     </div>
@@ -290,48 +309,70 @@
             '베기': { type: 'py', dmg: 1, cd: 1000, mp: 0, el: 'py-1' },
             '연속 베기': { type: 'py', dmg: 3, cd: 2000, mp: 0, el: 'py-1-extra', reqFlag: 'hasCombo' },
             '찌르기': { type: 'py', dmg: 1, cd: 2000, mp: 0, el: 'py-2' },
-            '방어': { type: 'py', dmg: 0, cd: 500, mp: 0, el: 'py-3' }, // 방어 쿨 0.5s
+            '방어': { type: 'py', dmg: 0, cd: 500, mp: 0, el: 'py-3' }, 
             '매직 애로우': { type: 'mp', dmg: 2, cd: 2000, mp: 2, el: 'mp-1' },
             '파이어볼': { type: 'mp', dmg: 3, cd: 3000, mp: 3, el: 'mp-2', reqFlag: 'fireballActive' },
-            '쉴드': { type: 'mp', dmg: 0, cd: 2000, mp: 2, el: 'mp-3' }
+            '쉴드': { type: 'mp', dmg: 0, cd: 2000, mp: 2, el: 'mp-3' },
+            '라이트닝': { type: 'mp', dmg: 5, cd: 5000, mp: 5, el: 'mp-3-extra', reqFlag: 'lightningActive' }
         };
 
         const STAGE_DATA = {
             1: [ 
-                { id: 'kobold', name: '코볼트', hp: 5, atk: 1, cd: 5000, img: 'DR_Monster_Kobold.png', bgIdx: 0 },
-                { id: 'goblin', name: '고블린', hp: 7, atk: 1, cd: 4000, img: 'DR_Monster_Goblin.png', bgIdx: 0 },
-                { id: 'orc', name: '오크', hp: 9, atk: 1, cd: 4000, img: 'DR_Monster_Orc.png', bgIdx: 0 },
-                { id: 'highorc', name: '하이오크', hp: 12, atk: 2, cd: 4000, img: 'DR_Monster_High_Orc.png', isBoss: true, bgIdx: 0 },
-                { id: 'slime', name: '슬라임', hp: 5, atk: 1, cd: 5000, img: 'DR_Monster_Slime.png', bgIdx: 1 },
-                { id: 'swarm1', name: '거대 모기 벌레', hp: 5, atk: 2, cd: 4000, img: 'DR_Monster_Swarm.png', bgIdx: 1 },
-                { id: 'ghoul', name: '구울', hp: 9, atk: 1, cd: 4000, img: 'DR_Monster_Ghoul.png', bgIdx: 1 },
-                { id: 'troll', name: '트롤', hp: 20, atk: 2, cd: 3000, img: 'DR_Monster_Troll.png', isBoss: true, bgIdx: 1 }
+                { id: 'kobold', nameImg: 'DR_Monster_Kobold_Name.png', hp: 5, atk: 1, cd: 5000, img: 'DR_Monster_Kobold.png', bgIdx: 0 },
+                { id: 'goblin', nameImg: 'DR_Monster_Goblin_Name.png', hp: 7, atk: 1, cd: 4000, img: 'DR_Monster_Goblin.png', bgIdx: 0 },
+                { id: 'orc', nameImg: 'DR_Monster_Orc_Name.png', hp: 9, atk: 1, cd: 4000, img: 'DR_Monster_Orc.png', bgIdx: 0 },
+                { id: 'highorc', nameImg: 'DR_Monster_High_Orc_Name.png', hp: 12, atk: 2, cd: 4000, img: 'DR_Monster_High_Orc.png', isBoss: true, bgIdx: 0 },
+                { id: 'slime', nameImg: 'DR_Monster_Slime_Name.png', hp: 5, atk: 1, cd: 5000, img: 'DR_Monster_Slime.png', bgIdx: 1 },
+                { id: 'swarm1', nameImg: 'DR_Monster_Mosquito_Name.png', hp: 5, atk: 2, cd: 4000, img: 'DR_Monster_Swarm.png', bgIdx: 1 },
+                { id: 'ghoul', nameImg: 'DR_Monster_Ghoul_Name.png', hp: 9, atk: 1, cd: 4000, img: 'DR_Monster_Ghoul.png', dropItem: '마법 지팡이', bgIdx: 1 },
+                { id: 'troll', nameImg: 'DR_Monster_Troll_Name.png', hp: 20, atk: 2, cd: 3000, img: 'DR_Monster_Troll.png', isBoss: true, bgIdx: 1 }
             ],
             2: [ 
-                { id: 'swarm2', name: '박쥐 떼', hp: 8, atk: 3, cd: 4000, img: 'DR_Monster_Swarm.png', bgIdx: 0 },
-                { id: 'golem', name: '바위 골렘', hp: 15, atk: 2, cd: 4000, img: 'DR_Monster_Golem.png', bgIdx: 0 },
-                { id: 'spider', name: '거대 독거미', hp: 10, atk: 1, cd: 3000, img: 'DR_Monster_Spider.png', bgIdx: 0 },
-                { id: 'scorpion', name: '크리스탈 스콜피온', hp: 25, atk: 3, cd: 3000, img: 'DR_Monster_Spider.png', dropItem: '파이어볼 해금', isBoss: true, bgIdx: 0 },
-                { id: 'wolf', name: '늑대', hp: 10, atk: 2, cd: 4000, img: 'DR_Monster_Scorpion.png', bgIdx: 1 },
-                { id: 'harpy', name: '하피', hp: 15, atk: 3, cd: 3000, img: 'DR_Monster_Harpy.png', bgIdx: 1 },
-                { id: 'mandragora', name: '만드라고라', hp: 10, atk: 4, cd: 3000, img: 'DR_Monster_Mandragora.png', bgIdx: 1 },
-                { id: 'griffin', name: '그리핀', hp: 15, atk: 2, cd: 3000, img: 'DR_Monster_Griffin.png', dropItem: '쉴드 해금', isBoss: true, bgIdx: 1 },
-                { id: 'ghoul_normal', name: '구울', hp: 12, atk: 2, cd: 4000, img: 'DR_Monster_Ghoul.png', dropItem: '마법 지팡이', bgIdx: 1 } // 지팡이 해금용 구울 (Normal)
+                { id: 'swarm2', nameImg: 'DR_Monster_Swarm_Name.png', hp: 8, atk: 3, cd: 4000, img: 'DR_Monster_Swarm.png', bgIdx: 0 },
+                { id: 'golem', nameImg: 'DR_Monster_Golem_Name.png', hp: 15, atk: 2, cd: 4000, img: 'DR_Monster_Golem.png', bgIdx: 0 },
+                { id: 'spider', nameImg: 'DR_Monster_Spider_Name.png', hp: 10, atk: 1, cd: 3000, img: 'DR_Monster_Spider.png', bgIdx: 0 },
+                { id: 'scorpion', nameImg: 'DR_Monster_Scorpion_Name.png', hp: 25, atk: 3, cd: 3000, img: 'DR_Monster_Spider.png', dropItem: '파이어볼 해금', isBoss: true, bgIdx: 0 },
+                { id: 'wolf', nameImg: 'DR_Monster_Wolf_Name.png', hp: 10, atk: 2, cd: 4000, img: 'DR_Monster_Scorpion.png', bgIdx: 1 },
+                { id: 'harpy', nameImg: 'DR_Monster_Harpy_Name.png', hp: 15, atk: 3, cd: 3000, img: 'DR_Monster_Harpy.png', bgIdx: 1 },
+                { id: 'mandragora', nameImg: 'DR_Monster_Mandragora_Name.png', hp: 10, atk: 4, cd: 3000, img: 'DR_Monster_Mandragora.png', bgIdx: 1 },
+                { id: 'griffin', nameImg: 'DR_Monster_Griffin_Name.png', hp: 15, atk: 2, cd: 3000, img: 'DR_Monster_Griffin.png', dropItem: '쉴드 해금', isBoss: true, bgIdx: 1 }
             ],
             3: [ 
-                { id: 'skeleton', name: '해골 병사', hp: 15, atk: 2, cd: 2000, img: 'DR_Monster_Skeleton.png', bgIdx: 0 },
-                { id: 'gargoyle', name: '가고일', hp: 15, atk: 5, cd: 3000, img: 'DR_Monster_Gargoyle.png', bgIdx: 0 },
-                { id: 'dullahan', name: '듀라한', hp: 30, atk: 3, cd: 3000, img: 'DR_Monster_Dullahan.png', isBoss: true, bgIdx: 0 },
-                { id: 'succubus', name: '서큐버스', hp: 20, atk: 5, cd: 3000, img: 'DR_Monster_Succubus.png', bgIdx: 1 },
-                { id: 'demon', name: '마왕', hp: 40, atk: 10, cd: 3000, img: 'DR_Monster_Demon.png', isBoss: true, bgIdx: 1 }
+                { id: 'skeleton', nameImg: 'DR_Monster_Skeleton_Name.png', hp: 15, atk: 2, cd: 2000, img: 'DR_Monster_Skeleton.png', bgIdx: 0 },
+                { id: 'gargoyle', nameImg: 'DR_Monster_Gargoyle_Name.png', hp: 15, atk: 5, cd: 3000, img: 'DR_Monster_Gargoyle.png', bgIdx: 0 },
+                { id: 'dullahan', nameImg: 'DR_Monster_Dullahan_Name.png', hp: 30, atk: 3, cd: 3000, img: 'DR_Monster_Dullahan.png', isBoss: true, bgIdx: 0 },
+                { id: 'succubus', nameImg: 'DR_Monster_Succubus_Name.png', hp: 20, atk: 5, cd: 3000, img: 'DR_Monster_Succubus.png', bgIdx: 1 },
+                { id: 'demon', nameImg: 'DR_Monster_Demon_Name.png', hp: 40, atk: 10, cd: 3000, img: 'DR_Monster_Demon.png', isBoss: true, bgIdx: 1 }
             ]
         };
 
         const STAGE_DIALOGUE = {
             'kobold': { intro: { m: "키킥, 약탈!", p: "갑자기 마을에 몬스터라니..?" }, outro: { p: "뭔가 이상해.. 다른 곳으로 가봐야겠어!" } },
-            'goblin': { intro: { m: "어딜 그리 급히 가시나!", p: "넌 또 뭐야!" }, outro: { p: "코볼트에 고블린? 심상치 않아." } },
-            'orc': { intro: { m: "죽인다!", p: "이런.. 오크까지..!" }, outro: { p: "지체할 시간이 없어!" } },
-            'highorc': { intro: { m: "넌 못 지나간다!", p: "비켜!" }, outro: { p: "마을은 정리가 어느정도 된 것 같네.." } }
+            'goblin': { intro: { m: "어딜 그리 급히 가시나!", p: "넌 또 뭐야!" }, outro: { p: "이런 잡몹이 내 앞길을 막다니!" } },
+            'orc': { intro: { m: "죽인다!", p: "이런.. 오크까지..!" }, outro: { p: "슬슬 적응이 되는걸?" } },
+            'highorc': { intro: { m: "넌 못 지나간다!", p: "비켜!" }, outro: { p: "마을은 정리 됐으니 다른 곳으로!!" } },
+            
+            'slime': { intro: { m: "꾸르릉...", p: "뭐야 이 액체는?" }, outro: { p: "옷이 더러워졌어!!" } },
+            'swarm1': { intro: { m: "위이이잉!!", p: "벌레라니 제일 싫어!" }, outro: { p: "여름이었다." } },
+            'ghoul': { intro: { m: "구울은 울지 않아.", p: "아이고 부장님" }, outro: { p: "지팡이? 이것만 있다면 나도 마검사?" } },
+            'troll': { intro: { m: "나는 불에 약할지도!!", p: "그렇다면..!" }, outro: { p: "몬스터마다 약점이 존재하는걸까?" } },
+
+            'swarm2': { intro: { m: "피를 빨아주마!!", p: "박쥐가 말을 한다!!" }, outro: { p: "헌혈은 사람의 생명을 살릴 수 있습니다." } },
+            'golem': { intro: { m: "나는 물리 공격으론 1밖에 안깍기지", p: "하지만 마법 공격으론 어떨까!" }, outro: { p: "어쩌면 나 소질 있을지도..?" } },
+            'spider': { intro: { m: "내 독으로 널 녹여주마.", p: "히익! 방어를 잘 해야겠어!" }, outro: { p: "어쩌면 나 소질 있을지도..?" } },
+            'scorpion': { intro: { m: "반짝반짝 보석 좋아.", p: "나도!" }, outro: { p: "왜 보석 드랍을 안 하지?" } },
+
+            'wolf': { intro: { m: "내 공격을 방어해봐라!", p: "방어만 해볼까?" }, outro: { p: "늑구야 아프지마" } },
+            'harpy': { intro: { m: "물리 공격은 나에게 통하지 않지!", p: "통하긴 하는데.." }, outro: { p: "힘든 전투였다!" } },
+            'mandragora': { intro: { m: "끼에에에에에!!!", p: "스턴 걸릴 것 같아!!" }, outro: { p: "후우.. 귀가 너무 아프군" } },
+            'griffin': { intro: { m: "나는 모든 공격을 피할 수 있지!", p: "그렇다면 마법은 어떠냐!" }, outro: { p: "바람이 부는군.." } },
+
+            'skeleton': { intro: { m: "달그닥 달그닥", p: "뼈다귀 주제에!" }, outro: { p: "이제 거의 다 온건가!" } },
+            'gargoyle': { intro: { m: "나는 매우 튼튼하다.", p: "손가락이 아프겠는걸!" }, outro: { p: "여행이 끝나면 물리치료를 받아야겠어." } },
+            'dullahan': { intro: { m: "연속으로 베지 않는 이상 날 죽일수 없다.", p: "하지만 너의 공격을 막기만 한다면!?" }, outro: { p: "방패가 이겼다!" } },
+            
+            'succubus': { intro: { m: "나는 밤의 여왕..", p: "나에겐 빛이 있다!" }, outro: { p: "빛은 승리한다!" } },
+            'demon': { intro: { m: "드디어 왔는가! 용사여!", p: "이제 끝낼때가 왔다!" }, outro: { p: "이제 좀 쉬고 싶네.." } }
         };
 
         const HIT_PLAYER_LINES = ["크윽.. 강하군.", "젠장!", "질 수 없다!", "버틴다!", "누가 이기나 보자!", "이럴수가!", "도망치지 않아!", "칫, 이 정도야!"];
@@ -352,7 +393,7 @@
         let monster = null;
         let selectedMarketItem = null;
         
-        let lastTime = 0, monsterAttackTimer = 0, mpRegenTimer = 0, monsterStunTimer = 0;
+        let lastTime = 0, monsterAttackTimer = 0, mpRegenTimer = 0, monsterStunTimer = 0, poisonTimer = 0;
         let stageTimer = 60000; 
         let gameLoopStarted = false; 
 
@@ -438,10 +479,11 @@
             if(e) e.stopPropagation();
             inputEl.value = ''; inputEl.blur();
             if (gameState === 'DIFF') switchScreen('start-screen');
-            else if (['GAME', 'PAUSE', 'GAMEOVER', 'POPUP', 'TRANSITION', 'MARKET', 'MARKET_INFO'].includes(gameState)) { 
+            else if (['GAME', 'PAUSE', 'GAMEOVER', 'POPUP', 'TRANSITION', 'MARKET', 'MARKET_INFO', 'CREDITS'].includes(gameState)) { 
                 document.getElementById('popup-layer').style.display = 'none';
                 document.getElementById('market-layer').style.display = 'none';
                 document.getElementById('market-info-layer').style.display = 'none';
+                document.getElementById('credits-layer').style.display = 'none';
                 switchScreen('diff-screen'); 
             }
         }
@@ -476,7 +518,6 @@
             document.getElementById('popup-bg-img').src = 'Data/DR_Item_Popup.png';
         }
 
-        /* 이펙트 및 흔들림 연출 */
         function triggerMonsterShake() {
             const mImg = document.getElementById('monster-img');
             const mGauge = document.getElementById('monster-gauge-img');
@@ -542,6 +583,34 @@
             }
         }
 
+        function showCredits() {
+            gameState = 'CREDITS';
+            inputEl.blur();
+            const layer = document.getElementById('credits-layer');
+            const textEl = document.getElementById('credits-text');
+            const nextBtn = document.getElementById('credits-next-btn');
+            
+            layer.style.display = 'flex';
+            textEl.innerText = '';
+            nextBtn.style.display = 'none';
+
+            const fullText = "지금까지 도구리의 여정을 함께 해주셔서 감사합니다.\n도구리는 돌아온다.";
+            let i = 0;
+            const interval = 5000 / fullText.length; // 5초 동안 타이핑
+            
+            function type() {
+                if (gameState !== 'CREDITS') return;
+                if (i < fullText.length) {
+                    textEl.innerText += fullText.charAt(i);
+                    i++;
+                    setTimeout(type, interval);
+                } else {
+                    nextBtn.style.display = 'block';
+                }
+            }
+            type();
+        }
+
         /* =================================================================
            상점 시스템
         ================================================================= */
@@ -573,7 +642,6 @@
             document.getElementById('info-item-img').src = `Data/${selectedMarketItem.img}`;
             document.getElementById('info-item-name').innerText = selectedMarketItem.name;
             
-            // 8글자마다 줄바꿈
             let formattedDesc = selectedMarketItem.desc.match(/.{1,8}/g).join('\n');
             document.getElementById('info-item-desc').innerText = formattedDesc;
             
@@ -625,9 +693,10 @@
             currentDiff = selectedDiff;
             monsterIdx = 0;
             player.hp = player.maxHp; player.mp = player.maxMp; player.bonusPyAtk = 0;
-            player.flags = { blockCount: 0, dullahanBlock: 0, griffinHits: 0 };
+            player.flags = { blockCount: 0, dullahanBlock: 0, griffinHits: 0, poisoned: false };
             
             Object.keys(SKILLS).forEach(k => player.cooldowns[k] = 0);
+            document.getElementById('hp-gauge').classList.remove('poisoned-hp');
             updateStatusUI();
             
             switchScreen('game-screen');
@@ -649,15 +718,15 @@
             }
             
             monster = { ...mData, maxHp: mData.hp }; 
-            monsterAttackTimer = 0; monsterStunTimer = 0; stageTimer = 60000; 
+            monsterAttackTimer = 0; monsterStunTimer = 0; stageTimer = 60000; poisonTimer = 0;
+            player.flags.poisoned = false;
+            document.getElementById('hp-gauge').classList.remove('poisoned-hp');
             
-            // 보스 스케일링
             const scale = monster.isBoss ? 1.3 : 1;
             document.getElementById('monster-img').style.transform = `translate(-50%, -50%) scale(${scale})`;
             document.getElementById('monster-gauge-img').style.transform = `translate(-50%, -50%) scale(${scale})`;
             document.getElementById('monster-shadow').style.transform = `translate(-50%, -50%) scale(${scale})`;
 
-            // 리셋 스타일 (죽음 효과 방지)
             const mImg = document.getElementById('monster-img');
             const mGauge = document.getElementById('monster-gauge-img');
             mImg.classList.remove('monster-dead'); mGauge.classList.remove('monster-dead');
@@ -674,6 +743,11 @@
 
             mImg.src = `Data/${monster.img}`;
             mGauge.src = `Data/${monster.img}`;
+            
+            // 몬스터 이름 매핑
+            let nameSrc = monster.nameImg ? monster.nameImg : 'DR_Monster_Kobold_Name.png';
+            document.getElementById('monster-name-tag').src = `Data/${nameSrc}`;
+
             container.style.backgroundImage = BG_MAP.bgList[currentDiff][monster.bgIdx];
             
             updateSkillUI(); updateMonsterHpUI(); updateTimerUI();
@@ -689,12 +763,11 @@
             document.getElementById('popup-layer').style.display = 'none';
             
             let pText = document.getElementById('popup-text').innerText;
-            if (pText.includes('연속 베기')) {
+            if (pText.includes('연속 베기') || pText.includes('라이트닝')) {
                 gameState = 'GAME';
                 lastTime = performance.now();
                 inputEl.focus();
             } else {
-                // 스테이지 클리어 (몬스터 사망 팝업) 후 상점 호출
                 showMarket();
             }
         }
@@ -719,6 +792,21 @@
                 gameState = 'GAMEOVER'; inputEl.blur();
                 showPopup('시간 초과!\n게임 오버!', 'GAMEOVER');
                 return;
+            }
+
+            // 거대 독거미 독 대미지 로직
+            if (player.flags.poisoned && player.hp > 0) {
+                poisonTimer += dt;
+                if (poisonTimer >= 2000) {
+                    poisonTimer -= 2000;
+                    player.hp -= 1;
+                    updateStatusUI();
+                    triggerScreenShake();
+                    if (player.hp <= 0) {
+                        gameState = 'GAMEOVER'; inputEl.blur(); 
+                        showPopup('게임 오버!', 'GAMEOVER');
+                    }
+                }
             }
 
             if (player.stunTimer > 0) player.stunTimer -= dt;
@@ -796,15 +884,28 @@
 
         function playerAttacksMonster(skillName, skillData) {
             let dmg = skillData.dmg;
-            if (skillData.type === 'py') dmg += player.bonusPyAtk; // 물리 공격력 보너스 적용
+            if (skillData.type === 'py') dmg += player.bonusPyAtk; 
             
+            // 몬스터별 개별 피격 로직 (서큐버스, 마왕 등)
+            if (monster.id === 'succubus') {
+                if (skillData.type === 'py' && Math.random() < 0.5) dmg = 0;
+                if (skillData.type === 'mp') dmg = 2; 
+                if (skillName === '라이트닝' && Math.random() < 0.8) monsterStunTimer = 3000;
+            } else if (monster.id === 'demon') {
+                if (skillData.type === 'py' && Math.random() < 0.8) dmg = 0;
+                if (skillData.type === 'mp') dmg = 1;
+                if (skillName === '매직 애로우' && Math.random() < 0.8) monsterStunTimer = 3000;
+            }
+
             triggerMonsterShake();
             playSpriteVFX('attack-vfx');
-            playSpriteVFX('hit-vfx'); // 타격 시 히트 이펙트
+            playSpriteVFX('hit-vfx'); 
             playAudio('sfx-atk');
             
-            const hitLines = ["크악!", "아프다!", "이놈이!", "제법이군.."];
-            playDialogue(hitLines[Math.floor(Math.random() * hitLines.length)], null);
+            if (dmg > 0) {
+                const hitLines = ["크악!", "아프다!", "이놈이!", "제법이군.."];
+                playDialogue(hitLines[Math.floor(Math.random() * hitLines.length)], null);
+            }
 
             monster.hp -= dmg;
             updateMonsterHpUI();
@@ -814,8 +915,20 @@
 
         function monsterAttacksPlayer() {
             let dmg = monster.atk;
+            
             if (player.isDefending) {
-                dmg = 0; player.isDefending = false; 
+                // 방어 관통 및 특수 기믹 처리
+                if (monster.id === 'succubus') {
+                    dmg = 2;
+                } else if (monster.id === 'demon' && player.currentDefSkill !== '쉴드') {
+                    dmg = monster.atk; 
+                } else if (monster.id === 'gargoyle') {
+                    dmg = 1;
+                } else {
+                    dmg = 0; 
+                }
+                
+                player.isDefending = false; 
                 document.getElementById('weapon-shield').classList.remove('active');
                 triggerBlockShake(); 
                 playAudio('sfx-def');
@@ -828,7 +941,14 @@
                 playAudio('sfx-hit');
                 
                 playDialogue(null, HIT_PLAYER_LINES[Math.floor(Math.random() * HIT_PLAYER_LINES.length)]);
+
+                // 거대 독거미 독 부여
+                if (monster.id === 'spider' && !player.flags.poisoned) {
+                    player.flags.poisoned = true;
+                    document.getElementById('hp-gauge').classList.add('poisoned-hp');
+                }
                 
+                // 하이오크 피격 이벤트
                 if (monster.id === 'highorc' && !player.flags.hasCombo) {
                     player.flags.hasCombo = true;
                     updateSkillUI();
@@ -852,27 +972,30 @@
             mImg.classList.add('monster-dead');
             mGauge.classList.add('monster-dead');
             
-            // 몬스터 체력 UI 숨김
             document.getElementById('monster-shadow').style.display = 'none';
             document.getElementById('monster-hp-bg').style.display = 'none';
             document.getElementById('monster-hp-gauge').style.display = 'none';
             document.getElementById('monster-name-tag').style.display = 'none';
-            document.getElementById('monster-chat').style.display = 'none';
 
-            setTimeout(() => {
-                monsterDeathProcess();
-            }, 500);
+            setTimeout(() => { monsterDeathProcess(); }, 500);
         }
 
         function monsterDeathProcess() {
             player.gold += 1; document.getElementById('gold-val').innerText = player.gold;
             
             let popText = `골드 +1 획득!`;
+            
             if (monster.dropItem) {
                 popText += `\n${monster.dropItem} 획득!`;
                 if (monster.dropItem === '마법 지팡이') player.flags.hasStaff = true;
                 if (monster.dropItem === '파이어볼 해금') player.flags.fireballActive = true;
                 if (monster.dropItem === '쉴드 해금') player.flags.shieldActive = true;
+            }
+
+            // 듀라한 사망 시 라이트닝 습득
+            if (monster.id === 'dullahan') {
+                popText += `\n라이트닝을 습득했다!`;
+                player.flags.lightningActive = true;
             }
 
             const dialog = STAGE_DIALOGUE[monster.id];
@@ -882,13 +1005,21 @@
                 playDialogue(null, dialog.outro.p);
                 setTimeout(() => {
                     if (gameState === 'TRANSITION') {
-                        gameState = 'POPUP';
-                        showPopup(popText, 'NEXT');
+                        if (monster.id === 'demon') {
+                            showCredits();
+                        } else {
+                            gameState = 'POPUP';
+                            showPopup(popText, 'NEXT');
+                        }
                     }
                 }, 3000);
             } else {
-                gameState = 'POPUP'; inputEl.blur();
-                showPopup(popText, 'NEXT');
+                if (monster.id === 'demon') {
+                    showCredits();
+                } else {
+                    gameState = 'POPUP'; inputEl.blur();
+                    showPopup(popText, 'NEXT');
+                }
             }
         }
 
@@ -920,9 +1051,10 @@
             }
             
             if (currentDiff === 1) {
-                ['mp-1', 'mp-2', 'mp-3'].forEach(id => {
+                ['mp-1', 'mp-2', 'mp-3', 'mp-3-extra'].forEach(id => {
                     let el = document.getElementById(id);
                     el.innerText = '???'; el.classList.add('locked-skill');
+                    if (id === 'mp-3-extra') el.style.display = 'none';
                 });
                 document.getElementById('weapon-staff').style.display = 'none';
             } else {
@@ -950,6 +1082,16 @@
                 } else {
                     document.getElementById('mp-3').innerText = '???';
                     document.getElementById('mp-3').classList.add('locked-skill');
+                }
+
+                if (player.flags.lightningActive) {
+                    document.getElementById('mp-3-extra').style.display = 'block';
+                    document.getElementById('mp-3-extra').innerText = '라이트닝';
+                    document.getElementById('mp-3-extra').classList.remove('locked-skill');
+                    document.getElementById('mp-3').style.left = '980px'; // 쉴드 텍스트를 좌측으로 밀기
+                } else {
+                    document.getElementById('mp-3-extra').style.display = 'none';
+                    document.getElementById('mp-3').style.left = '1030px'; 
                 }
             }
         }
