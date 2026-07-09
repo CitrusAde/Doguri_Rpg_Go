@@ -186,13 +186,11 @@
         <img id="stop-btn" src="Data/DR_Stop_Button.png" class="ui-element clickable" style="left: 82px; top: 84.5px; display: none; z-index: 100;" onclick="togglePause()" alt="Pause">
         <img id="back-btn" src="Data/DR_Back_Button.png" class="ui-element clickable" style="left: 1130px; top: 85px; display: none; z-index: 100;" onclick="goBack()" alt="Back">
 
-        <!-- 1. 시작 화면 -->
         <div id="start-screen" class="screen active">
             <img src="Data/DR_Logo.png" class="ui-element" style="left: 640px; top: 258px;" alt="Logo">
             <img src="Data/DR_Start_Button.png" class="ui-element clickable" style="left: 640.5px; top: 614px;" onclick="switchScreen('diff-screen')" alt="Start">
         </div>
 
-        <!-- 2. 난이도 선택 화면 -->
         <div id="diff-screen" class="screen">
             <img src="Data/DR_Easy_Button.png" id="diff-1" class="ui-element clickable" style="left: 264.5px; top: 360px;" onclick="handleDiffClick(1)" alt="Easy">
             <img src="Data/DR_Normal_Button.png" id="diff-2" class="ui-element clickable" style="left: 514.5px; top: 360px;" onclick="handleDiffClick(2)" alt="Normal">
@@ -202,7 +200,6 @@
             <img src="Data/DR_Play_Button.png" class="ui-element clickable" style="left: 640.5px; top: 614px;" onclick="checkAndStartGame()" alt="Play">
         </div>
 
-        <!-- 3. 게임 플레이 화면 -->
         <div id="game-screen" class="screen">
             
             <img id="weapon-shield" src="Data/DR_Shield.png" class="weapon-ui" alt="Shield">
@@ -215,10 +212,8 @@
             <img id="monster-hp-gauge" src="Data/DR_Monster_Hp_Gauge.png" class="ui-element" style="left: 640px; top: 126px; z-index: 6;">
             <img id="monster-name-tag" src="Data/DR_Monster_Kobold_Name.png" class="ui-element" style="left: 640px; top: 160px; z-index: 6;">
 
-            <!-- 몬스터 그림자 (y: 460 고정) -->
             <img id="monster-shadow" src="Data/DR_Monster_Shadow.png" class="ui-element" style="left: 645.5px; top: 460px; z-index: 3;">
             
-            <!-- 몬스터 본체 (보스일 경우 스크립트에서 y좌표 287로, 평소 337로 수정) -->
             <img id="monster-img" src="" class="ui-element" style="left: 640px; top: 337px; z-index: 4;">
             <img id="monster-gauge-img" src="" class="ui-element" style="left: 640px; top: 337px;">
             
@@ -259,7 +254,6 @@
             <div id="mp-3-extra" class="skill-text">라이트닝</div>
         </div>
 
-        <!-- 4. 팝업 레이어 -->
         <div id="popup-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100; display: none;" onclick="handlePopupClick(event)">
             <img id="popup-bg-img" src="Data/DR_Item_Popup.png" class="ui-element" style="left: 640px; top: 320px; z-index: 101; pointer-events: none;">
             <div id="popup-text" class="popup-text"></div>
@@ -268,26 +262,23 @@
             <img id="popup-gameover-btn" src="Data/DR_Gameover_Button.png" class="ui-element clickable" style="left: 640px; top: 460px; z-index: 103; display: none;" onclick="goBack(event)" alt="Game Over">
         </div>
 
-        <!-- 5. 상점 (마켓) 레이어 -->
         <div id="market-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 150; display: none;">
             <img src="Data/DR_Market_popup.png" class="ui-element" style="left: 640px; top: 250px;">
             <div id="market-items-container"></div>
             <img id="market-next-btn" src="Data/DR_Next_Button.png" class="ui-element clickable" style="left: 640px; top: 460px;" onclick="closeMarket(event)" alt="Next">
         </div>
 
-        <!-- 6. 아이템 정보 팝업 레이어 -->
         <div id="market-info-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 160; display: none;">
             <img src="Data/DR_Item_info_popup.png" class="ui-element" style="left: 640px; top: 321px;">
             <img id="info-item-img" src="" class="ui-element" style="left: 479px; top: 281px;">
-            <div id="info-item-name" class="ui-element" style="left: 679px; top: 236px; font-size: 30px; font-weight: bold; color: #fff; text-shadow: 2px 2px 0 #000;"></div>
-            <!-- 우측 정렬 및 폭 조정 -->
-            <div id="info-item-desc" class="ui-element" style="left: 696px; top: 302px; font-size: 20px; color: #fff; line-height: 1.4; text-shadow: 1px 1px 0 #000; text-align: right; width: 300px;"></div>
+            
+            <div id="info-item-name" style="position: absolute; left: 563px; top: 218px; font-size: 30px; font-weight: bold; color: #fff; text-shadow: 2px 2px 0 #000; text-align: left;"></div>
+            <div id="info-item-desc" style="position: absolute; left: 566px; top: 262px; font-size: 20px; color: #fff; line-height: 1.4; text-shadow: 1px 1px 0 #000; text-align: left; width: 300px; white-space: pre-wrap;"></div>
             
             <img src="Data/DR_Item_buy.png" class="ui-element clickable" style="left: 520px; top: 396px;" onclick="buyItem(event)" alt="Buy">
             <img src="Data/DR_Item_cancel.png" class="ui-element clickable" style="left: 760px; top: 396px;" onclick="closeMarketInfo(event)" alt="Cancel">
         </div>
         
-        <!-- 7. 시네마틱 크레딧 레이어 -->
         <div id="cinematic-layer">
             <div id="cinematic-text"></div>
             <img id="cinematic-next-btn" src="Data/DR_Next_Button.png" class="ui-element clickable" style="left: 640px; top: 600px; display:none;" onclick="handleCinematicNext(event)" alt="Next">
@@ -428,6 +419,10 @@
         let lastTime = 0, monsterAttackTimer = 0, mpRegenTimer = 0, monsterStunTimer = 0, poisonTimer = 0;
         let stageTimer = 60000; 
         let gameLoopId = null;
+
+        // 플레이어/몬스터 텍스트 타이머 관리를 위한 전역 변수
+        let pChatTimeout = null;
+        let mChatTimeout = null;
 
         const container = document.getElementById('game-container');
         const inputEl = document.getElementById('typing-input');
@@ -610,16 +605,19 @@
             document.getElementById('attack-time-gauge').style.clipPath = `inset(0 ${100 - (stageTimer/60000)*100}% 0 0)`;
         }
 
+        // 텍스트 지속 시간 버그 수정 및 관리
         function playDialogue(mText, pText) {
             if (mText) {
                 let mEl = document.getElementById('monster-chat');
                 mEl.innerText = mText; mEl.style.display = 'block';
-                setTimeout(() => { if (gameState !== 'GAMEOVER') mEl.style.display = 'none'; }, 3000);
+                if(mChatTimeout) clearTimeout(mChatTimeout);
+                mChatTimeout = setTimeout(() => { if (gameState !== 'GAMEOVER') mEl.style.display = 'none'; }, 3000);
             }
             if (pText) {
                 let pEl = document.getElementById('player-chat-text');
                 pEl.innerText = pText; pEl.style.display = 'flex';
-                setTimeout(() => { if (gameState !== 'GAMEOVER') pEl.style.display = 'none'; }, 3000);
+                if(pChatTimeout) clearTimeout(pChatTimeout);
+                pChatTimeout = setTimeout(() => { if (gameState !== 'GAMEOVER') pEl.style.display = 'none'; }, 5000); // 5초 동안 유지되도록 수정
             }
         }
 
@@ -691,9 +689,8 @@
             document.getElementById('info-item-img').src = `Data/${selectedMarketItem.img}`;
             document.getElementById('info-item-name').innerText = selectedMarketItem.name;
             
-            // 20글자마다 줄바꿈 처리
-            let formattedDesc = selectedMarketItem.desc.match(/.{1,20}/g).join('\n');
-            document.getElementById('info-item-desc').innerText = formattedDesc;
+            // 글자 수 제한 없이 자연스럽게 width에 맞춰 줄바꿈되도록 수정
+            document.getElementById('info-item-desc').innerText = selectedMarketItem.desc;
             
             gameState = 'MARKET_INFO';
             document.getElementById('market-info-layer').style.display = 'block';
@@ -758,7 +755,11 @@
             player.hp = player.maxHp; player.mp = player.maxMp; 
             sessionFlags = { poisoned: false };
             
-            Object.keys(SKILLS).forEach(k => player.cooldowns[k] = 0);
+            // 시작 시 쿨타임이 절반 차 보이는 버그 해결
+            // 현재 시간을 할당해 완벽히 0부터 타이머가 돌아가도록 초기화
+            let now = performance.now();
+            Object.keys(SKILLS).forEach(k => player.cooldowns[k] = now);
+            
             document.getElementById('hp-gauge').classList.remove('poisoned-hp');
             document.getElementById('gold-val').innerText = gData.gold;
             updateStatusUI();
@@ -772,6 +773,12 @@
         }
 
         function loadMonster() {
+            // 빠른 플레이 시 이전 대사가 남아있는 버그 해결을 위해 클리어
+            document.getElementById('player-chat-text').style.display = 'none';
+            document.getElementById('monster-chat').style.display = 'none';
+            if(pChatTimeout) clearTimeout(pChatTimeout);
+            if(mChatTimeout) clearTimeout(mChatTimeout);
+
             let mData = STAGE_DATA[currentDiff] ? STAGE_DATA[currentDiff][monsterIdx] : null;
             if (!mData) { 
                 gData.unlockedDiff = Math.max(gData.unlockedDiff, currentDiff + 1); saveData();
@@ -784,7 +791,6 @@
             sessionFlags.poisoned = false;
             document.getElementById('hp-gauge').classList.remove('poisoned-hp');
             
-            // 보스일 때 크기 및 y좌표 조정 (y:287)
             const scale = monster.isBoss ? 1.3 : 1;
             const topPos = monster.isBoss ? 287 : 337;
             const sImg = document.getElementById('monster-img');
@@ -797,13 +803,16 @@
             
             sImg.style.top = `${topPos}px`;
             sGauge.style.top = `${topPos}px`;
-            // 그림자는 460으로 고정
             sShadow.style.top = '460px'; 
 
-            sImg.classList.remove('monster-dead'); sGauge.classList.remove('monster-dead');
+            sImg.classList.remove('monster-dead'); 
             
             sImg.style.display = 'block';
             sGauge.style.display = 'block';
+            
+            // 게이지 초기값 강제 리셋하여 혹시 모를 잔상 방지
+            sGauge.style.clipPath = 'inset(100% 0 0 0)';
+
             sShadow.style.display = 'block';
             document.getElementById('monster-hp-bg').style.display = 'block';
             document.getElementById('monster-hp-gauge').style.display = 'block';
@@ -890,7 +899,6 @@
                 return;
             }
 
-            // 거대 독거미 독 기믹
             if (sessionFlags.poisoned && player.hp > 0) {
                 poisonTimer += dt;
                 if (poisonTimer >= 2000) {
@@ -982,7 +990,6 @@
             let dmg = skillData.dmg;
             if (skillData.type === 'py') dmg += gData.bonusPyAtk; 
             
-            // 몬스터별 개별 피격 로직
             if (monster.id === 'succubus') {
                 if (skillData.type === 'py' && Math.random() < 0.5) dmg = 0;
                 if (skillData.type === 'mp') dmg = 2; 
@@ -1058,17 +1065,18 @@
             const mGauge = document.getElementById('monster-gauge-img');
             
             mImg.classList.add('monster-dead');
-            mGauge.classList.add('monster-dead');
+            
+            // 몬스터 사망 시 게이지가 위를 덮고 있어서 2/3 지점까지만 까맣게 변하는 버그 수정
+            mGauge.style.display = 'none';
             
             document.getElementById('monster-shadow').style.display = 'none';
             document.getElementById('monster-hp-bg').style.display = 'none';
             document.getElementById('monster-hp-gauge').style.display = 'none';
             document.getElementById('monster-name-tag').style.display = 'none';
 
-            // 잔상 버그 해결을 위해 0.5s 후 완전히 디스플레이 none 및 클래스 제거
             setTimeout(() => { 
-                mImg.style.display = 'none'; mGauge.style.display = 'none';
-                mImg.classList.remove('monster-dead'); mGauge.classList.remove('monster-dead');
+                mImg.style.display = 'none'; 
+                mImg.classList.remove('monster-dead'); 
                 monsterDeathProcess(); 
             }, 500);
         }
@@ -1104,7 +1112,7 @@
                         gameState = 'POPUP';
                         showPopup(popText, 'NEXT');
                     }
-                }, 3000);
+                }, 3000); 
             } else {
                 gameState = 'POPUP'; inputEl.blur();
                 showPopup(popText, 'NEXT');
