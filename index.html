@@ -350,8 +350,8 @@
                 { id: 'swarm2', nameImg: 'DR_Monster_Swarm_Name.png', hp: 8, atk: 3, cd: 4000, img: 'DR_Monster_Swarm.png', bgIdx: 0 },
                 { id: 'golem', nameImg: 'DR_Monster_Golem_Name.png', hp: 15, atk: 2, cd: 4000, img: 'DR_Monster_Golem.png', bgIdx: 0 },
                 { id: 'spider', nameImg: 'DR_Monster_Spider_Name.png', hp: 10, atk: 1, cd: 3000, img: 'DR_Monster_Spider.png', bgIdx: 0 },
-                { id: 'scorpion', nameImg: 'DR_Monster_Scorpion_Name.png', hp: 25, atk: 3, cd: 3000, img: 'DR_Monster_Spider.png', dropItem: '파이어볼 해금', isBoss: true, bgIdx: 0 },
-                { id: 'wolf', nameImg: 'DR_Monster_Wolf_Name.png', hp: 10, atk: 2, cd: 4000, img: 'DR_Monster_Scorpion.png', bgIdx: 1 },
+                { id: 'scorpion', nameImg: 'DR_Monster_Scorpion_Name.png', hp: 25, atk: 3, cd: 3000, img: 'DR_Monster_Scorpion.png', dropItem: '파이어볼 해금', isBoss: true, bgIdx: 0 },
+                { id: 'wolf', nameImg: 'DR_Monster_Wolf_Name.png', hp: 10, atk: 2, cd: 4000, img: 'DR_Monster_Wolf.png', bgIdx: 1 },
                 { id: 'harpy', nameImg: 'DR_Monster_Harpy_Name.png', hp: 15, atk: 3, cd: 3000, img: 'DR_Monster_Harpy.png', bgIdx: 1 },
                 { id: 'mandragora', nameImg: 'DR_Monster_Mandragora_Name.png', hp: 10, atk: 4, cd: 3000, img: 'DR_Monster_Mandragora.png', bgIdx: 1 },
                 { id: 'griffin', nameImg: 'DR_Monster_Griffin_Name.png', hp: 15, atk: 2, cd: 3000, img: 'DR_Monster_Griffin.png', dropItem: '쉴드 해금', isBoss: true, bgIdx: 1 }
@@ -774,9 +774,14 @@
             
             if (isFinalBoss) {
                 if (currentDiff === 1) {
-                    playCinematic(`갑자기 나타난 몬스터, 나는 무슨 일이 일어났는지 확인할 필요가 있어!`, "OUTRO");
+                    playCinematic(`허접한 몬스터들을 때려잡으니 과거의 영광이 되살아난 기분이었다.
+                    하지만 나의 힘은 여기서 멈출 줄 모르기에,
+                    나를 이 지경으로 만든 마왕놈을 때려잡으러 떠나기로 결심했다.`, "OUTRO");
                 } else if (currentDiff === 2) {
-                    playCinematic(`점점 더 흑막에 가까워지고 있는거 같아. 멈추지 않고 끝까지 가볼꺼야!`, "OUTRO");
+                    playCinematic(`이 정도로는 나를 막을 수 없다. 
+마왕이 아니고서야 나를 누가 막을 수 있을까.
+곧 간다. 마왕아.
+`, "OUTRO");
                 } else {
                     switchScreen('diff-screen');
                 }
