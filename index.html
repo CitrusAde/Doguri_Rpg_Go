@@ -313,14 +313,14 @@
         loadData();
 
         /* =================================================================
-           상수 데이터 및 설정
+           상수 데이터 및 설정 (배경이미지 이름 맵핑 완료)
         ================================================================= */
         const BG_MAP = {
             main: 'url("Data/DR_Main_Bg.png")', select: 'url("Data/DR_Game_Select_Bg.png")',
             bgList: {
-                1: ['url("Data/DR_Easy_stage_1_Bg.png")', 'url("Data/DR_Easy_stage_2_Bg.png")'],
-                2: ['url("Data/DR_Normal_stage_1_Bg.png")', 'url("Data/DR_Normal_stage_2_Bg.png")'],
-                3: ['url("Data/DR_Hard_stage_1_Bg.png")', 'url("Data/DR_Hard_stage_2_Bg.png")']
+                1: ['url("Data/DR_Town_Bg.png")', 'url("Data/DR_Swamp_Bg.png")'],
+                2: ['url("Data/DR_Cave_Bg.png")', 'url("Data/DR_Field_Bg.png")'],
+                3: ['url("Data/DR_Castle_Entrance_Bg.png")', 'url("Data/DR_Castle_Inside_Bg.png")']
             }
         };
 
@@ -488,7 +488,7 @@
         function handleDiffClick(diff) {
             if (diff > gData.unlockedDiff) {
                 gameState = 'ALERT';
-                showPopup('이전 난이도\n클리어 필요', 'ALERT');
+                showPopup("이전 난이도<br>클리어 필요", "ALERT", true);
                 return;
             }
             selectedDiff = diff;
@@ -525,8 +525,8 @@
         function togglePause() {
             if (gameState === 'GAME') {
                 gameState = 'PAUSE';
-                const pauseHTML = `일시 정지\n(아무 곳이나 눌러 재개)`;
-                showPopup(pauseHTML, 'PAUSE');
+                const pauseHTML = `일시 정지<br><span style="display:block; font-size:20px; color:#aaa; margin-top:5px; line-height:1;">(아무 곳이나 눌러 재개)</span>`;
+                showPopup(pauseHTML, 'PAUSE', true);
             } 
         }
 
@@ -542,9 +542,10 @@
             }
         }
 
-        function showPopup(text, type = 'PAUSE') {
+        function showPopup(text, type = 'PAUSE', isHTML = false) {
             document.getElementById('popup-layer').style.display = 'block';
-            document.getElementById('popup-text').innerText = text;
+            if (isHTML) document.getElementById('popup-text').innerHTML = text;
+            else document.getElementById('popup-text').innerText = text;
             
             document.getElementById('popup-next-btn').style.display = (type === 'NEXT') ? 'block' : 'none';
             document.getElementById('popup-gameover-btn').style.display = (type === 'GAMEOVER') ? 'block' : 'none';
@@ -741,7 +742,7 @@
         function checkAndStartGame() {
             if (selectedDiff > gData.unlockedDiff) {
                 gameState = 'ALERT'; 
-                showPopup("이전 난이도\n클리어 필요", "ALERT");
+                showPopup("이전 난이도<br>클리어 필요", "ALERT", true);
                 return;
             }
             
