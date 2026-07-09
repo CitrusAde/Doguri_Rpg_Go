@@ -723,9 +723,9 @@
             document.getElementById('market-layer').style.display = 'none';
             
             if (currentDiff === 1) {
-                playCinematic("갑자기 나타난 몬스터, 나는 무슨 일이 일어났는지 확인할 필요가 있어!", "OUTRO");
+                playCinematic("허접한 몬스터들을 때려잡으니 과거의 영광이 되살아난 기분이었다. 하지만 나의 힘은 여기서 멈출 줄 모르기에, 나를 이 지경으로 만든 마왕놈을 때려잡으러 떠나기로 결심했다.", "OUTRO");
             } else if (currentDiff === 2) {
-                playCinematic("점점 더 흑막에 가까워지고 있는거 같아. 멈추지 않고 끝까지 가볼꺼야!", "OUTRO");
+                playCinematic("이 정도로는 나를 막을 수 없다. 마왕이 아니고서야 나를 누가 막을 수 있을까. 곧 간다. 마왕아. 아디오스(아님)", "OUTRO");
             } else {
                 switchScreen('diff-screen');
             }
@@ -740,9 +740,9 @@
             }
             
             let introText = "";
-            if (selectedDiff === 1) introText = "갑자기 마을에 몬스터들이 나타나고 사람들이 고통에 빠졌다.";
-            else if (selectedDiff === 2) introText = "마을을 벗어나 여기까지 왔지만 더 다양한 몬스터들이 나의 앞길을 막고 있었다.";
-            else if (selectedDiff === 3) introText = "결국 마왕이 벌인 소행이었던가! 나는 마왕을 무찌를 것이다!";
+            if (selectedDiff === 1) introText = "평화로운 도구리의 마을, 갑자기 나타난 몬스터들로 인해 사람들이 혼비백산하였다. 나는 가만히 두고 볼 수 없었기에 지하창고에 있는 개쩌는 방패와 칼을 장비하고 거리로 나섰다.";
+            else if (selectedDiff === 2) introText = "흔해 빠진 몬스터들도 지겹다. 더 강한 몬스터를 처치하기 위해 나는 여정을 떠났고, 내 눈앞에 나의 양식들이 등장하기 시작했다.";
+            else if (selectedDiff === 3) introText = "여긴가, 나의 힘을 표출할 마지막 장이. 스산한 기운이 마치 나를 감싸고 있는 듯한 기분... 나쁘지 않아. 드디어 여정의 끝이 보이는군. 좋아.";
             
             if(introText) playCinematic(introText, 'INTRO');
             else proceedStartGame();
@@ -866,7 +866,7 @@
                         saveData();
                     }
                     if (monster.id === 'demon') {
-                        playCinematic("지금까지 도구리의 여정을 함께 해주셔서 감사합니다.\n도구리는 돌아온다.", "CREDITS");
+                        playCinematic("이제 더 이상 나를 막을 수 있는 것은 없다. 평화로워진 마을로 돌아가 나의 무용담을 전파해야겠어. 아.. 이게 되네. \n 지금까지 도구리의 여정을 함께 해주셔서 감사합니다.도구리는 돌아온다.", "CREDITS");
                     } else {
                         showMarket();
                     }
