@@ -525,8 +525,8 @@
         function togglePause() {
             if (gameState === 'GAME') {
                 gameState = 'PAUSE';
-                const pauseHTML = `일시 정지<br><span style="display:block; font-size:20px; color:#aaa; margin-top:5px; line-height:1;">(아무 곳이나 눌러 재개)</span>`;
-                showPopup(pauseHTML, 'PAUSE', true);
+                const pauseHTML = `일시 정지\n(아무 곳이나 눌러 재개)`;
+                showPopup(pauseHTML, 'PAUSE');
             } 
         }
 
@@ -542,10 +542,9 @@
             }
         }
 
-        function showPopup(text, type = 'PAUSE', isHTML = false) {
+        function showPopup(text, type = 'PAUSE') {
             document.getElementById('popup-layer').style.display = 'block';
-            if (isHTML) document.getElementById('popup-text').innerHTML = text;
-            else document.getElementById('popup-text').innerText = text;
+            document.getElementById('popup-text').innerText = text;
             
             document.getElementById('popup-next-btn').style.display = (type === 'NEXT') ? 'block' : 'none';
             document.getElementById('popup-gameover-btn').style.display = (type === 'GAMEOVER') ? 'block' : 'none';
@@ -719,165 +718,183 @@
         }
 
         function closeMarket(e) {
-    if(e) e.stopPropagation();
-    document.getElementById('market-layer').style.display = 'none';
-    
-    if (currentDiff === 1) {
-        playCinematic("허접한 몬스터들을 때려잡으니 과거의 영광이 되살아난 기분이었다.<br>하지만 나의 힘은 여기서 멈출 줄 모르기에,<br>나를 이 지경으로 만든 마왕놈을 때려잡으러 떠나기로 결심했다.", "OUTRO");
-    } else if (currentDiff === 2) {
-        playCinematic("이 정도로는 나를 막을 수 없다.<br>마왕이 아니고서야 나를 누가 막을 수 있을까.<br>곧 간다. 마왕아.<br>아디오스(아님)", "OUTRO");
-    } else {
-        switchScreen('diff-screen');
-    }
-}
+            if(e) e.stopPropagation();
+            document.getElementById('market-layer').style.display = 'none';
+            
+            if (currentDiff === 1) {
+                playCinematic(`허접한 몬스터들을 때려잡으니 과거의 영광이 되살아난 기분이었다.
+하지만 나의 힘은 여기서 멈출 줄 모르기에,
+나를 이 지경으로 만든 마왕놈을 때려잡으러 떠나기로 결심했다.`, "OUTRO");
+            } else if (currentDiff === 2) {
+                playCinematic(`이 정도로는 나를 막을 수 없다.
+마왕이 아니고서야 나를 누가 막을 수 있을까.
+곧 간다. 마왕아.
+아디오스(아님)`, "OUTRO");
+            } else {
+                switchScreen('diff-screen');
+            }
+        }
 
-/* =================================================================
-   게임 흐름 로직
-================================================================= */
-function checkAndStartGame() {
-    if (selectedDiff > gData.unlockedDiff) {
-        gameState = 'ALERT'; 
-        showPopup("이전 난이도<br>클리어 필요", "ALERT"); // \n을 <br>로 수정함
-        return;
-    }
-    
-    let introText = "";
-    if (selectedDiff === 1) introText = "평화로운 도구리의 마을, 갑자기 나타난 몬스터들로 인해 사람들이 혼비백산하였다.<br>나는 가만히 두고 볼 수 없었기에,<br>지하창고에 있는 개쩌는 방패와 칼을 장비하고 거리로 나섰다.";
-    else if (selectedDiff === 2) introText = "흔해 빠진 몬스터들도 지겹다.<br>더 강한 몬스터를 처치하기 위해 나는 여정을 떠났고,<br>내 눈앞에 나의 제물들이 등장하기 시작했다.";
-    else if (selectedDiff === 3) introText = "여긴가, 나의 힘을 표출할 마지막 장이.<br>스산한 기운이 마치 나를 감싸고 있는 듯한 기분...<br>나쁘지 않아.<br>드디어 여정의 끝이 보이는군. 좋아.";
-    
-    if(introText) playCinematic(introText, 'INTRO');
-    else proceedStartGame();
-}
+        /* =================================================================
+           게임 흐름 로직
+        ================================================================= */
+        function checkAndStartGame() {
+            if (selectedDiff > gData.unlockedDiff) {
+                gameState = 'ALERT'; 
+                showPopup("이전 난이도\n클리어 필요", "ALERT");
+                return;
+            }
+            
+            let introText = "";
+            if (selectedDiff === 1) introText = `평화로운 도구리의 마을, 갑자기 나타난 몬스터들로 인해 사람들이 혼비백산하였다.
+나는 가만히 두고 볼 수 없었기에,
+지하창고에 있는 개쩌는 방패와 칼을 장비하고 거리로 나섰다.`;
+            else if (selectedDiff === 2) introText = `흔해 빠진 몬스터들도 지겹다.
+더 강한 몬스터를 처치하기 위해 나는 여정을 떠났고,
+내 눈앞에 나의 제물들이 등장하기 시작했다.`;
+            else if (selectedDiff === 3) introText = `여긴가, 나의 힘을 표출할 마지막 장이.
+스산한 기운이 마치 나를 감싸고 있는 듯한 기분...
+나쁘지 않아.
+드디어 여정의 끝이 보이는군. 좋아.`;
+            
+            if(introText) playCinematic(introText, 'INTRO');
+            else proceedStartGame();
+        }
 
-function proceedStartGame() {
-    inputEl.value = ''; 
-    currentDiff = selectedDiff;
-    monsterIdx = 0;
-    player.hp = player.maxHp; player.mp = player.maxMp; 
-    sessionFlags = { poisoned: false };
-    
-    // 시작 시 쿨타임이 절반 차 보이는 버그 해결
-    // 현재 시간을 할당해 완벽히 0부터 타이머가 돌아가도록 초기화
-    let now = performance.now();
-    Object.keys(SKILLS).forEach(k => player.cooldowns[k] = now);
-    
-    document.getElementById('hp-gauge').classList.remove('poisoned-hp');
-    document.getElementById('gold-val').innerText = gData.gold;
-    updateStatusUI();
-    
-    switchScreen('game-screen');
-    loadMonster();
-    
-    playAudio('bgm');
-    if (gameLoopId) cancelAnimationFrame(gameLoopId);
-    gameLoopId = requestAnimationFrame(gameLoop);
-}
+        function proceedStartGame() {
+            inputEl.value = ''; 
+            currentDiff = selectedDiff;
+            monsterIdx = 0;
+            player.hp = player.maxHp; player.mp = player.maxMp; 
+            sessionFlags = { poisoned: false };
+            
+            // 시작 시 쿨타임이 절반 차 보이는 버그 해결
+            // 현재 시간을 할당해 완벽히 0부터 타이머가 돌아가도록 초기화
+            let now = performance.now();
+            Object.keys(SKILLS).forEach(k => player.cooldowns[k] = now);
+            
+            document.getElementById('hp-gauge').classList.remove('poisoned-hp');
+            document.getElementById('gold-val').innerText = gData.gold;
+            updateStatusUI();
+            
+            switchScreen('game-screen');
+            loadMonster();
+            
+            playAudio('bgm');
+            if (gameLoopId) cancelAnimationFrame(gameLoopId);
+            gameLoopId = requestAnimationFrame(gameLoop);
+        }
 
-function loadMonster() {
-    // 빠른 플레이 시 이전 대사가 남아있는 버그 해결을 위해 클리어
-    document.getElementById('player-chat-text').style.display = 'none';
-    document.getElementById('monster-chat').style.display = 'none';
-    if(pChatTimeout) clearTimeout(pChatTimeout);
-    if(mChatTimeout) clearTimeout(mChatTimeout);
+        function loadMonster() {
+            // 빠른 플레이 시 이전 대사가 남아있는 버그 해결을 위해 클리어
+            document.getElementById('player-chat-text').style.display = 'none';
+            document.getElementById('monster-chat').style.display = 'none';
+            if(pChatTimeout) clearTimeout(pChatTimeout);
+            if(mChatTimeout) clearTimeout(mChatTimeout);
 
-    let mData = STAGE_DATA[currentDiff] ? STAGE_DATA[currentDiff][monsterIdx] : null;
-    if (!mData) { 
-        gData.unlockedDiff = Math.max(gData.unlockedDiff, currentDiff + 1); saveData();
-        gameState = 'GAMEOVER'; inputEl.blur();
-        showPopup('난이도 클리어!', 'GAMEOVER'); return; 
-    }
-    
-    monster = { ...mData, maxHp: mData.hp }; 
-    monsterAttackTimer = 0; monsterStunTimer = 0; stageTimer = 60000; poisonTimer = 0;
-    sessionFlags.poisoned = false;
-    document.getElementById('hp-gauge').classList.remove('poisoned-hp');
-    
-    const scale = monster.isBoss ? 1.3 : 1;
-    const topPos = monster.isBoss ? 287 : 337;
-    const sImg = document.getElementById('monster-img');
-    const sGauge = document.getElementById('monster-gauge-img');
-    const sShadow = document.getElementById('monster-shadow');
+            let mData = STAGE_DATA[currentDiff] ? STAGE_DATA[currentDiff][monsterIdx] : null;
+            if (!mData) { 
+                gData.unlockedDiff = Math.max(gData.unlockedDiff, currentDiff + 1); saveData();
+                gameState = 'GAMEOVER'; inputEl.blur();
+                showPopup('난이도 클리어!', 'GAMEOVER'); return; 
+            }
+            
+            monster = { ...mData, maxHp: mData.hp }; 
+            monsterAttackTimer = 0; monsterStunTimer = 0; stageTimer = 60000; poisonTimer = 0;
+            sessionFlags.poisoned = false;
+            document.getElementById('hp-gauge').classList.remove('poisoned-hp');
+            
+            const scale = monster.isBoss ? 1.3 : 1;
+            const topPos = monster.isBoss ? 287 : 337;
+            const sImg = document.getElementById('monster-img');
+            const sGauge = document.getElementById('monster-gauge-img');
+            const sShadow = document.getElementById('monster-shadow');
 
-    sImg.style.transform = `translate(-50%, -50%) scale(${scale})`;
-    sGauge.style.transform = `translate(-50%, -50%) scale(${scale})`;
-    sShadow.style.transform = `translate(-50%, -50%) scale(${scale})`;
-    
-    sImg.style.top = `${topPos}px`;
-    sGauge.style.top = `${topPos}px`;
-    sShadow.style.top = '460px'; 
+            sImg.style.transform = `translate(-50%, -50%) scale(${scale})`;
+            sGauge.style.transform = `translate(-50%, -50%) scale(${scale})`;
+            sShadow.style.transform = `translate(-50%, -50%) scale(${scale})`;
+            
+            sImg.style.top = `${topPos}px`;
+            sGauge.style.top = `${topPos}px`;
+            sShadow.style.top = '460px'; 
 
-    sImg.classList.remove('monster-dead'); 
-    
-    sImg.style.display = 'block';
-    sGauge.style.display = 'block';
-    
-    // 게이지 초기값 강제 리셋하여 혹시 모를 잔상 방지
-    sGauge.style.clipPath = 'inset(100% 0 0 0)';
+            sImg.classList.remove('monster-dead'); 
+            
+            sImg.style.display = 'block';
+            sGauge.style.display = 'block';
+            
+            // 게이지 초기값 강제 리셋하여 혹시 모를 잔상 방지
+            sGauge.style.clipPath = 'inset(100% 0 0 0)';
 
-    sShadow.style.display = 'block';
-    document.getElementById('monster-hp-bg').style.display = 'block';
-    document.getElementById('monster-hp-gauge').style.display = 'block';
-    document.getElementById('monster-name-tag').style.display = 'block';
-    
-    player.isDefending = false;
-    document.getElementById('weapon-shield').classList.remove('active');
+            sShadow.style.display = 'block';
+            document.getElementById('monster-hp-bg').style.display = 'block';
+            document.getElementById('monster-hp-gauge').style.display = 'block';
+            document.getElementById('monster-name-tag').style.display = 'block';
+            
+            player.isDefending = false;
+            document.getElementById('weapon-shield').classList.remove('active');
 
-    sImg.src = `Data/${monster.img}`;
-    sGauge.src = `Data/${monster.img}`;
-    
-    let nameSrc = monster.nameImg ? monster.nameImg : 'DR_Monster_Kobold_Name.png';
-    document.getElementById('monster-name-tag').src = `Data/${nameSrc}`;
+            sImg.src = `Data/${monster.img}`;
+            sGauge.src = `Data/${monster.img}`;
+            
+            let nameSrc = monster.nameImg ? monster.nameImg : 'DR_Monster_Kobold_Name.png';
+            document.getElementById('monster-name-tag').src = `Data/${nameSrc}`;
 
-    container.style.backgroundImage = BG_MAP.bgList[currentDiff][monster.bgIdx];
-    
-    updateSkillUI(); updateMonsterHpUI(); updateTimerUI();
-    
-    const dialog = STAGE_DIALOGUE[monster.id];
-    if (dialog && dialog.intro) {
-        gameState = 'DIALOGUE';
-        inputEl.blur();
-        playDialogue(dialog.intro.m, dialog.intro.p);
-        setTimeout(() => {
-            if (gameState === 'DIALOGUE') {
+            container.style.backgroundImage = BG_MAP.bgList[currentDiff][monster.bgIdx];
+            
+            updateSkillUI(); updateMonsterHpUI(); updateTimerUI();
+            
+            const dialog = STAGE_DIALOGUE[monster.id];
+            if (dialog && dialog.intro) {
+                gameState = 'DIALOGUE';
+                inputEl.blur();
+                playDialogue(dialog.intro.m, dialog.intro.p);
+                setTimeout(() => {
+                    if (gameState === 'DIALOGUE') {
+                        gameState = 'GAME';
+                        lastTime = performance.now();
+                        inputEl.focus();
+                    }
+                }, 3000);
+            } else {
                 gameState = 'GAME';
                 lastTime = performance.now();
                 inputEl.focus();
             }
-        }, 3000);
-    } else {
-        gameState = 'GAME';
-        lastTime = performance.now();
-        inputEl.focus();
-    }
-}
-
-function handlePopupNext(e) {
-    if(e) e.stopPropagation();
-    document.getElementById('popup-layer').style.display = 'none';
-    
-    let pText = document.getElementById('popup-text').innerText;
-    if (pText.includes('연속 베기') || pText.includes('라이트닝')) {
-        gameState = 'GAME';
-        lastTime = performance.now();
-        inputEl.focus();
-    } else {
-        if (monster.isBoss) {
-            if (gData.unlockedDiff <= currentDiff) {
-                gData.unlockedDiff = currentDiff + 1;
-                saveData();
-            }
-            if (monster.id === 'demon') {
-                playCinematic("이제 더 이상 나를 막을 수 있는 것은 없다.<br>평화로워진 마을로 돌아가 나의 무용담을 전파해야겠어.<br>아.. 이게 되네.<br><br>지금까지 도구리의 여정을 함께 해주셔서 감사합니다.<br>도구리는 돌아온다.", "CREDITS");
-            } else {
-                showMarket();
-            }
-        } else {
-            monsterIdx++;
-            loadMonster();
         }
-    }
-}
+
+        function handlePopupNext(e) {
+            if(e) e.stopPropagation();
+            document.getElementById('popup-layer').style.display = 'none';
+            
+            let pText = document.getElementById('popup-text').innerText;
+            if (pText.includes('연속 베기') || pText.includes('라이트닝')) {
+                gameState = 'GAME';
+                lastTime = performance.now();
+                inputEl.focus();
+            } else {
+                if (monster.isBoss) {
+                    if (gData.unlockedDiff <= currentDiff) {
+                        gData.unlockedDiff = currentDiff + 1;
+                        saveData();
+                    }
+                    if (monster.id === 'demon') {
+                        playCinematic(`이제 더 이상 나를 막을 수 있는 것은 없다.
+평화로워진 마을로 돌아가 나의 무용담을 전파해야겠어.
+아.. 이게 되네.
+
+지금까지 도구리의 여정을 함께 해주셔서 감사합니다.
+도구리는 돌아온다.`, "CREDITS");
+                    } else {
+                        showMarket();
+                    }
+                } else {
+                    monsterIdx++;
+                    loadMonster();
+                }
+            }
+        }
+
         /* =================================================================
            단일 메인 루프
         ================================================================= */
