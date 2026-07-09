@@ -27,16 +27,14 @@
         .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; }
         .screen.active { display: block; }
         
-        /* 중심점 기준 절대 좌표 공통 클래스 */
         .ui-element { position: absolute; object-fit: none; transform: translate(-50%, -50%); }
         
-        /* 버튼 눌림 애니메이션 */
         .clickable { cursor: pointer; transition: transform 0.1s ease; }
         .clickable:active { transform: translate(-50%, -50%) scale(0.95) !important; filter: brightness(0.8); }
         
         .locked-diff { filter: brightness(0.3); }
 
-        /* 무기 UI 및 애니메이션 설정 (다른 UI 뒤인 z-index: 0) */
+        /* 무기 UI 및 애니메이션 설정 */
         .weapon-ui {
             position: absolute; z-index: 0; transform: translate(-50%, -50%);
             transition: all 0.15s ease-out;
@@ -50,13 +48,14 @@
         #weapon-staff { left: 1196px; top: 600px; display: none; }
         #weapon-staff.active { left: 1075px; top: 486px; }
 
-        /* 공격 이펙트 (시퀀스 스프라이트) */
-        #attack-vfx {
+        /* 공격/피격 이펙트 (시퀀스 스프라이트) */
+        .vfx-sprite {
             position: absolute; left: 640px; top: 337px;
             width: 250px; height: 250px; transform: translate(-50%, -50%);
-            background-image: url('Data/DR_Slash_Attack_fx.png');
             background-size: 200% 200%; z-index: 15; display: none; pointer-events: none;
         }
+        #attack-vfx { background-image: url('Data/DR_Slash_Attack_fx.png'); }
+        #hit-vfx { background-image: url('Data/DR_Hit_fx_1.png'); z-index: 16; }
 
         /* 피격 시 붉은 화면 레이어 */
         #red-flash {
@@ -65,10 +64,15 @@
             transition: opacity 0.1s ease;
         }
 
-        /* 게이지 바 애니메이션 */
+        /* 몬스터 사망 효과 */
+        .monster-dead {
+            filter: brightness(0) !important;
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+
         #hp-gauge, #mp-gauge, #monster-hp-gauge, #attack-time-gauge { transition: clip-path 0.2s ease-out; }
         
-        /* 상태 텍스트 */
         .status-text {
             position: absolute; transform: translate(-50%, -50%);
             font-size: 20px; font-weight: bold; color: #fff; z-index: 3;
@@ -80,7 +84,7 @@
             clip-path: inset(100% 0 0 0); pointer-events: none;
         }
 
-        /* 대사 폰트 5px 감소 (24px -> 19px) */
+        /* 대사 폰트 5px 감소 및 굵게 유지 */
         #monster-chat {
             position: absolute; left: 700px; top: 250px; background: #fff; color: #000;
             padding: 15px 25px; border-radius: 20px; font-size: 19px; max-width: 300px;
@@ -98,7 +102,6 @@
             font-size: 19px; color: #fff; z-index: 20; display: none; white-space: pre-wrap; font-weight: bold;
         }
 
-        /* 중앙 타이핑 입력 창 */
         #typing-input {
             position: absolute; left: 640px; top: 639.5px; transform: translate(-50%, -50%);
             background: transparent; border: none; color: #fff;
@@ -106,7 +109,6 @@
             text-align: center; outline: none; width: 350px; z-index: 20;
         }
 
-        /* 팝업 UI */
         .popup-text {
             position: absolute; left: 640px; top: 320px; width: 358px; height: 200px;
             transform: translate(-50%, -50%);
@@ -115,7 +117,6 @@
             white-space: pre-wrap; line-height: 1.5;
         }
 
-        /* 스킬 텍스트 공통 */
         .skill-text {
             position: absolute; transform: translate(-50%, -50%); font-size: 26px; font-weight: bold; z-index: 10;
             background: linear-gradient(to top, #fff var(--fill, 100%), #444 var(--fill, 100%));
@@ -124,13 +125,10 @@
         }
         .locked-skill { color: #555 !important; background: none !important; -webkit-text-fill-color: #555 !important; }
 
-        /* 물리 스킬 */
         #py-1 { left: 250px; top: 580.5px; }
         #py-1-extra { left: 310px; top: 580.5px; display: none; }
         #py-2 { left: 250px; top: 610.5px; }
         #py-3 { left: 250px; top: 640.5px; }
-
-        /* 마법 스킬 */
         #mp-1 { left: 1030px; top: 580.5px; }
         #mp-2 { left: 1030px; top: 610.5px; }
         #mp-3 { left: 1030px; top: 640.5px; }
@@ -148,18 +146,31 @@
             50% { transform: translate(8px, -8px); }
             75% { transform: translate(-8px, -8px); }
         }
+        @keyframes block-screen-anim {
+            0%, 100% { transform: translate(0, 0); }
+            33% { transform: translate(-3px, 0); }
+            66% { transform: translate(3px, 0); }
+        }
         .shake-monster { animation: shake-anim 0.2s ease-in-out; }
         .shake-screen { animation: shake-screen-anim 0.2s ease-in-out; }
+        .block-screen { animation: block-screen-anim 0.15s ease-in-out; }
+
     </style>
 </head>
 <body>
 
+    <!-- 오디오 엘리먼트 (더미 소스, 실제 환경에서 연결) -->
+    <audio id="bgm" src="Data/bgm.mp3" loop></audio>
+    <audio id="sfx-atk" src="Data/attack.mp3"></audio>
+    <audio id="sfx-hit" src="Data/hit.mp3"></audio>
+    <audio id="sfx-def" src="Data/defend.mp3"></audio>
+    <audio id="sfx-buy" src="Data/buy.mp3"></audio>
+    <audio id="sfx-err" src="Data/error.mp3"></audio>
+
     <div id="game-container">
         
-        <!-- 피격 붉은 화면 효과 -->
         <div id="red-flash"></div>
 
-        <!-- 상단 버튼 -->
         <img id="stop-btn" src="Data/DR_Stop_Button.png" class="ui-element clickable" style="left: 82px; top: 84.5px; display: none; z-index: 100;" onclick="togglePause()" alt="Pause">
         <img id="back-btn" src="Data/DR_Back_Button.png" class="ui-element clickable" style="left: 1130px; top: 85px; display: none; z-index: 100;" onclick="goBack()" alt="Back">
 
@@ -182,7 +193,6 @@
         <!-- 3. 게임 플레이 화면 -->
         <div id="game-screen" class="screen">
             
-            <!-- 무기 애니메이션 UI (z-index 0) -->
             <img id="weapon-shield" src="Data/DR_Shield.png" class="weapon-ui" alt="Shield">
             <img id="weapon-sword" src="Data/DR_Sword.png" class="weapon-ui" alt="Sword">
             <img id="weapon-staff" src="Data/DR_Staff.png" class="weapon-ui" alt="Staff">
@@ -197,10 +207,10 @@
             <img id="monster-img" src="" class="ui-element" style="left: 640px; top: 337px; z-index: 4;">
             <img id="monster-gauge-img" src="" class="ui-element" style="left: 640px; top: 337px;">
             
-            <!-- 공격 이펙트 -->
-            <div id="attack-vfx"></div>
+            <!-- 이펙트 -->
+            <div id="attack-vfx" class="vfx-sprite"></div>
+            <div id="hit-vfx" class="vfx-sprite"></div>
             
-            <!-- 대사 말풍선 -->
             <div id="monster-chat"></div>
 
             <img src="Data/DR_HP_Bg.png" class="ui-element" style="left: 250px; top: 470.5px; z-index: 1;">
@@ -219,7 +229,6 @@
             
             <div id="player-chat-text"></div> 
             
-            <!-- 타이머 -->
             <img id="attack-time-gauge" src="Data/DR_Attack_Time.png" class="ui-element" style="left: 640.5px; top: 671px; z-index: 1;">
             <div id="timer-text" class="status-text" style="left: 640.5px; top: 671px; font-size: 24px; z-index: 2;">01:00</div>
 
@@ -244,13 +253,30 @@
             <img id="popup-gameover-btn" src="Data/DR_Gameover_Button.png" class="ui-element clickable" style="left: 640px; top: 460px; z-index: 103; display: none;" onclick="goBack(event)" alt="Game Over">
         </div>
 
+        <!-- 5. 상점 (마켓) 레이어 -->
+        <div id="market-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 150; display: none;">
+            <img src="Data/DR_Market_popup.png" class="ui-element" style="left: 640px; top: 250px;">
+            <div id="market-items-container"></div>
+            <img id="market-next-btn" src="Data/DR_Next_Button.png" class="ui-element clickable" style="left: 640px; top: 460px;" onclick="closeMarketAndNext(event)" alt="Next">
+        </div>
+
+        <!-- 6. 아이템 정보 팝업 레이어 (상점 위) -->
+        <div id="market-info-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 160; display: none;">
+            <img src="Data/DR_Item_info_popup.png" class="ui-element" style="left: 640px; top: 321px;">
+            <img id="info-item-img" src="" class="ui-element" style="left: 479px; top: 281px;">
+            <div id="info-item-name" class="ui-element" style="left: 679px; top: 236px; font-size: 30px; font-weight: bold; color: #fff; text-shadow: 2px 2px 0 #000;"></div>
+            <div id="info-item-desc" class="ui-element" style="left: 696px; top: 320px; font-size: 20px; color: #fff; line-height: 1.4; text-shadow: 1px 1px 0 #000; text-align: left; width: 200px;"></div>
+            
+            <img src="Data/DR_Item_buy.png" class="ui-element clickable" style="left: 520px; top: 396px;" onclick="buyItem(event)" alt="Buy">
+            <img src="Data/DR_Item_cancel.png" class="ui-element clickable" style="left: 760px; top: 396px;" onclick="closeMarketInfo(event)" alt="Cancel">
+        </div>
+
     </div>
 
     <script>
         /* =================================================================
            데이터 및 설정
         ================================================================= */
-        // 배경 이미지 초기 세팅 확인
         const BG_MAP = {
             main: 'url("Data/DR_Main_Bg.png")', select: 'url("Data/DR_Game_Select_Bg.png")',
             bgList: {
@@ -264,7 +290,7 @@
             '베기': { type: 'py', dmg: 1, cd: 1000, mp: 0, el: 'py-1' },
             '연속 베기': { type: 'py', dmg: 3, cd: 2000, mp: 0, el: 'py-1-extra', reqFlag: 'hasCombo' },
             '찌르기': { type: 'py', dmg: 1, cd: 2000, mp: 0, el: 'py-2' },
-            '방어': { type: 'py', dmg: 0, cd: 500, mp: 0, el: 'py-3' }, // 방어 쿨타임 0.5초(500ms)로 수정
+            '방어': { type: 'py', dmg: 0, cd: 500, mp: 0, el: 'py-3' }, // 방어 쿨 0.5s
             '매직 애로우': { type: 'mp', dmg: 2, cd: 2000, mp: 2, el: 'mp-1' },
             '파이어볼': { type: 'mp', dmg: 3, cd: 3000, mp: 3, el: 'mp-2', reqFlag: 'fireballActive' },
             '쉴드': { type: 'mp', dmg: 0, cd: 2000, mp: 2, el: 'mp-3' }
@@ -278,7 +304,7 @@
                 { id: 'highorc', name: '하이오크', hp: 12, atk: 2, cd: 4000, img: 'DR_Monster_High_Orc.png', isBoss: true, bgIdx: 0 },
                 { id: 'slime', name: '슬라임', hp: 5, atk: 1, cd: 5000, img: 'DR_Monster_Slime.png', bgIdx: 1 },
                 { id: 'swarm1', name: '거대 모기 벌레', hp: 5, atk: 2, cd: 4000, img: 'DR_Monster_Swarm.png', bgIdx: 1 },
-                { id: 'ghoul', name: '구울', hp: 9, atk: 1, cd: 4000, img: 'DR_Monster_Ghoul.png', dropItem: '마법 지팡이', bgIdx: 1 },
+                { id: 'ghoul', name: '구울', hp: 9, atk: 1, cd: 4000, img: 'DR_Monster_Ghoul.png', bgIdx: 1 },
                 { id: 'troll', name: '트롤', hp: 20, atk: 2, cd: 3000, img: 'DR_Monster_Troll.png', isBoss: true, bgIdx: 1 }
             ],
             2: [ 
@@ -289,7 +315,8 @@
                 { id: 'wolf', name: '늑대', hp: 10, atk: 2, cd: 4000, img: 'DR_Monster_Scorpion.png', bgIdx: 1 },
                 { id: 'harpy', name: '하피', hp: 15, atk: 3, cd: 3000, img: 'DR_Monster_Harpy.png', bgIdx: 1 },
                 { id: 'mandragora', name: '만드라고라', hp: 10, atk: 4, cd: 3000, img: 'DR_Monster_Mandragora.png', bgIdx: 1 },
-                { id: 'griffin', name: '그리핀', hp: 15, atk: 2, cd: 3000, img: 'DR_Monster_Griffin.png', dropItem: '쉴드 해금', isBoss: true, bgIdx: 1 }
+                { id: 'griffin', name: '그리핀', hp: 15, atk: 2, cd: 3000, img: 'DR_Monster_Griffin.png', dropItem: '쉴드 해금', isBoss: true, bgIdx: 1 },
+                { id: 'ghoul_normal', name: '구울', hp: 12, atk: 2, cd: 4000, img: 'DR_Monster_Ghoul.png', dropItem: '마법 지팡이', bgIdx: 1 } // 지팡이 해금용 구울 (Normal)
             ],
             3: [ 
                 { id: 'skeleton', name: '해골 병사', hp: 15, atk: 2, cd: 2000, img: 'DR_Monster_Skeleton.png', bgIdx: 0 },
@@ -309,14 +336,21 @@
 
         const HIT_PLAYER_LINES = ["크윽.. 강하군.", "젠장!", "질 수 없다!", "버틴다!", "누가 이기나 보자!", "이럴수가!", "도망치지 않아!", "칫, 이 정도야!"];
 
+        const STORE_ITEMS = [
+            { id: 1, name: '물약', price: 5, desc: '체력 완전 회복', img: 'DR_Store_Item_1.png', action: () => { player.hp = player.maxHp; } },
+            { id: 2, name: '공격력 +1', price: 9, desc: '모든 물리 공격력 1 증가', img: 'DR_Store_Item_2.png', action: () => { player.bonusPyAtk += 1; } },
+            { id: 3, name: '공격력 +2', price: 15, desc: '모든 물리 공격력 2 증가', img: 'DR_Store_Item_3.png', action: () => { player.bonusPyAtk += 2; } }
+        ];
+
         let gameState = 'START'; 
         let unlockedDiff = 1; 
         let currentDiff = 1;
         let selectedDiff = 1;
         let monsterIdx = 0;
         
-        let player = { maxHp: 10, hp: 10, maxMp: 10, mp: 10, gold: 0, cooldowns: {}, flags: {}, isDefending: false, stunTimer: 0 };
+        let player = { maxHp: 10, hp: 10, maxMp: 10, mp: 10, gold: 0, bonusPyAtk: 0, cooldowns: {}, flags: {}, isDefending: false, stunTimer: 0 };
         let monster = null;
+        let selectedMarketItem = null;
         
         let lastTime = 0, monsterAttackTimer = 0, mpRegenTimer = 0, monsterStunTimer = 0;
         let stageTimer = 60000; 
@@ -324,9 +358,12 @@
 
         const container = document.getElementById('game-container');
         const inputEl = document.getElementById('typing-input');
-        
-        // 초기 렌더링 시 배경 명시적 할당
         container.style.backgroundImage = BG_MAP.main;
+
+        function playAudio(id) {
+            const el = document.getElementById(id);
+            if(el) { el.currentTime = 0; el.play().catch(()=>{}); }
+        }
 
         /* =================================================================
            키보드 조작
@@ -342,10 +379,17 @@
                 } else if (gameState === 'ALERT') {
                     document.getElementById('popup-layer').style.display = 'none';
                     gameState = 'DIFF';
+                } else if (gameState === 'MARKET') {
+                    closeMarketAndNext();
                 }
             } 
             else if (gameState === 'DIFF') {
                 if (['1', '2', '3', '4'].includes(e.key)) handleDiffClick(parseInt(e.key));
+            }
+            else if (gameState === 'MARKET') {
+                if (['1', '2', '3'].includes(e.key)) {
+                    openMarketInfo(parseInt(e.key) - 1);
+                }
             }
         });
 
@@ -394,8 +438,10 @@
             if(e) e.stopPropagation();
             inputEl.value = ''; inputEl.blur();
             if (gameState === 'DIFF') switchScreen('start-screen');
-            else if (['GAME', 'PAUSE', 'GAMEOVER', 'POPUP', 'TRANSITION'].includes(gameState)) { 
+            else if (['GAME', 'PAUSE', 'GAMEOVER', 'POPUP', 'TRANSITION', 'MARKET', 'MARKET_INFO'].includes(gameState)) { 
                 document.getElementById('popup-layer').style.display = 'none';
+                document.getElementById('market-layer').style.display = 'none';
+                document.getElementById('market-info-layer').style.display = 'none';
                 switchScreen('diff-screen'); 
             }
         }
@@ -403,7 +449,6 @@
         function togglePause() {
             if (gameState === 'GAME') {
                 gameState = 'PAUSE';
-                // 줄간격 축소 및 안내문구 색상/폰트 변경
                 const pauseHTML = `일시 정지<br><span style="display:block; font-size:25px; color:#aaa; margin-top:5px; line-height:1;">(아무 곳이나 눌러 재개)</span>`;
                 showPopup(pauseHTML, 'PAUSE', true);
             } 
@@ -423,14 +468,12 @@
 
         function showPopup(text, type = 'PAUSE', isHTML = false) {
             document.getElementById('popup-layer').style.display = 'block';
-            if (isHTML) {
-                document.getElementById('popup-text').innerHTML = text;
-            } else {
-                document.getElementById('popup-text').innerText = text;
-            }
+            if (isHTML) document.getElementById('popup-text').innerHTML = text;
+            else document.getElementById('popup-text').innerText = text;
             
             document.getElementById('popup-next-btn').style.display = (type === 'NEXT') ? 'block' : 'none';
             document.getElementById('popup-gameover-btn').style.display = (type === 'GAMEOVER') ? 'block' : 'none';
+            document.getElementById('popup-bg-img').src = 'Data/DR_Item_Popup.png';
         }
 
         /* 이펙트 및 흔들림 연출 */
@@ -443,18 +486,23 @@
         }
         function triggerScreenShake() {
             const screen = document.getElementById('game-container');
-            screen.classList.remove('shake-screen');
+            screen.classList.remove('shake-screen'); screen.classList.remove('block-screen');
             void screen.offsetWidth;
             screen.classList.add('shake-screen');
             
-            // 붉은 화면 깜빡임
             const redFlash = document.getElementById('red-flash');
             redFlash.style.opacity = '0.4';
             setTimeout(() => { redFlash.style.opacity = '0'; }, 150);
         }
+        function triggerBlockShake() {
+            const screen = document.getElementById('game-container');
+            screen.classList.remove('shake-screen'); screen.classList.remove('block-screen');
+            void screen.offsetWidth;
+            screen.classList.add('block-screen');
+        }
 
-        function playAttackVFX() {
-            const vfx = document.getElementById('attack-vfx');
+        function playSpriteVFX(id) {
+            const vfx = document.getElementById(id);
             vfx.style.display = 'block';
             let frame = 0;
             const frames = ['0% 0%', '100% 0%', '0% 100%', '100% 100%'];
@@ -465,7 +513,7 @@
                     clearInterval(interval);
                     vfx.style.display = 'none';
                 }
-            }, 50); // 총 200ms
+            }, 50);
         }
 
         function updateTimerUI() {
@@ -485,13 +533,84 @@
             if (mText) {
                 let mEl = document.getElementById('monster-chat');
                 mEl.innerText = mText; mEl.style.display = 'block';
-                setTimeout(() => { if (gameState !== 'GAMEOVER') mEl.style.display = 'none'; }, 2000);
+                setTimeout(() => { if (gameState !== 'GAMEOVER') mEl.style.display = 'none'; }, 3000);
             }
             if (pText) {
                 let pEl = document.getElementById('player-chat-text');
                 pEl.innerText = pText; pEl.style.display = 'flex';
-                setTimeout(() => { if (gameState !== 'GAMEOVER') pEl.style.display = 'none'; }, 2000);
+                setTimeout(() => { if (gameState !== 'GAMEOVER') pEl.style.display = 'none'; }, 3000);
             }
+        }
+
+        /* =================================================================
+           상점 시스템
+        ================================================================= */
+        function renderMarket() {
+            const container = document.getElementById('market-items-container');
+            container.innerHTML = '';
+            const positions = [495, 640, 785];
+            
+            STORE_ITEMS.slice(0,3).forEach((item, idx) => {
+                let x = positions[idx];
+                container.innerHTML += `
+                    <img src="Data/${item.img}" class="ui-element clickable" style="left:${x}px; top:260px;" onclick="openMarketInfo(${idx})">
+                    <div class="ui-element" style="left:${x}px; top:360px; font-size:25px; color:#ffd700; text-shadow:2px 2px 0 #000; font-weight:bold;">${item.price} 골드</div>
+                    <div class="ui-element" style="left:${x}px; top:180px; font-size:20px; color:#aaa; font-weight:bold;">[${idx+1}]</div>
+                `;
+            });
+        }
+
+        function showMarket() {
+            gameState = 'MARKET';
+            document.getElementById('market-layer').style.display = 'block';
+            renderMarket();
+        }
+
+        function openMarketInfo(idx) {
+            if(gameState !== 'MARKET') return;
+            selectedMarketItem = STORE_ITEMS[idx];
+            
+            document.getElementById('info-item-img').src = `Data/${selectedMarketItem.img}`;
+            document.getElementById('info-item-name').innerText = selectedMarketItem.name;
+            
+            // 8글자마다 줄바꿈
+            let formattedDesc = selectedMarketItem.desc.match(/.{1,8}/g).join('\n');
+            document.getElementById('info-item-desc').innerText = formattedDesc;
+            
+            gameState = 'MARKET_INFO';
+            document.getElementById('market-info-layer').style.display = 'block';
+            playAudio('sfx-buy');
+        }
+
+        function closeMarketInfo(e) {
+            if(e) e.stopPropagation();
+            gameState = 'MARKET';
+            document.getElementById('market-info-layer').style.display = 'none';
+        }
+
+        function buyItem(e) {
+            if(e) e.stopPropagation();
+            if (player.gold >= selectedMarketItem.price) {
+                player.gold -= selectedMarketItem.price;
+                selectedMarketItem.action();
+                document.getElementById('gold-val').innerText = player.gold;
+                updateStatusUI();
+                playAudio('sfx-buy');
+                closeMarketInfo();
+            } else {
+                playAudio('sfx-err');
+                alert("골드가 부족합니다!");
+            }
+        }
+
+        function closeMarketAndNext(e) {
+            if(e) e.stopPropagation();
+            document.getElementById('market-layer').style.display = 'none';
+            monsterIdx++;
+            gameState = 'GAME';
+            loadMonster();
+            lastTime = performance.now();
+            inputEl.focus();
         }
 
         /* =================================================================
@@ -505,7 +624,7 @@
             inputEl.value = ''; 
             currentDiff = selectedDiff;
             monsterIdx = 0;
-            player.hp = player.maxHp; player.mp = player.maxMp;
+            player.hp = player.maxHp; player.mp = player.maxMp; player.bonusPyAtk = 0;
             player.flags = { blockCount: 0, dullahanBlock: 0, griffinHits: 0 };
             
             Object.keys(SKILLS).forEach(k => player.cooldowns[k] = 0);
@@ -516,10 +635,8 @@
             
             gameState = 'GAME';
             lastTime = performance.now();
-            if (!gameLoopStarted) {
-                requestAnimationFrame(gameLoop);
-                gameLoopStarted = true;
-            }
+            playAudio('bgm');
+            if (!gameLoopStarted) { requestAnimationFrame(gameLoop); gameLoopStarted = true; }
             inputEl.focus();
         }
 
@@ -534,21 +651,29 @@
             monster = { ...mData, maxHp: mData.hp }; 
             monsterAttackTimer = 0; monsterStunTimer = 0; stageTimer = 60000; 
             
+            // 보스 스케일링
+            const scale = monster.isBoss ? 1.3 : 1;
+            document.getElementById('monster-img').style.transform = `translate(-50%, -50%) scale(${scale})`;
+            document.getElementById('monster-gauge-img').style.transform = `translate(-50%, -50%) scale(${scale})`;
+            document.getElementById('monster-shadow').style.transform = `translate(-50%, -50%) scale(${scale})`;
+
+            // 리셋 스타일 (죽음 효과 방지)
+            const mImg = document.getElementById('monster-img');
+            const mGauge = document.getElementById('monster-gauge-img');
+            mImg.classList.remove('monster-dead'); mGauge.classList.remove('monster-dead');
+            
             document.getElementById('monster-img').style.display = 'block';
             document.getElementById('monster-gauge-img').style.display = 'block';
             document.getElementById('monster-shadow').style.display = 'block';
             document.getElementById('monster-hp-bg').style.display = 'block';
             document.getElementById('monster-hp-gauge').style.display = 'block';
             document.getElementById('monster-name-tag').style.display = 'block';
-            document.getElementById('monster-chat').style.display = 'none';
-            document.getElementById('player-chat-text').style.display = 'none';
             
-            // 방어 UI 초기화
             player.isDefending = false;
             document.getElementById('weapon-shield').classList.remove('active');
 
-            document.getElementById('monster-img').src = `Data/${monster.img}`;
-            document.getElementById('monster-gauge-img').src = `Data/${monster.img}`;
+            mImg.src = `Data/${monster.img}`;
+            mGauge.src = `Data/${monster.img}`;
             container.style.backgroundImage = BG_MAP.bgList[currentDiff][monster.bgIdx];
             
             updateSkillUI(); updateMonsterHpUI(); updateTimerUI();
@@ -569,16 +694,9 @@
                 lastTime = performance.now();
                 inputEl.focus();
             } else {
-                monsterIdx++;
-                gameState = 'GAME';
-                loadMonster();
-                lastTime = performance.now();
-                inputEl.focus();
+                // 스테이지 클리어 (몬스터 사망 팝업) 후 상점 호출
+                showMarket();
             }
-        }
-
-        function stopGameLoop() {
-            // 루프는 계속 돌게 하고 상태만 변경
         }
 
         /* =================================================================
@@ -651,16 +769,15 @@
                         player.cooldowns[word] = now;
                         player.mp -= s.mp;
                         
-                        // 방어가 깨지면 쉴드 원위치
                         player.isDefending = false;
                         document.getElementById('weapon-shield').classList.remove('active');
                         
                         if (word === '방어' || word === '쉴드') {
                             player.isDefending = true;
                             player.currentDefSkill = word;
-                            document.getElementById('weapon-shield').classList.add('active'); // 방어 애니메이션
+                            document.getElementById('weapon-shield').classList.add('active'); 
+                            playAudio('sfx-def');
                         } else {
-                            // 무기 애니메이션 실행
                             if (s.type === 'py') {
                                 const sw = document.getElementById('weapon-sword');
                                 sw.classList.add('active'); setTimeout(() => sw.classList.remove('active'), 150);
@@ -679,9 +796,12 @@
 
         function playerAttacksMonster(skillName, skillData) {
             let dmg = skillData.dmg;
+            if (skillData.type === 'py') dmg += player.bonusPyAtk; // 물리 공격력 보너스 적용
             
             triggerMonsterShake();
-            playAttackVFX();
+            playSpriteVFX('attack-vfx');
+            playSpriteVFX('hit-vfx'); // 타격 시 히트 이펙트
+            playAudio('sfx-atk');
             
             const hitLines = ["크악!", "아프다!", "이놈이!", "제법이군.."];
             playDialogue(hitLines[Math.floor(Math.random() * hitLines.length)], null);
@@ -689,29 +809,24 @@
             monster.hp -= dmg;
             updateMonsterHpUI();
 
-            if (monster.hp <= 0) monsterDeathProcess();
+            if (monster.hp <= 0) triggerMonsterDeath();
         }
 
         function monsterAttacksPlayer() {
             let dmg = monster.atk;
             if (player.isDefending) {
-                dmg = 0; 
-                player.isDefending = false; 
+                dmg = 0; player.isDefending = false; 
                 document.getElementById('weapon-shield').classList.remove('active');
-                
-                // 방어 성공 시 짧은 흔들림
-                const screen = document.getElementById('game-container');
-                screen.classList.remove('shake-screen');
-                void screen.offsetWidth;
-                screen.classList.add('shake-screen'); // 재사용
+                triggerBlockShake(); 
+                playAudio('sfx-def');
             }
 
             if (dmg > 0) {
                 player.hp -= dmg;
                 updateStatusUI();
                 triggerScreenShake(); 
+                playAudio('sfx-hit');
                 
-                // 랜덤 피격 대사
                 playDialogue(null, HIT_PLAYER_LINES[Math.floor(Math.random() * HIT_PLAYER_LINES.length)]);
                 
                 if (monster.id === 'highorc' && !player.flags.hasCombo) {
@@ -725,25 +840,34 @@
 
                 if (player.hp <= 0) {
                     gameState = 'GAMEOVER'; inputEl.blur(); 
-                    showPopup('시간 초과!\n게임 오버!', 'GAMEOVER');
+                    showPopup('게임 오버!', 'GAMEOVER');
                 }
             }
         }
 
-        function monsterDeathProcess() {
-            document.getElementById('monster-img').style.display = 'none';
-            document.getElementById('monster-gauge-img').style.display = 'none';
+        function triggerMonsterDeath() {
+            const mImg = document.getElementById('monster-img');
+            const mGauge = document.getElementById('monster-gauge-img');
+            
+            mImg.classList.add('monster-dead');
+            mGauge.classList.add('monster-dead');
+            
+            // 몬스터 체력 UI 숨김
             document.getElementById('monster-shadow').style.display = 'none';
             document.getElementById('monster-hp-bg').style.display = 'none';
             document.getElementById('monster-hp-gauge').style.display = 'none';
             document.getElementById('monster-name-tag').style.display = 'none';
             document.getElementById('monster-chat').style.display = 'none';
 
+            setTimeout(() => {
+                monsterDeathProcess();
+            }, 500);
+        }
+
+        function monsterDeathProcess() {
             player.gold += 1; document.getElementById('gold-val').innerText = player.gold;
             
             let popText = `골드 +1 획득!`;
-            
-            // 해금 아이템 처리
             if (monster.dropItem) {
                 popText += `\n${monster.dropItem} 획득!`;
                 if (monster.dropItem === '마법 지팡이') player.flags.hasStaff = true;
@@ -761,7 +885,7 @@
                         gameState = 'POPUP';
                         showPopup(popText, 'NEXT');
                     }
-                }, 2000);
+                }, 3000);
             } else {
                 gameState = 'POPUP'; inputEl.blur();
                 showPopup(popText, 'NEXT');
@@ -787,7 +911,6 @@
         }
 
         function updateSkillUI() {
-            // 연속 베기
             if (player.flags.hasCombo) {
                 document.getElementById('py-1').style.left = '190px';
                 document.getElementById('py-1-extra').style.display = 'block';
@@ -796,7 +919,6 @@
                 document.getElementById('py-1-extra').style.display = 'none';
             }
             
-            // 마법 스킬 (난이도 및 해금 반영)
             if (currentDiff === 1) {
                 ['mp-1', 'mp-2', 'mp-3'].forEach(id => {
                     let el = document.getElementById(id);
@@ -804,7 +926,6 @@
                 });
                 document.getElementById('weapon-staff').style.display = 'none';
             } else {
-                // 매직 애로우 (지팡이 필요)
                 if (player.flags.hasStaff) {
                     document.getElementById('weapon-staff').style.display = 'block';
                     document.getElementById('mp-1').innerText = '매직 애로우';
@@ -815,7 +936,6 @@
                     document.getElementById('mp-1').classList.add('locked-skill');
                 }
 
-                // 파이어볼 해금
                 if (player.flags.fireballActive) {
                     document.getElementById('mp-2').innerText = '파이어볼';
                     document.getElementById('mp-2').classList.remove('locked-skill');
@@ -824,7 +944,6 @@
                     document.getElementById('mp-2').classList.add('locked-skill');
                 }
 
-                // 쉴드 해금
                 if (player.flags.shieldActive) {
                     document.getElementById('mp-3').innerText = '쉴드';
                     document.getElementById('mp-3').classList.remove('locked-skill');
