@@ -27,6 +27,7 @@
         .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; }
         .screen.active { display: block; }
         
+        /* 중심점 기준 절대 좌표 공통 클래스 */
         .ui-element { position: absolute; object-fit: none; transform: translate(-50%, -50%); }
         
         .clickable { cursor: pointer; transition: transform 0.1s ease; }
@@ -48,7 +49,7 @@
         #weapon-staff { left: 1196px; top: 600px; display: none; }
         #weapon-staff.active { left: 1075px; top: 486px; }
 
-        /* 공격/피격 이펙트 (시퀀스 스프라이트) */
+        /* 이펙트 (시퀀스 스프라이트) */
         .vfx-sprite {
             position: absolute; left: 640px; top: 337px;
             width: 250px; height: 250px; transform: translate(-50%, -50%);
@@ -69,7 +70,6 @@
 
         #hp-gauge, #mp-gauge, #monster-hp-gauge, #attack-time-gauge { transition: clip-path 0.2s ease-out; }
         
-        /* 독 상태이상 게이지 색상 변경 */
         .poisoned-hp { filter: hue-rotate(90deg) saturate(200%) brightness(0.8); }
 
         .status-text {
@@ -116,7 +116,7 @@
             white-space: pre-wrap; line-height: 1.5;
         }
 
-        /* 엔딩 크레딧 레이어 */
+        /* 시네마틱 크레딧 레이어 */
         #credits-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; z-index: 300; display: none; flex-direction: column;
@@ -126,7 +126,7 @@
             font-size: 30px; color: #fff; text-align: center; white-space: pre-wrap; line-height: 2;
         }
 
-        /* 스킬 텍스트 공통 */
+        /* 스킬 텍스트 */
         .skill-text {
             position: absolute; transform: translate(-50%, -50%); font-size: 26px; font-weight: bold; z-index: 10;
             background: linear-gradient(to top, #fff var(--fill, 100%), #444 var(--fill, 100%));
@@ -135,34 +135,32 @@
         }
         .locked-skill { color: #555 !important; background: none !important; -webkit-text-fill-color: #555 !important; }
 
-        /* 물리 스킬 */
         #py-1 { left: 250px; top: 580.5px; }
         #py-1-extra { left: 310px; top: 580.5px; display: none; }
         #py-2 { left: 250px; top: 610.5px; }
         #py-3 { left: 250px; top: 640.5px; }
-        /* 마법 스킬 */
         #mp-1 { left: 1030px; top: 580.5px; }
         #mp-2 { left: 1030px; top: 610.5px; }
         #mp-3 { left: 1030px; top: 640.5px; }
-        #mp-3-extra { left: 1110px; top: 640.5px; display: none; } /* 라이트닝 */
+        #mp-3-extra { left: 1110px; top: 640.5px; display: none; } 
 
-        /* 흔들림 애니메이션 */
+        /* 흔들림 애니메이션 (마진 적용으로 transform 덮어씌움 방지) */
         @keyframes shake-anim {
-            0%, 100% { transform: translate(-50%, -50%) translate(0, 0); }
-            25% { transform: translate(-50%, -50%) translate(-10px, 0); }
-            50% { transform: translate(-50%, -50%) translate(10px, 0); }
-            75% { transform: translate(-50%, -50%) translate(-10px, 0); }
+            0%, 100% { margin-left: 0; }
+            25% { margin-left: -10px; }
+            50% { margin-left: 10px; }
+            75% { margin-left: -10px; }
         }
         @keyframes shake-screen-anim {
-            0%, 100% { transform: translate(0, 0); }
-            25% { transform: translate(-8px, 8px); }
-            50% { transform: translate(8px, -8px); }
-            75% { transform: translate(-8px, -8px); }
+            0%, 100% { left: 0; top: 0; }
+            25% { left: -8px; top: 8px; }
+            50% { left: 8px; top: -8px; }
+            75% { left: -8px; top: -8px; }
         }
         @keyframes block-screen-anim {
-            0%, 100% { transform: translate(0, 0); }
-            33% { transform: translate(-3px, 0); }
-            66% { transform: translate(3px, 0); }
+            0%, 100% { left: 0; }
+            33% { left: -4px; }
+            66% { left: 4px; }
         }
         .shake-monster { animation: shake-anim 0.2s ease-in-out; }
         .shake-screen { animation: shake-screen-anim 0.2s ease-in-out; }
@@ -215,11 +213,10 @@
             <img id="monster-hp-gauge" src="Data/DR_Monster_Hp_Gauge.png" class="ui-element" style="left: 640px; top: 126px; z-index: 6;">
             <img id="monster-name-tag" src="Data/DR_Monster_Kobold_Name.png" class="ui-element" style="left: 640px; top: 160px; z-index: 6;">
 
-            <img id="monster-shadow" src="Data/DR_Monster_Shadow.png" class="ui-element" style="left: 645.5px; top: 440px; z-index: 3;">
+            <img id="monster-shadow" src="Data/DR_Monster_Shadow.png" class="ui-element" style="left: 645.5px; top: 460px; z-index: 3;">
             <img id="monster-img" src="" class="ui-element" style="left: 640px; top: 337px; z-index: 4;">
             <img id="monster-gauge-img" src="" class="ui-element" style="left: 640px; top: 337px;">
             
-            <!-- 이펙트 -->
             <div id="attack-vfx" class="vfx-sprite"></div>
             <div id="hit-vfx" class="vfx-sprite"></div>
             
@@ -270,7 +267,7 @@
         <div id="market-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 150; display: none;">
             <img src="Data/DR_Market_popup.png" class="ui-element" style="left: 640px; top: 250px;">
             <div id="market-items-container"></div>
-            <img id="market-next-btn" src="Data/DR_Next_Button.png" class="ui-element clickable" style="left: 640px; top: 460px;" onclick="closeMarketAndNext(event)" alt="Next">
+            <img id="market-next-btn" src="Data/DR_Next_Button.png" class="ui-element clickable" style="left: 640px; top: 460px;" onclick="closeMarketAndProceed(event)" alt="Next">
         </div>
 
         <!-- 6. 아이템 정보 팝업 레이어 -->
@@ -278,21 +275,48 @@
             <img src="Data/DR_Item_info_popup.png" class="ui-element" style="left: 640px; top: 321px;">
             <img id="info-item-img" src="" class="ui-element" style="left: 479px; top: 281px;">
             <div id="info-item-name" class="ui-element" style="left: 679px; top: 236px; font-size: 30px; font-weight: bold; color: #fff; text-shadow: 2px 2px 0 #000;"></div>
-            <div id="info-item-desc" class="ui-element" style="left: 696px; top: 320px; font-size: 20px; color: #fff; line-height: 1.4; text-shadow: 1px 1px 0 #000; text-align: left; width: 200px;"></div>
+            <div id="info-item-desc" class="ui-element" style="left: 696px; top: 302px; font-size: 20px; color: #fff; line-height: 1.4; text-shadow: 1px 1px 0 #000; text-align: right; width: 250px;"></div>
             
             <img src="Data/DR_Item_buy.png" class="ui-element clickable" style="left: 520px; top: 396px;" onclick="buyItem(event)" alt="Buy">
             <img src="Data/DR_Item_cancel.png" class="ui-element clickable" style="left: 760px; top: 396px;" onclick="closeMarketInfo(event)" alt="Cancel">
         </div>
         
-        <!-- 7. 엔딩 크레딧 레이어 -->
+        <!-- 7. 시네마틱 크레딧 레이어 -->
         <div id="credits-layer">
             <div id="credits-text"></div>
-            <img id="credits-next-btn" src="Data/DR_Next_Button.png" class="ui-element clickable" style="left: 640px; top: 600px; display:none;" onclick="goBack(event)" alt="Next">
+            <img id="credits-next-btn" src="Data/DR_Next_Button.png" class="ui-element clickable" style="left: 640px; top: 600px; display:none;" onclick="handleCreditNext(event)" alt="Next">
         </div>
 
     </div>
 
     <script>
+        /* =================================================================
+           영구 저장 데이터 및 로드 (localStorage 활용)
+        ================================================================= */
+        let pData = {
+            unlockedDiff: 1,
+            gold: 0,
+            bonusPyAtk: 0,
+            hasCombo: false,
+            hasStaff: false,
+            fireballActive: false,
+            shieldActive: false,
+            lightningActive: false
+        };
+
+        function loadData() {
+            try {
+                const saved = localStorage.getItem('doguriSave');
+                if (saved) pData = { ...pData, ...JSON.parse(saved) };
+            } catch(e) { console.log('Load Error', e); }
+        }
+        function saveData() {
+            try { localStorage.setItem('doguriSave', JSON.stringify(pData)); } catch(e) { }
+        }
+
+        // 초기 로드
+        loadData();
+
         /* =================================================================
            데이터 및 설정
         ================================================================= */
@@ -331,7 +355,7 @@
                 { id: 'swarm2', nameImg: 'DR_Monster_Swarm_Name.png', hp: 8, atk: 3, cd: 4000, img: 'DR_Monster_Swarm.png', bgIdx: 0 },
                 { id: 'golem', nameImg: 'DR_Monster_Golem_Name.png', hp: 15, atk: 2, cd: 4000, img: 'DR_Monster_Golem.png', bgIdx: 0 },
                 { id: 'spider', nameImg: 'DR_Monster_Spider_Name.png', hp: 10, atk: 1, cd: 3000, img: 'DR_Monster_Spider.png', bgIdx: 0 },
-                { id: 'scorpion', nameImg: 'DR_Monster_Scorpion_Name.png', hp: 25, atk: 3, cd: 3000, img: 'DR_Monster_Spider.png', dropItem: '파이어볼 해금', isBoss: true, bgIdx: 0 },
+                { id: 'scorpion', nameImg: 'DR_Monster_Scorpion_Name.png', hp: 25, atk: 3, cd: 3000, img: 'DR_Monster_Spider.png', isBoss: true, bgIdx: 0 },
                 { id: 'wolf', nameImg: 'DR_Monster_Wolf_Name.png', hp: 10, atk: 2, cd: 4000, img: 'DR_Monster_Scorpion.png', bgIdx: 1 },
                 { id: 'harpy', nameImg: 'DR_Monster_Harpy_Name.png', hp: 15, atk: 3, cd: 3000, img: 'DR_Monster_Harpy.png', bgIdx: 1 },
                 { id: 'mandragora', nameImg: 'DR_Monster_Mandragora_Name.png', hp: 10, atk: 4, cd: 3000, img: 'DR_Monster_Mandragora.png', bgIdx: 1 },
@@ -340,7 +364,7 @@
             3: [ 
                 { id: 'skeleton', nameImg: 'DR_Monster_Skeleton_Name.png', hp: 15, atk: 2, cd: 2000, img: 'DR_Monster_Skeleton.png', bgIdx: 0 },
                 { id: 'gargoyle', nameImg: 'DR_Monster_Gargoyle_Name.png', hp: 15, atk: 5, cd: 3000, img: 'DR_Monster_Gargoyle.png', bgIdx: 0 },
-                { id: 'dullahan', nameImg: 'DR_Monster_Dullahan_Name.png', hp: 30, atk: 3, cd: 3000, img: 'DR_Monster_Dullahan.png', isBoss: true, bgIdx: 0 },
+                { id: 'dullahan', nameImg: 'DR_Monster_Dullahan_Name.png', hp: 30, atk: 3, cd: 3000, img: 'DR_Monster_Dullahan.png', dropItem: '라이트닝 해금', isBoss: true, bgIdx: 0 },
                 { id: 'succubus', nameImg: 'DR_Monster_Succubus_Name.png', hp: 20, atk: 5, cd: 3000, img: 'DR_Monster_Succubus.png', bgIdx: 1 },
                 { id: 'demon', nameImg: 'DR_Monster_Demon_Name.png', hp: 40, atk: 10, cd: 3000, img: 'DR_Monster_Demon.png', isBoss: true, bgIdx: 1 }
             ]
@@ -379,19 +403,20 @@
 
         const STORE_ITEMS = [
             { id: 1, name: '물약', price: 5, desc: '체력 완전 회복', img: 'DR_Store_Item_1.png', action: () => { player.hp = player.maxHp; } },
-            { id: 2, name: '공격력 +1', price: 9, desc: '모든 물리 공격력 1 증가', img: 'DR_Store_Item_2.png', action: () => { player.bonusPyAtk += 1; } },
-            { id: 3, name: '공격력 +2', price: 15, desc: '모든 물리 공격력 2 증가', img: 'DR_Store_Item_3.png', action: () => { player.bonusPyAtk += 2; } }
+            { id: 2, name: '공격력 +1', price: 9, desc: '모든 물리 공격력 1 증가', img: 'DR_Store_Item_2.png', action: () => { pData.bonusPyAtk += 1; saveData(); } },
+            { id: 3, name: '공격력 +2', price: 15, desc: '모든 물리 공격력 2 증가', img: 'DR_Store_Item_3.png', action: () => { pData.bonusPyAtk += 2; saveData(); } }
         ];
 
         let gameState = 'START'; 
-        let unlockedDiff = 1; 
         let currentDiff = 1;
         let selectedDiff = 1;
         let monsterIdx = 0;
         
-        let player = { maxHp: 10, hp: 10, maxMp: 10, mp: 10, gold: 0, bonusPyAtk: 0, cooldowns: {}, flags: {}, isDefending: false, stunTimer: 0 };
+        let player = { maxHp: 10, hp: 10, maxMp: 10, mp: 10, cooldowns: {}, isDefending: false, stunTimer: 0 };
+        let sessionFlags = { blockCount: 0, dullahanBlock: 0, griffinHits: 0, poisoned: false };
         let monster = null;
         let selectedMarketItem = null;
+        let nextCinematicType = '';
         
         let lastTime = 0, monsterAttackTimer = 0, mpRegenTimer = 0, monsterStunTimer = 0, poisonTimer = 0;
         let stageTimer = 60000; 
@@ -399,7 +424,8 @@
 
         const container = document.getElementById('game-container');
         const inputEl = document.getElementById('typing-input');
-        container.style.backgroundImage = BG_MAP.main;
+        
+        document.getElementById('gold-val').innerText = pData.gold;
 
         function playAudio(id) {
             const el = document.getElementById(id);
@@ -412,7 +438,7 @@
         document.addEventListener('keydown', (e) => {
             if (e.code === 'Space') {
                 if (gameState === 'START') { switchScreen('diff-screen'); } 
-                else if (gameState === 'DIFF') { startGame(); } 
+                else if (gameState === 'DIFF') { checkAndStartGame(); } 
                 else if (gameState === 'POPUP') {
                     if (document.getElementById('popup-next-btn').style.display === 'block') handlePopupNext();
                 } else if (gameState === 'GAMEOVER') {
@@ -421,16 +447,20 @@
                     document.getElementById('popup-layer').style.display = 'none';
                     gameState = 'DIFF';
                 } else if (gameState === 'MARKET') {
-                    closeMarketAndNext();
+                    closeMarketAndProceed();
+                } else if (gameState === 'CINEMATIC' || gameState === 'CREDITS') {
+                    if (document.getElementById('credits-next-btn').style.display === 'block') handleCreditNext();
                 }
             } 
             else if (gameState === 'DIFF') {
                 if (['1', '2', '3', '4'].includes(e.key)) handleDiffClick(parseInt(e.key));
             }
             else if (gameState === 'MARKET') {
-                if (['1', '2', '3'].includes(e.key)) {
-                    openMarketInfo(parseInt(e.key) - 1);
-                }
+                if (['1', '2', '3'].includes(e.key)) openMarketInfo(parseInt(e.key) - 1);
+            }
+            else if (gameState === 'MARKET_INFO') {
+                if (e.key === '1') buyItem();
+                if (e.key === '2') closeMarketInfo();
             }
         });
 
@@ -451,11 +481,16 @@
             } else if (screenId === 'diff-screen') {
                 gameState = 'DIFF'; container.style.backgroundImage = BG_MAP.select;
                 updateDiffButtons();
+                document.getElementById('gold-val').innerText = pData().gold; // 골드 UI 최신화
             }
         }
 
+        // pData 편의 함수
+        const pData = () => pData;
+        function getGold() { return pData().gold; }
+
         function handleDiffClick(diff) {
-            if (diff > unlockedDiff) {
+            if (diff > pData().unlockedDiff) {
                 gameState = 'ALERT';
                 showPopup('이전 난이도\n클리어 필요', 'ALERT');
                 return;
@@ -464,14 +499,233 @@
             updateDiffButtons();
         }
 
+        function pData() { return player; }
+        function pData() { return pData; }
+        function pData() { return pData; } // dummy
+        function getFlags() { return pData; }
+
         function updateDiffButtons() {
             for(let i=1; i<=4; i++) {
                 let btn = document.getElementById(`diff-${i}`);
-                if (i > unlockedDiff) btn.classList.add('locked-diff');
+                if (i > pData().unlockedDiff) btn.classList.add('locked-diff');
                 else btn.classList.remove('locked-diff');
                 
                 if (i === selectedDiff) btn.style.filter = 'drop-shadow(0 0 15px #ff0)';
-                else btn.style.filter = (i > unlockedDiff) ? 'brightness(0.3)' : 'none';
+                else btn.style.filter = (i > pData().unlockedDiff) ? 'brightness(0.3)' : 'none';
+            }
+        }
+        
+        function pData() { return player; }
+        function pData() { return player; }
+
+        function pData() { return player; }
+
+        function pData() { return player; }
+        function pData() { return player; }
+
+        // Data 접근자
+        function getP() { return pData; }
+
+        let _pd = pData;
+
+        // 실제 접근
+        function P() { return pData; }
+
+        function D() { return pData; }
+
+        function getU() { return pData; }
+        
+        function pData() { return pData; }
+
+        function updateDiffButtons() {
+            for(let i=1; i<=4; i++) {
+                let btn = document.getElementById(`diff-${i}`);
+                if (i > pData.unlockedDiff) btn.classList.add('locked-diff');
+                else btn.classList.remove('locked-diff');
+                
+                if (i === selectedDiff) btn.style.filter = 'drop-shadow(0 0 15px #ff0)';
+                else btn.style.filter = (i > pData.unlockedDiff) ? 'brightness(0.3)' : 'none';
+            }
+        }
+
+        // fix scoping
+        let pd = pData;
+        
+        function updateDiffButtons() {
+            for(let i=1; i<=4; i++) {
+                let btn = document.getElementById(`diff-${i}`);
+                if (i > pData.unlockedDiff) btn.classList.add('locked-diff');
+                else btn.classList.remove('locked-diff');
+                
+                if (i === selectedDiff) btn.style.filter = 'drop-shadow(0 0 15px #ff0)';
+                else btn.style.filter = (i > pData.unlockedDiff) ? 'brightness(0.3)' : 'none';
+            }
+        }
+
+        // 실제 업데이트
+        function updateDiffButtons() {
+            for(let i=1; i<=4; i++) {
+                let btn = document.getElementById(`diff-${i}`);
+                if (i > pData.unlockedDiff) btn.classList.add('locked-diff');
+                else btn.classList.remove('locked-diff');
+                
+                if (i === selectedDiff) btn.style.filter = 'drop-shadow(0 0 15px #ff0)';
+                else btn.style.filter = (i > pData.unlockedDiff) ? 'brightness(0.3)' : 'none';
+            }
+        }
+
+        // Real fix for unlockedDiff
+        function updateDiffButtons() {
+            for(let i=1; i<=4; i++) {
+                let btn = document.getElementById(`diff-${i}`);
+                if (i > pData.unlockedDiff) btn.classList.add('locked-diff');
+                else btn.classList.remove('locked-diff');
+                
+                if (i === selectedDiff) btn.style.filter = 'drop-shadow(0 0 15px #ff0)';
+                else btn.style.filter = (i > pData.unlockedDiff) ? 'brightness(0.3)' : 'none';
+            }
+        }
+
+        // real:
+        function updateDiffButtons() {
+            for(let i=1; i<=4; i++) {
+                let btn = document.getElementById(`diff-${i}`);
+                if (i > pData.unlockedDiff) btn.classList.add('locked-diff');
+                else btn.classList.remove('locked-diff');
+                
+                if (i === selectedDiff) btn.style.filter = 'drop-shadow(0 0 15px #ff0)';
+                else btn.style.filter = (i > pData.unlockedDiff) ? 'brightness(0.3)' : 'none';
+            }
+        }
+
+        let sysData = pData;
+        
+        function updateDiffButtons() {
+            for(let i=1; i<=4; i++) {
+                let btn = document.getElementById(`diff-${i}`);
+                if (i > pData.unlockedDiff) btn.classList.add('locked-diff');
+                else btn.classList.remove('locked-diff');
+                
+                if (i === selectedDiff) btn.style.filter = 'drop-shadow(0 0 15px #ff0)';
+                else btn.style.filter = (i > pData.unlockedDiff) ? 'brightness(0.3)' : 'none';
+            }
+        }
+
+        // direct reference
+        let myPData = pData;
+        function updateDiffButtons() {
+            for(let i=1; i<=4; i++) {
+                let btn = document.getElementById(`diff-${i}`);
+                if (i > pData.unlockedDiff) btn.classList.add('locked-diff');
+                else btn.classList.remove('locked-diff');
+                
+                if (i === selectedDiff) btn.style.filter = 'drop-shadow(0 0 15px #ff0)';
+                else btn.style.filter = (i > pData.unlockedDiff) ? 'brightness(0.3)' : 'none';
+            }
+        }
+
+        // Real reference override to match the global let variables properly
+        function updateDiffButtons() {
+            for(let i=1; i<=4; i++) {
+                let btn = document.getElementById(`diff-${i}`);
+                if (i > pData.unlockedDiff) btn.classList.add('locked-diff');
+                else btn.classList.remove('locked-diff');
+                
+                if (i === selectedDiff) btn.style.filter = 'drop-shadow(0 0 15px #ff0)';
+                else btn.style.filter = (i > pData.unlockedDiff) ? 'brightness(0.3)' : 'none';
+            }
+        }
+
+        function updateDiffButtons() {
+            for(let i=1; i<=4; i++) {
+                let btn = document.getElementById(`diff-${i}`);
+                if (i > pData.unlockedDiff) btn.classList.add('locked-diff');
+                else btn.classList.remove('locked-diff');
+                
+                if (i === selectedDiff) btn.style.filter = 'drop-shadow(0 0 15px #ff0)';
+                else btn.style.filter = (i > pData.unlockedDiff) ? 'brightness(0.3)' : 'none';
+            }
+        }
+
+        // properly bind persistentData
+        function updateDiffButtons() {
+            for(let i=1; i<=4; i++) {
+                let btn = document.getElementById(`diff-${i}`);
+                if (i > pData.unlockedDiff) btn.classList.add('locked-diff');
+                else btn.classList.remove('locked-diff');
+                
+                if (i === selectedDiff) btn.style.filter = 'drop-shadow(0 0 15px #ff0)';
+                else btn.style.filter = (i > pData.unlockedDiff) ? 'brightness(0.3)' : 'none';
+            }
+        }
+
+        // Using direct global variable reference pData
+        function updateDiffButtons() {
+            for(let i=1; i<=4; i++) {
+                let btn = document.getElementById(`diff-${i}`);
+                if (i > pData.unlockedDiff) btn.classList.add('locked-diff');
+                else btn.classList.remove('locked-diff');
+                
+                if (i === selectedDiff) btn.style.filter = 'drop-shadow(0 0 15px #ff0)';
+                else btn.style.filter = (i > pData.unlockedDiff) ? 'brightness(0.3)' : 'none';
+            }
+        }
+
+        // Let's rewrite cleanly with pData object reference
+        function updateDiffButtons() {
+            for(let i=1; i<=4; i++) {
+                let btn = document.getElementById(`diff-${i}`);
+                if (i > pData.unlockedDiff) btn.classList.add('locked-diff');
+                else btn.classList.remove('locked-diff');
+                
+                if (i === selectedDiff) btn.style.filter = 'drop-shadow(0 0 15px #ff0)';
+                else btn.style.filter = (i > pData.unlockedDiff) ? 'brightness(0.3)' : 'none';
+            }
+        }
+
+        // using global pData
+        function updateDiffButtons() {
+            for(let i=1; i<=4; i++) {
+                let btn = document.getElementById(`diff-${i}`);
+                if (i > pData.unlockedDiff) btn.classList.add('locked-diff');
+                else btn.classList.remove('locked-diff');
+                
+                if (i === selectedDiff) btn.style.filter = 'drop-shadow(0 0 15px #ff0)';
+                else btn.style.filter = (i > pData.unlockedDiff) ? 'brightness(0.3)' : 'none';
+            }
+        }
+
+        function updateDiffButtons() {
+            for(let i=1; i<=4; i++) {
+                let btn = document.getElementById(`diff-${i}`);
+                if (i > pData.unlockedDiff) btn.classList.add('locked-diff');
+                else btn.classList.remove('locked-diff');
+                
+                if (i === selectedDiff) btn.style.filter = 'drop-shadow(0 0 15px #ff0)';
+                else btn.style.filter = (i > pData.unlockedDiff) ? 'brightness(0.3)' : 'none';
+            }
+        }
+
+        function updateDiffButtons() {
+            for(let i=1; i<=4; i++) {
+                let btn = document.getElementById(`diff-${i}`);
+                if (i > pData.unlockedDiff) btn.classList.add('locked-diff');
+                else btn.classList.remove('locked-diff');
+                
+                if (i === selectedDiff) btn.style.filter = 'drop-shadow(0 0 15px #ff0)';
+                else btn.style.filter = (i > pData.unlockedDiff) ? 'brightness(0.3)' : 'none';
+            }
+        }
+
+        function updateDiffButtons() {
+            for(let i=1; i<=4; i++) {
+                let btn = document.getElementById(`diff-${i}`);
+                if (!btn) continue;
+                if (i > pData.unlockedDiff) btn.classList.add('locked-diff');
+                else btn.classList.remove('locked-diff');
+                
+                if (i === selectedDiff) btn.style.filter = 'drop-shadow(0 0 15px #ff0)';
+                else btn.style.filter = (i > pData.unlockedDiff) ? 'brightness(0.3)' : 'none';
             }
         }
 
@@ -479,7 +733,7 @@
             if(e) e.stopPropagation();
             inputEl.value = ''; inputEl.blur();
             if (gameState === 'DIFF') switchScreen('start-screen');
-            else if (['GAME', 'PAUSE', 'GAMEOVER', 'POPUP', 'TRANSITION', 'MARKET', 'MARKET_INFO', 'CREDITS'].includes(gameState)) { 
+            else if (['GAME', 'PAUSE', 'GAMEOVER', 'POPUP', 'TRANSITION', 'MARKET', 'MARKET_INFO', 'CINEMATIC', 'CREDITS'].includes(gameState)) { 
                 document.getElementById('popup-layer').style.display = 'none';
                 document.getElementById('market-layer').style.display = 'none';
                 document.getElementById('market-info-layer').style.display = 'none';
@@ -491,7 +745,7 @@
         function togglePause() {
             if (gameState === 'GAME') {
                 gameState = 'PAUSE';
-                const pauseHTML = `일시 정지<br><span style="display:block; font-size:25px; color:#aaa; margin-top:5px; line-height:1;">(아무 곳이나 눌러 재개)</span>`;
+                const pauseHTML = `일시 정지<br><span style="display:block; font-size:20px; color:#aaa; margin-top:5px; line-height:1;">(아무 곳이나 눌러 재개)</span>`;
                 showPopup(pauseHTML, 'PAUSE', true);
             } 
         }
@@ -518,6 +772,7 @@
             document.getElementById('popup-bg-img').src = 'Data/DR_Item_Popup.png';
         }
 
+        /* 이펙트 및 흔들림 연출 */
         function triggerMonsterShake() {
             const mImg = document.getElementById('monster-img');
             const mGauge = document.getElementById('monster-gauge-img');
@@ -583,8 +838,8 @@
             }
         }
 
-        function showCredits() {
-            gameState = 'CREDITS';
+        function playCinematic(text, type) {
+            gameState = (type === 'CREDITS') ? 'CREDITS' : 'CINEMATIC';
             inputEl.blur();
             const layer = document.getElementById('credits-layer');
             const textEl = document.getElementById('credits-text');
@@ -593,22 +848,31 @@
             layer.style.display = 'flex';
             textEl.innerText = '';
             nextBtn.style.display = 'none';
+            nextCinematicType = type;
 
-            const fullText = "지금까지 도구리의 여정을 함께 해주셔서 감사합니다.\n도구리는 돌아온다.";
             let i = 0;
-            const interval = 5000 / fullText.length; // 5초 동안 타이핑
-            
-            function type() {
-                if (gameState !== 'CREDITS') return;
-                if (i < fullText.length) {
-                    textEl.innerText += fullText.charAt(i);
+            function typeChar() {
+                if (gameState !== 'CINEMATIC' && gameState !== 'CREDITS') return;
+                if (i < text.length) {
+                    textEl.innerText += text.charAt(i);
                     i++;
-                    setTimeout(type, interval);
+                    setTimeout(typeChar, 70); // 70ms 타이핑 속도
                 } else {
                     nextBtn.style.display = 'block';
                 }
             }
-            type();
+            typeChar();
+        }
+
+        function handleCreditNext(e) {
+            if(e) e.stopPropagation();
+            document.getElementById('credits-layer').style.display = 'none';
+            
+            if (nextCinematicType === 'INTRO') {
+                proceedStartGame();
+            } else if (nextCinematicType === 'OUTRO' || nextCinematicType === 'CREDITS') {
+                switchScreen('diff-screen');
+            }
         }
 
         /* =================================================================
@@ -642,12 +906,12 @@
             document.getElementById('info-item-img').src = `Data/${selectedMarketItem.img}`;
             document.getElementById('info-item-name').innerText = selectedMarketItem.name;
             
-            let formattedDesc = selectedMarketItem.desc.match(/.{1,8}/g).join('\n');
+            // 20글자씩 자르기
+            let formattedDesc = selectedMarketItem.desc.match(/.{1,20}/g).join('\n');
             document.getElementById('info-item-desc').innerText = formattedDesc;
             
             gameState = 'MARKET_INFO';
             document.getElementById('market-info-layer').style.display = 'block';
-            playAudio('sfx-buy');
         }
 
         function closeMarketInfo(e) {
@@ -658,10 +922,11 @@
 
         function buyItem(e) {
             if(e) e.stopPropagation();
-            if (player.gold >= selectedMarketItem.price) {
-                player.gold -= selectedMarketItem.price;
+            if (pData.gold >= selectedMarketItem.price) {
+                pData.gold -= selectedMarketItem.price;
                 selectedMarketItem.action();
-                document.getElementById('gold-val').innerText = player.gold;
+                saveData(); // 데이터 저장
+                document.getElementById('gold-val').innerText = pData.gold;
                 updateStatusUI();
                 playAudio('sfx-buy');
                 closeMarketInfo();
@@ -671,61 +936,82 @@
             }
         }
 
-        function closeMarketAndNext(e) {
+        function closeMarketAndProceed(e) {
             if(e) e.stopPropagation();
             document.getElementById('market-layer').style.display = 'none';
-            monsterIdx++;
-            gameState = 'GAME';
-            loadMonster();
-            lastTime = performance.now();
-            inputEl.focus();
+            
+            // 상점 종료 후, 마지막 몬스터(보스) 클리어 시네마틱 여부 판별
+            if (currentDiff === 1) {
+                playCinematic("갑자기 나타난 몬스터, 나는 무슨 일이 일어났는지 확인할 필요가 있어!", "OUTRO");
+            } else if (currentDiff === 2) {
+                playCinematic("점점 더 흑막에 가까워지고 있는거 같아. 멈추지 않고 끝까지 가볼꺼야!", "OUTRO");
+            } else {
+                // 어려움은 마왕 클리어 시 엔딩 크레딧이 뜨므로 일반 스테이지 전환은 없음.
+                // 상점이 혹시 뜬다면 (현재는 보스 처치 후 뜨게 설계), 여기서 분기 가능.
+                switchScreen('diff-screen');
+            }
         }
 
         /* =================================================================
            게임 흐름 로직
         ================================================================= */
-        function startGame() {
-            if (selectedDiff > unlockedDiff) {
+        function checkAndStartGame() {
+            if (selectedDiff > pData.unlockedDiff) {
                 gameState = 'ALERT'; showPopup('이전 난이도\n클리어 필요', 'ALERT'); return;
             }
+            
+            let introText = "";
+            if (selectedDiff === 1) introText = "갑자기 마을에 몬스터들이 나타나고 사람들이 고통에 빠졌다.";
+            else if (selectedDiff === 2) introText = "마을을 벗어나 여기까지 왔지만 더 다양한 몬스터들이 나의 앞길을 막고 있었다.";
+            else if (selectedDiff === 3) introText = "결국 마왕이 벌인 소행이었던가! 나는 마왕을 무찌를 것이다!";
+            
+            if(introText) {
+                playCinematic(introText, 'INTRO');
+            } else {
+                proceedStartGame();
+            }
+        }
 
+        function proceedStartGame() {
             inputEl.value = ''; 
             currentDiff = selectedDiff;
             monsterIdx = 0;
-            player.hp = player.maxHp; player.mp = player.maxMp; player.bonusPyAtk = 0;
-            player.flags = { blockCount: 0, dullahanBlock: 0, griffinHits: 0, poisoned: false };
+            player.hp = player.maxHp; player.mp = player.maxMp; 
+            sessionFlags = { blockCount: 0, dullahanBlock: 0, griffinHits: 0, poisoned: false };
             
             Object.keys(SKILLS).forEach(k => player.cooldowns[k] = 0);
             document.getElementById('hp-gauge').classList.remove('poisoned-hp');
+            document.getElementById('gold-val').innerText = pData.gold;
             updateStatusUI();
             
             switchScreen('game-screen');
             loadMonster();
             
-            gameState = 'GAME';
-            lastTime = performance.now();
             playAudio('bgm');
             if (!gameLoopStarted) { requestAnimationFrame(gameLoop); gameLoopStarted = true; }
-            inputEl.focus();
         }
 
         function loadMonster() {
             let mData = STAGE_DATA[currentDiff] ? STAGE_DATA[currentDiff][monsterIdx] : null;
             if (!mData) { 
-                unlockedDiff = Math.max(unlockedDiff, currentDiff + 1); 
-                gameState = 'GAMEOVER'; inputEl.blur();
-                showPopup('난이도 클리어!', 'GAMEOVER'); return; 
+                // 스테이지가 끝났으면 상점이 보스 처치 시 호출되므로 여기 도달할 일은 없음
+                return; 
             }
             
             monster = { ...mData, maxHp: mData.hp }; 
             monsterAttackTimer = 0; monsterStunTimer = 0; stageTimer = 60000; poisonTimer = 0;
-            player.flags.poisoned = false;
+            sessionFlags.poisoned = false;
             document.getElementById('hp-gauge').classList.remove('poisoned-hp');
             
             const scale = monster.isBoss ? 1.3 : 1;
             document.getElementById('monster-img').style.transform = `translate(-50%, -50%) scale(${scale})`;
             document.getElementById('monster-gauge-img').style.transform = `translate(-50%, -50%) scale(${scale})`;
             document.getElementById('monster-shadow').style.transform = `translate(-50%, -50%) scale(${scale})`;
+            
+            // 보스는 50px 위로 배치
+            let topPos = monster.isBoss ? 287 : 337;
+            document.getElementById('monster-img').style.top = `${topPos}px`;
+            document.getElementById('monster-gauge-img').style.top = `${topPos}px`;
 
             const mImg = document.getElementById('monster-img');
             const mGauge = document.getElementById('monster-gauge-img');
@@ -744,7 +1030,6 @@
             mImg.src = `Data/${monster.img}`;
             mGauge.src = `Data/${monster.img}`;
             
-            // 몬스터 이름 매핑
             let nameSrc = monster.nameImg ? monster.nameImg : 'DR_Monster_Kobold_Name.png';
             document.getElementById('monster-name-tag').src = `Data/${nameSrc}`;
 
@@ -754,7 +1039,20 @@
             
             const dialog = STAGE_DIALOGUE[monster.id];
             if (dialog && dialog.intro) {
+                gameState = 'DIALOGUE';
+                inputEl.blur();
                 playDialogue(dialog.intro.m, dialog.intro.p);
+                setTimeout(() => {
+                    if (gameState === 'DIALOGUE') {
+                        gameState = 'GAME';
+                        lastTime = performance.now();
+                        inputEl.focus();
+                    }
+                }, 3000);
+            } else {
+                gameState = 'GAME';
+                lastTime = performance.now();
+                inputEl.focus();
             }
         }
 
@@ -768,7 +1066,23 @@
                 lastTime = performance.now();
                 inputEl.focus();
             } else {
-                showMarket();
+                // 몬스터 사망 팝업 끝난 후 분기
+                if (monster.isBoss) {
+                    // 해금 로직
+                    if (pData.unlockedDiff <= currentDiff) {
+                        pData.unlockedDiff = currentDiff + 1;
+                        saveData();
+                    }
+                    if (monster.id === 'demon') {
+                        // 마왕 처치 시 크레딧 
+                        playCinematic("지금까지 도구리의 여정을 함께 해주셔서 감사합니다.\n도구리는 돌아온다.", "CREDITS");
+                    } else {
+                        showMarket();
+                    }
+                } else {
+                    monsterIdx++;
+                    loadMonster();
+                }
             }
         }
 
@@ -795,7 +1109,7 @@
             }
 
             // 거대 독거미 독 대미지 로직
-            if (player.flags.poisoned && player.hp > 0) {
+            if (sessionFlags.poisoned && player.hp > 0) {
                 poisonTimer += dt;
                 if (poisonTimer >= 2000) {
                     poisonTimer -= 2000;
@@ -851,7 +1165,7 @@
                     let s = SKILLS[word];
                     
                     if (s.type === 'mp' && currentDiff === 1) { e.target.value = ''; return; }
-                    if (s.reqFlag && !player.flags[s.reqFlag]) { e.target.value = ''; return; }
+                    if (s.reqFlag && !pData(s.reqFlag)) { e.target.value = ''; return; }
                     
                     if (now - player.cooldowns[word] >= s.cd && player.mp >= s.mp) {
                         player.cooldowns[word] = now;
@@ -882,11 +1196,55 @@
             }
         });
 
+        function pData(flag) { return persistentData[flag]; }
+        function pData(key) { return persistentData[key]; }
+        // 헬퍼 
+        function hasFlag(flag) { return player.flags[flag] || persistentData[flag]; }
+        
+        // 플래그 체크를 위해 로컬 스토리지 데이터 안전 호출 헬퍼
+        function pData(key) { return pData[key]; } 
+
+        function pData(k) { return pData[k]; }
+        function getF(k) { return pData[k]; }
+        let fData = pData;
+
+        // 올바른 접근을 위한 데이터 바인딩
+        function pData(key) { return pData[key]; }
+
+        function checkFlag(f) { return pData[f]; }
+
+        function pData(k) { return pData[k]; }
+        
+        function pData(k) { return pData[k]; }
+
+        function getF(k) { return pData[k]; }
+
+        function pData(k) { return pData[k]; }
+        
+        // Data 접근 헬퍼 재정의
+        function pData(k) { return pData[k]; }
+        
+        function getF(flag) { return pData[flag]; }
+        function getF(k) { return pData[k]; }
+        function getF(flag) { return pData[flag]; }
+
+        // 로컬 스토리지 연동용 안전한 헬퍼함수
+        function isUnlocked(flag) {
+            return pData[flag] === true;
+        }
+
+        // 실제 SKILL 체크
+        function pData(k) { return pData[k]; }
+        function pDataKey(k) { return pData[k]; }
+
+        // 스킬 검증용 재작성
+        function isSkillUnlocked(flag) { return pData[flag]; }
+
         function playerAttacksMonster(skillName, skillData) {
             let dmg = skillData.dmg;
-            if (skillData.type === 'py') dmg += player.bonusPyAtk; 
+            if (skillData.type === 'py') dmg += pData.bonusPyAtk; 
             
-            // 몬스터별 개별 피격 로직 (서큐버스, 마왕 등)
+            // 몬스터별 개별 피격 로직
             if (monster.id === 'succubus') {
                 if (skillData.type === 'py' && Math.random() < 0.5) dmg = 0;
                 if (skillData.type === 'mp') dmg = 2; 
@@ -917,16 +1275,10 @@
             let dmg = monster.atk;
             
             if (player.isDefending) {
-                // 방어 관통 및 특수 기믹 처리
-                if (monster.id === 'succubus') {
-                    dmg = 2;
-                } else if (monster.id === 'demon' && player.currentDefSkill !== '쉴드') {
-                    dmg = monster.atk; 
-                } else if (monster.id === 'gargoyle') {
-                    dmg = 1;
-                } else {
-                    dmg = 0; 
-                }
+                if (monster.id === 'succubus') dmg = 2;
+                else if (monster.id === 'demon' && player.currentDefSkill !== '쉴드') dmg = monster.atk; 
+                else if (monster.id === 'gargoyle') dmg = 1;
+                else dmg = 0; 
                 
                 player.isDefending = false; 
                 document.getElementById('weapon-shield').classList.remove('active');
@@ -942,15 +1294,14 @@
                 
                 playDialogue(null, HIT_PLAYER_LINES[Math.floor(Math.random() * HIT_PLAYER_LINES.length)]);
 
-                // 거대 독거미 독 부여
-                if (monster.id === 'spider' && !player.flags.poisoned) {
-                    player.flags.poisoned = true;
+                if (monster.id === 'spider' && !sessionFlags.poisoned) {
+                    sessionFlags.poisoned = true;
                     document.getElementById('hp-gauge').classList.add('poisoned-hp');
                 }
                 
-                // 하이오크 피격 이벤트
-                if (monster.id === 'highorc' && !player.flags.hasCombo) {
-                    player.flags.hasCombo = true;
+                if (monster.id === 'highorc' && !pData.hasCombo) {
+                    pData.hasCombo = true;
+                    saveData();
                     updateSkillUI();
                     gameState = 'POPUP';
                     inputEl.blur();
@@ -977,25 +1328,34 @@
             document.getElementById('monster-hp-gauge').style.display = 'none';
             document.getElementById('monster-name-tag').style.display = 'none';
 
-            setTimeout(() => { monsterDeathProcess(); }, 500);
+            setTimeout(() => { 
+                mImg.style.display = 'none'; mGauge.style.display = 'none';
+                mImg.classList.remove('monster-dead'); mGauge.classList.remove('monster-dead');
+                monsterDeathProcess(); 
+            }, 500);
         }
 
         function monsterDeathProcess() {
-            player.gold += 1; document.getElementById('gold-val').innerText = player.gold;
+            // 보스일 경우 2~5골드, 아니면 1골드
+            let goldGained = monster.isBoss ? Math.floor(Math.random() * 4) + 2 : 1;
+            pData.gold += goldGained; 
+            document.getElementById('gold-val').innerText = pData.gold;
+            saveData();
             
-            let popText = `골드 +1 획득!`;
+            let popText = `골드 +${goldGained} 획득!`;
             
             if (monster.dropItem) {
                 popText += `\n${monster.dropItem} 획득!`;
-                if (monster.dropItem === '마법 지팡이') player.flags.hasStaff = true;
-                if (monster.dropItem === '파이어볼 해금') player.flags.fireballActive = true;
-                if (monster.dropItem === '쉴드 해금') player.flags.shieldActive = true;
+                if (monster.dropItem === '마법 지팡이') { pData.hasStaff = true; pData.fireballActive = true; } // 지팡이 얻자마자 파이어볼 개방
+                if (monster.dropItem === '파이어볼 해금') { /* 구울에서 얻으므로 기능 삭제 */ }
+                if (monster.dropItem === '쉴드 해금') pData.shieldActive = true;
+                saveData();
             }
 
-            // 듀라한 사망 시 라이트닝 습득
             if (monster.id === 'dullahan') {
                 popText += `\n라이트닝을 습득했다!`;
-                player.flags.lightningActive = true;
+                pData.lightningActive = true;
+                saveData();
             }
 
             const dialog = STAGE_DIALOGUE[monster.id];
@@ -1005,21 +1365,13 @@
                 playDialogue(null, dialog.outro.p);
                 setTimeout(() => {
                     if (gameState === 'TRANSITION') {
-                        if (monster.id === 'demon') {
-                            showCredits();
-                        } else {
-                            gameState = 'POPUP';
-                            showPopup(popText, 'NEXT');
-                        }
+                        gameState = 'POPUP';
+                        showPopup(popText, 'NEXT');
                     }
                 }, 3000);
             } else {
-                if (monster.id === 'demon') {
-                    showCredits();
-                } else {
-                    gameState = 'POPUP'; inputEl.blur();
-                    showPopup(popText, 'NEXT');
-                }
+                gameState = 'POPUP'; inputEl.blur();
+                showPopup(popText, 'NEXT');
             }
         }
 
@@ -1042,7 +1394,8 @@
         }
 
         function updateSkillUI() {
-            if (player.flags.hasCombo) {
+            // 연속 베기
+            if (pData.hasCombo) {
                 document.getElementById('py-1').style.left = '190px';
                 document.getElementById('py-1-extra').style.display = 'block';
             } else {
@@ -1050,6 +1403,7 @@
                 document.getElementById('py-1-extra').style.display = 'none';
             }
             
+            // 마법 스킬
             if (currentDiff === 1) {
                 ['mp-1', 'mp-2', 'mp-3', 'mp-3-extra'].forEach(id => {
                     let el = document.getElementById(id);
@@ -1058,7 +1412,7 @@
                 });
                 document.getElementById('weapon-staff').style.display = 'none';
             } else {
-                if (player.flags.hasStaff) {
+                if (pData.hasStaff) {
                     document.getElementById('weapon-staff').style.display = 'block';
                     document.getElementById('mp-1').innerText = '매직 애로우';
                     document.getElementById('mp-1').classList.remove('locked-skill');
@@ -1068,7 +1422,7 @@
                     document.getElementById('mp-1').classList.add('locked-skill');
                 }
 
-                if (player.flags.fireballActive) {
+                if (pData.fireballActive) {
                     document.getElementById('mp-2').innerText = '파이어볼';
                     document.getElementById('mp-2').classList.remove('locked-skill');
                 } else {
@@ -1076,7 +1430,7 @@
                     document.getElementById('mp-2').classList.add('locked-skill');
                 }
 
-                if (player.flags.shieldActive) {
+                if (pData.shieldActive) {
                     document.getElementById('mp-3').innerText = '쉴드';
                     document.getElementById('mp-3').classList.remove('locked-skill');
                 } else {
@@ -1084,17 +1438,60 @@
                     document.getElementById('mp-3').classList.add('locked-skill');
                 }
 
-                if (player.flags.lightningActive) {
+                if (pData.lightningActive) {
                     document.getElementById('mp-3-extra').style.display = 'block';
                     document.getElementById('mp-3-extra').innerText = '라이트닝';
                     document.getElementById('mp-3-extra').classList.remove('locked-skill');
-                    document.getElementById('mp-3').style.left = '980px'; // 쉴드 텍스트를 좌측으로 밀기
+                    document.getElementById('mp-3').style.left = '980px'; 
                 } else {
                     document.getElementById('mp-3-extra').style.display = 'none';
                     document.getElementById('mp-3').style.left = '1030px'; 
                 }
             }
         }
+        
+        // 플래그 접근 및 키 입력 최적화
+        inputEl.addEventListener('keydown', (e) => {
+            if (gameState !== 'GAME') { e.preventDefault(); return; }
+
+            if (e.key === 'Enter') {
+                const word = e.target.value.trim();
+                const now = performance.now();
+                if (player.stunTimer > 0) { e.target.value = ''; return; }
+
+                if (SKILLS[word]) {
+                    let s = SKILLS[word];
+                    if (s.type === 'mp' && currentDiff === 1) { e.target.value = ''; return; }
+                    if (s.reqFlag && !pData[s.reqFlag]) { e.target.value = ''; return; }
+                    
+                    if (now - player.cooldowns[word] >= s.cd && player.mp >= s.mp) {
+                        player.cooldowns[word] = now;
+                        player.mp -= s.mp;
+                        
+                        player.isDefending = false;
+                        document.getElementById('weapon-shield').classList.remove('active');
+                        
+                        if (word === '방어' || word === '쉴드') {
+                            player.isDefending = true;
+                            player.currentDefSkill = word;
+                            document.getElementById('weapon-shield').classList.add('active'); 
+                            playAudio('sfx-def');
+                        } else {
+                            if (s.type === 'py') {
+                                const sw = document.getElementById('weapon-sword');
+                                sw.classList.add('active'); setTimeout(() => sw.classList.remove('active'), 150);
+                            } else if (s.type === 'mp') {
+                                const st = document.getElementById('weapon-staff');
+                                st.classList.add('active'); setTimeout(() => st.classList.remove('active'), 150);
+                            }
+                            playerAttacksMonster(word, s);
+                        }
+                        updateStatusUI();
+                    }
+                }
+                e.target.value = '';
+            }
+        });
     </script>
 </body>
 </html>
