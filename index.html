@@ -27,7 +27,6 @@
         .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; }
         .screen.active { display: block; }
         
-        /* 중심점 기준 절대 좌표 공통 클래스 */
         .ui-element { position: absolute; object-fit: none; transform: translate(-50%, -50%); }
         
         .clickable { cursor: pointer; transition: transform 0.1s ease; }
@@ -35,7 +34,6 @@
         
         .locked-diff { filter: brightness(0.3); }
 
-        /* 무기 UI 및 애니메이션 설정 */
         .weapon-ui {
             position: absolute; z-index: 0; transform: translate(-50%, -50%);
             transition: all 0.15s ease-out;
@@ -49,7 +47,6 @@
         #weapon-staff { left: 1196px; top: 600px; display: none; }
         #weapon-staff.active { left: 1075px; top: 486px; }
 
-        /* 이펙트 (시퀀스 스프라이트) */
         .vfx-sprite {
             position: absolute; left: 640px; top: 337px;
             width: 250px; height: 250px; transform: translate(-50%, -50%);
@@ -58,19 +55,15 @@
         #attack-vfx { background-image: url('Data/DR_Slash_Attack_fx.png'); }
         #hit-vfx { background-image: url('Data/DR_Hit_fx_1.png'); z-index: 16; }
 
-        /* 피격 시 붉은 화면 레이어 */
         #red-flash {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background-color: red; opacity: 0; z-index: 99; pointer-events: none;
             transition: opacity 0.1s ease;
         }
 
-        /* 몬스터 사망 효과 */
         .monster-dead { filter: brightness(0) !important; opacity: 0; transition: all 0.5s ease; }
 
         #hp-gauge, #mp-gauge, #monster-hp-gauge, #attack-time-gauge { transition: clip-path 0.2s ease-out; }
-        
-        /* 독 상태이상 게이지 색상 */
         .poisoned-hp { filter: hue-rotate(90deg) saturate(200%) brightness(0.8); }
 
         .status-text {
@@ -84,7 +77,6 @@
             clip-path: inset(100% 0 0 0); pointer-events: none;
         }
 
-        /* 몬스터/플레이어 대사 폰트 */
         #monster-chat {
             position: absolute; left: 700px; top: 250px; background: #fff; color: #000;
             padding: 15px 25px; border-radius: 20px; font-size: 19px; max-width: 300px;
@@ -117,7 +109,6 @@
             white-space: pre-wrap; line-height: 1.5;
         }
 
-        /* 시네마틱 크레딧 레이어 */
         #cinematic-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.95); z-index: 300; display: none; flex-direction: column;
@@ -127,7 +118,6 @@
             font-size: 30px; color: #fff; text-align: center; white-space: pre-wrap; line-height: 2; padding: 0 50px;
         }
 
-        /* 스킬 텍스트 공통 */
         .skill-text {
             position: absolute; transform: translate(-50%, -50%); font-size: 26px; font-weight: bold; z-index: 10;
             background: linear-gradient(to top, #fff var(--fill, 100%), #444 var(--fill, 100%));
@@ -137,16 +127,19 @@
         .locked-skill { color: #555 !important; background: none !important; -webkit-text-fill-color: #555 !important; }
 
         #py-1 { left: 250px; top: 580.5px; }
-        #py-1-extra { left: 310px; top: 580.5px; display: none; }
+        #py-slash { left: 230px; top: 580.5px; display: none; color: #aaa; background: none; -webkit-text-fill-color: #aaa; }
+        #py-1-extra { left: 295px; top: 580.5px; display: none; }
+        
         #py-2 { left: 250px; top: 610.5px; }
         #py-3 { left: 250px; top: 640.5px; }
 
         #mp-1 { left: 1030px; top: 580.5px; }
         #mp-2 { left: 1030px; top: 610.5px; }
+        
         #mp-3 { left: 1030px; top: 640.5px; }
-        #mp-3-extra { left: 1110px; top: 640.5px; display: none; } 
+        #mp-slash { left: 1015px; top: 640.5px; display: none; color: #aaa; background: none; -webkit-text-fill-color: #aaa; }
+        #mp-3-extra { left: 1075px; top: 640.5px; display: none; } 
 
-        /* 흔들림 애니메이션 */
         @keyframes shake-anim {
             0%, 100% { margin-left: 0; }
             25% { margin-left: -10px; }
@@ -168,7 +161,6 @@
         .shake-screen { animation: shake-screen-anim 0.2s ease-in-out; }
         .block-screen { animation: block-screen-anim 0.15s ease-in-out; }
 
-        /* 정보 초기화 버튼 스타일 */
         #reset-btn {
             position: absolute; right: 20px; bottom: 20px; 
             font-size: 16px; color: #888; text-decoration: underline; 
@@ -176,6 +168,12 @@
         }
         #reset-btn:hover { color: #fff; }
 
+        .key-hint {
+            position: absolute; transform: translate(-50%, -50%);
+            font-size: 16px; color: #aaa; font-weight: bold; pointer-events: none; z-index: 50;
+        }
+
+        .relic-locked { filter: brightness(0.2) grayscale(1); pointer-events: none; }
     </style>
 </head>
 <body>
@@ -188,7 +186,6 @@
     <audio id="sfx-err" src="Data/error.mp3"></audio>
 
     <div id="game-container">
-        
         <div id="red-flash"></div>
         <div id="reset-btn" onclick="resetGameData()">[데이터 초기화]</div>
 
@@ -198,19 +195,42 @@
         <div id="start-screen" class="screen active">
             <img src="Data/DR_Logo.png" class="ui-element" style="left: 640px; top: 258px;" alt="Logo">
             <img src="Data/DR_Start_Button.png" class="ui-element clickable" style="left: 640.5px; top: 614px;" onclick="switchScreen('diff-screen')" alt="Start">
+            <div class="key-hint" style="left: 640.5px; top: 654px;">[Space]</div>
         </div>
 
         <div id="diff-screen" class="screen">
             <img src="Data/DR_Easy_Button.png" id="diff-1" class="ui-element clickable" style="left: 264.5px; top: 360px;" onclick="handleDiffClick(1)" alt="Easy">
+            <div class="key-hint" style="left: 264.5px; top: 400px;">[1]</div>
+            
             <img src="Data/DR_Normal_Button.png" id="diff-2" class="ui-element clickable" style="left: 514.5px; top: 360px;" onclick="handleDiffClick(2)" alt="Normal">
+            <div class="key-hint" style="left: 514.5px; top: 400px;">[2]</div>
+            
             <img src="Data/DR_Hard_Button.png" id="diff-3" class="ui-element clickable" style="left: 764.5px; top: 360px;" onclick="handleDiffClick(3)" alt="Hard">
+            <div class="key-hint" style="left: 764.5px; top: 400px;">[3]</div>
+            
             <img src="Data/DR_Extreme_Button.png" id="diff-4" class="ui-element clickable" style="left: 1014.5px; top: 360px;" onclick="handleDiffClick(4)" alt="Extreme">
+            <div class="key-hint" style="left: 1014.5px; top: 400px;">[4]</div>
             
             <img src="Data/DR_Play_Button.png" class="ui-element clickable" style="left: 640.5px; top: 614px;" onclick="checkAndStartGame()" alt="Play">
+            <div class="key-hint" style="left: 640.5px; top: 654px;">[Space]</div>
+
+            <img id="relic-btn-main" src="Data/DR_Relic_button.png" class="ui-element clickable" style="left: 914px; top: 658px;" onclick="openRelicMenu()">
+            <div class="key-hint" style="left: 914px; top: 698px;">[R]</div>
         </div>
 
         <div id="game-screen" class="screen">
             
+            <div id="in-game-relics" style="z-index: 20;">
+                <img id="ig-relic-1" src="Data/DR_Relic_1.png" class="ui-element clickable" style="left:153.5px; top:82.5px; transform:translate(-50%, -50%) scale(0.5); display:none;" onclick="showRelicInfo(1)">
+                <div id="ig-relic-1-hint" class="key-hint" style="left:153.5px; top:115px; display:none;">[F1]</div>
+                
+                <img id="ig-relic-2" src="Data/DR_Relic_2.png" class="ui-element clickable" style="left:208.5px; top:82.5px; transform:translate(-50%, -50%) scale(0.5); display:none;" onclick="showRelicInfo(2)">
+                <div id="ig-relic-2-hint" class="key-hint" style="left:208.5px; top:115px; display:none;">[F2]</div>
+                
+                <img id="ig-relic-3" src="Data/DR_Relic_3.png" class="ui-element clickable" style="left:264.5px; top:82.5px; transform:translate(-50%, -50%) scale(0.5); display:none;" onclick="showRelicInfo(3)">
+                <div id="ig-relic-3-hint" class="key-hint" style="left:264.5px; top:115px; display:none;">[F3]</div>
+            </div>
+
             <img id="weapon-shield" src="Data/DR_Shield.png" class="weapon-ui" alt="Shield">
             <img id="weapon-sword" src="Data/DR_Sword.png" class="weapon-ui" alt="Sword">
             <img id="weapon-staff" src="Data/DR_Staff.png" class="weapon-ui" alt="Staff">
@@ -222,13 +242,11 @@
             <img id="monster-name-tag" src="Data/DR_Monster_Kobold_Name.png" class="ui-element" style="left: 640px; top: 160px; z-index: 6;">
 
             <img id="monster-shadow" src="Data/DR_Monster_Shadow.png" class="ui-element" style="left: 645.5px; top: 460px; z-index: 3;">
-            
             <img id="monster-img" src="" class="ui-element" style="left: 640px; top: 337px; z-index: 4;">
             <img id="monster-gauge-img" src="" class="ui-element" style="left: 640px; top: 337px;">
             
             <div id="attack-vfx" class="vfx-sprite"></div>
             <div id="hit-vfx" class="vfx-sprite"></div>
-            
             <div id="monster-chat"></div>
 
             <img src="Data/DR_HP_Bg.png" class="ui-element" style="left: 250px; top: 470.5px; z-index: 1;">
@@ -253,13 +271,15 @@
             <input type="text" id="typing-input" autocomplete="off" spellcheck="false" placeholder="스킬 입력">
 
             <div id="py-1" class="skill-text">베기</div>
+            <div id="py-slash" class="skill-text">/</div>
             <div id="py-1-extra" class="skill-text">연속 베기</div>
             <div id="py-2" class="skill-text">찌르기</div>
             <div id="py-3" class="skill-text">방어</div>
 
-            <div id="mp-1" class="skill-text">매직 애로우</div>
-            <div id="mp-2" class="skill-text">파이어볼</div>
+            <div id="mp-1" class="skill-text">파이어볼</div>
+            <div id="mp-2" class="skill-text">매직 애로우</div>
             <div id="mp-3" class="skill-text">쉴드</div>
+            <div id="mp-slash" class="skill-text">/</div>
             <div id="mp-3-extra" class="skill-text">라이트닝</div>
         </div>
 
@@ -268,13 +288,18 @@
             <div id="popup-text" class="popup-text"></div>
             
             <img id="popup-next-btn" src="Data/DR_Next_Button.png" class="ui-element clickable" style="left: 640px; top: 460px; z-index: 103; display: none;" onclick="handlePopupNext(event)" alt="Next">
+            <div id="popup-next-hint" class="key-hint" style="left: 640px; top: 500px; z-index: 104; display: none;">[Space]</div>
+            
             <img id="popup-gameover-btn" src="Data/DR_Gameover_Button.png" class="ui-element clickable" style="left: 640px; top: 460px; z-index: 103; display: none;" onclick="goBack(event)" alt="Game Over">
+            <div id="popup-gameover-hint" class="key-hint" style="left: 640px; top: 500px; z-index: 104; display: none;">[Space]</div>
         </div>
 
         <div id="market-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 150; display: none;">
             <img src="Data/DR_Market_popup.png" class="ui-element" style="left: 640px; top: 250px;">
             <div id="market-items-container"></div>
+            
             <img id="market-next-btn" src="Data/DR_Next_Button.png" class="ui-element clickable" style="left: 640px; top: 460px;" onclick="closeMarket(event)" alt="Next">
+            <div class="key-hint" style="left: 640px; top: 500px;">[Space]</div>
         </div>
 
         <div id="market-info-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 160; display: none;">
@@ -285,12 +310,36 @@
             <div id="info-item-desc" style="position: absolute; left: 566px; top: 262px; font-size: 20px; color: #fff; line-height: 1.4; text-shadow: 1px 1px 0 #000; text-align: left; width: 300px; white-space: pre-wrap;"></div>
             
             <img src="Data/DR_Item_buy.png" class="ui-element clickable" style="left: 520px; top: 396px;" onclick="buyItem(event)" alt="Buy">
+            <div class="key-hint" style="left: 520px; top: 436px;">[1]</div>
+            
             <img src="Data/DR_Item_cancel.png" class="ui-element clickable" style="left: 760px; top: 396px;" onclick="closeMarketInfo(event)" alt="Cancel">
+            <div class="key-hint" style="left: 760px; top: 436px;">[2]</div>
         </div>
         
         <div id="cinematic-layer">
             <div id="cinematic-text"></div>
             <img id="cinematic-next-btn" src="Data/DR_Next_Button.png" class="ui-element clickable" style="left: 640px; top: 600px; display:none;" onclick="handleCinematicNext(event)" alt="Next">
+            <div id="cinematic-next-hint" class="key-hint" style="left: 640px; top: 640px; display:none; z-index: 301;">[Space]</div>
+        </div>
+
+        <!-- 유물 메뉴 레이어 -->
+        <div id="relic-menu-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 200; display: none;" onclick="closeRelicMenu(event)">
+            <img src="Data/DR_Relic_popup.png" class="ui-element" style="left: 640px; top: 360px;">
+            
+            <img id="rm-relic-1" src="Data/DR_Relic_1.png" class="ui-element clickable relic-locked" style="left: 540px; top: 362px;" onclick="showRelicInfo(1, event)">
+            <div class="key-hint" style="left: 540px; top: 412px;">[1]</div>
+            
+            <img id="rm-relic-2" src="Data/DR_Relic_2.png" class="ui-element clickable relic-locked" style="left: 640px; top: 362px;" onclick="showRelicInfo(2, event)">
+            <div class="key-hint" style="left: 640px; top: 412px;">[2]</div>
+            
+            <img id="rm-relic-3" src="Data/DR_Relic_3.png" class="ui-element clickable relic-locked" style="left: 740px; top: 362px;" onclick="showRelicInfo(3, event)">
+            <div class="key-hint" style="left: 740px; top: 412px;">[3]</div>
+        </div>
+
+        <!-- 유물 정보 팝업 레이어 -->
+        <div id="relic-info-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 250; display: none;" onclick="closeRelicInfo(event)">
+            <img src="Data/DR_Relic_info_popup.png" class="ui-element" style="left: 640px; top: 190px;">
+            <div id="relic-info-text" style="position: absolute; left: 640px; top: 190px; transform: translate(-50%, -50%); font-size: 20px; font-weight: bold; color: #fff; text-align: center; white-space: pre-wrap; width: 300px;"></div>
         </div>
 
     </div>
@@ -305,9 +354,11 @@
             bonusPyAtk: 0,
             hasCombo: false,
             hasStaff: false,
+            magicArrowActive: false,
             fireballActive: false,
             shieldActive: false,
-            lightningActive: false
+            lightningActive: false,
+            relics: []
         };
 
         function loadData() {
@@ -329,7 +380,7 @@
         }
 
         /* =================================================================
-           상수 데이터 및 설정 (배경 이미지 원상복구 완)
+           상수 데이터 및 설정
         ================================================================= */
         const BG_MAP = {
             main: 'url("Data/DR_Main_Bg.png")', select: 'url("Data/DR_Game_Select_Bg.png")',
@@ -345,8 +396,8 @@
             '연속 베기': { type: 'py', dmg: 3, cd: 2000, mp: 0, el: 'py-1-extra', reqFlag: 'hasCombo' },
             '찌르기': { type: 'py', dmg: 1, cd: 2000, mp: 0, el: 'py-2' },
             '방어': { type: 'py', dmg: 0, cd: 500, mp: 0, el: 'py-3' }, 
-            '매직 애로우': { type: 'mp', dmg: 2, cd: 2000, mp: 2, el: 'mp-1' },
-            '파이어볼': { type: 'mp', dmg: 3, cd: 3000, mp: 3, el: 'mp-2', reqFlag: 'fireballActive' },
+            '파이어볼': { type: 'mp', dmg: 3, cd: 3000, mp: 3, el: 'mp-1', reqFlag: 'fireballActive' },
+            '매직 애로우': { type: 'mp', dmg: 2, cd: 2000, mp: 2, el: 'mp-2', reqFlag: 'magicArrowActive' },
             '쉴드': { type: 'mp', dmg: 0, cd: 2000, mp: 2, el: 'mp-3', reqFlag: 'shieldActive' },
             '라이트닝': { type: 'mp', dmg: 5, cd: 5000, mp: 5, el: 'mp-3-extra', reqFlag: 'lightningActive' }
         };
@@ -366,7 +417,7 @@
                 { id: 'swarm2', nameImg: 'DR_Monster_Swarm_Name.png', hp: 8, atk: 3, cd: 4000, img: 'DR_Monster_Swarm.png', bgIdx: 0 },
                 { id: 'golem', nameImg: 'DR_Monster_Golem_Name.png', hp: 15, atk: 2, cd: 4000, img: 'DR_Monster_Golem.png', bgIdx: 0 },
                 { id: 'spider', nameImg: 'DR_Monster_Spider_Name.png', hp: 10, atk: 1, cd: 3000, img: 'DR_Monster_Spider.png', bgIdx: 0 },
-                { id: 'scorpion', nameImg: 'DR_Monster_Scorpion_Name.png', hp: 25, atk: 3, cd: 3000, img: 'DR_Monster_Spider.png', dropItem: '파이어볼 해금', isBoss: true, bgIdx: 0 },
+                { id: 'scorpion', nameImg: 'DR_Monster_Scorpion_Name.png', hp: 25, atk: 3, cd: 3000, img: 'DR_Monster_Spider.png', dropItem: '매직 애로우 해금', isBoss: true, bgIdx: 0 },
                 { id: 'wolf', nameImg: 'DR_Monster_Wolf_Name.png', hp: 10, atk: 2, cd: 4000, img: 'DR_Monster_Scorpion.png', bgIdx: 1 },
                 { id: 'harpy', nameImg: 'DR_Monster_Harpy_Name.png', hp: 15, atk: 3, cd: 3000, img: 'DR_Monster_Harpy.png', bgIdx: 1 },
                 { id: 'mandragora', nameImg: 'DR_Monster_Mandragora_Name.png', hp: 10, atk: 4, cd: 3000, img: 'DR_Monster_Mandragora.png', bgIdx: 1 },
@@ -375,7 +426,7 @@
             3: [ 
                 { id: 'skeleton', nameImg: 'DR_Monster_Skeleton_Name.png', hp: 15, atk: 2, cd: 2000, img: 'DR_Monster_Skeleton.png', bgIdx: 0 },
                 { id: 'gargoyle', nameImg: 'DR_Monster_Gargoyle_Name.png', hp: 15, atk: 5, cd: 3000, img: 'DR_Monster_Gargoyle.png', bgIdx: 0 },
-                { id: 'dullahan', nameImg: 'DR_Monster_Dullahan_Name.png', hp: 30, atk: 3, cd: 3000, img: 'DR_Monster_Dullahan.png', dropItem: '라이트닝 해금', isBoss: true, bgIdx: 0 },
+                { id: 'dullahan', nameImg: 'DR_Monster_Dullahan_Name.png', hp: 30, atk: 3, cd: 3000, img: 'DR_Monster_Dullahan.png', isBoss: true, bgIdx: 0 },
                 { id: 'succubus', nameImg: 'DR_Monster_Succubus_Name.png', hp: 20, atk: 5, cd: 3000, img: 'DR_Monster_Succubus.png', bgIdx: 1 },
                 { id: 'demon', nameImg: 'DR_Monster_Demon_Name.png', hp: 40, atk: 10, cd: 3000, img: 'DR_Monster_Demon.png', isBoss: true, bgIdx: 1 }
             ]
@@ -386,26 +437,21 @@
             'goblin': { intro: { m: "어딜 그리 급히 가시나!", p: "넌 또 뭐야!" }, outro: { p: "이런 잡몹이 내 앞길을 막다니!" } },
             'orc': { intro: { m: "죽인다!", p: "이런.. 오크까지..!" }, outro: { p: "슬슬 적응이 되는걸?" } },
             'highorc': { intro: { m: "넌 못 지나간다!", p: "비켜!" }, outro: { p: "마을은 정리 됐으니 다른 곳으로!!" } },
-            
             'slime': { intro: { m: "꾸르릉...", p: "뭐야 이 액체는?" }, outro: { p: "옷이 더러워졌어!!" } },
             'swarm1': { intro: { m: "위이이잉!!", p: "벌레라니 제일 싫어!" }, outro: { p: "여름이었다." } },
             'ghoul': { intro: { m: "구울은 울지 않아.", p: "아이고 부장님" }, outro: { p: "지팡이? 이것만 있다면 나도 마검사?" } },
             'troll': { intro: { m: "나는 불에 약할지도!!", p: "그렇다면..!" }, outro: { p: "몬스터마다 약점이 존재하는걸까?" } },
-
             'swarm2': { intro: { m: "피를 빨아주마!!", p: "박쥐가 말을 한다!!" }, outro: { p: "헌혈은 사람의 생명을 살릴 수 있습니다." } },
             'golem': { intro: { m: "나는 물리 공격으론 1밖에 안깍기지", p: "하지만 마법 공격으론 어떨까!" }, outro: { p: "어쩌면 나 소질 있을지도..?" } },
             'spider': { intro: { m: "내 독으로 널 녹여주마.", p: "히익! 방어를 잘 해야겠어!" }, outro: { p: "어쩌면 나 소질 있을지도..?" } },
             'scorpion': { intro: { m: "반짝반짝 보석 좋아.", p: "나도!" }, outro: { p: "왜 보석 드랍을 안 하지?" } },
-
             'wolf': { intro: { m: "내 공격을 방어해봐라!", p: "방어만 해볼까?" }, outro: { p: "늑구야 아프지마" } },
             'harpy': { intro: { m: "물리 공격은 나에게 통하지 않지!", p: "통하긴 하는데.." }, outro: { p: "힘든 전투였다!" } },
             'mandragora': { intro: { m: "끼에에에에에!!!", p: "스턴 걸릴 것 같아!!" }, outro: { p: "후우.. 귀가 너무 아프군" } },
             'griffin': { intro: { m: "나는 모든 공격을 피할 수 있지!", p: "그렇다면 마법은 어떠냐!" }, outro: { p: "바람이 부는군.." } },
-
             'skeleton': { intro: { m: "달그닥 달그닥", p: "뼈다귀 주제에!" }, outro: { p: "이제 거의 다 온건가!" } },
             'gargoyle': { intro: { m: "나는 매우 튼튼하다.", p: "손가락이 아프겠는걸!" }, outro: { p: "여행이 끝나면 물리치료를 받아야겠어." } },
             'dullahan': { intro: { m: "연속으로 베지 않는 이상 날 죽일수 없다.", p: "하지만 너의 공격을 막기만 한다면!?" }, outro: { p: "방패가 이겼다!" } },
-            
             'succubus': { intro: { m: "나는 밤의 여왕..", p: "나에겐 빛이 있다!" }, outro: { p: "빛은 승리한다!" } },
             'demon': { intro: { m: "드디어 왔는가! 용사여!", p: "이제 끝낼때가 왔다!" }, outro: { p: "이제 좀 쉬고 싶네.." } }
         };
@@ -431,16 +477,16 @@
         let monster = null;
         let selectedMarketItem = null;
         let nextCinematicType = '';
+        let windowActiveMarketItems = [];
         
-        // 시네마틱 스킵 기능을 위한 객체
         let cinematicObj = { text: '', i: 0, isTyping: false };
         let cinematicTimeout = null;
 
         let lastTime = 0, monsterAttackTimer = 0, mpRegenTimer = 0, monsterStunTimer = 0, poisonTimer = 0;
+        let relic1Timer = 0, relic2Timer = 0;
         let stageTimer = 60000; 
         let gameLoopId = null;
 
-        // 플레이어/몬스터 텍스트 타이머 관리
         let pChatTimeout = null;
         let mChatTimeout = null;
         let pChatTypeInterval = null;
@@ -457,10 +503,9 @@
         }
 
         /* =================================================================
-           키보드 조작 (치트키 및 스페이스바 제어 완)
+           키보드 조작
         ================================================================= */
         document.addEventListener('keydown', (e) => {
-            // [치트키] 0번 누르면 즉시 사망
             if (e.key === '0') {
                 if (gameState === 'GAME' && monster && monster.hp > 0) {
                     monster.hp = 0;
@@ -480,22 +525,24 @@
                     document.getElementById('popup-layer').style.display = 'none';
                     gameState = 'DIFF';
                 } else if (gameState === 'CINEMATIC') {
-                    // 시네마틱 타이핑 중이면 즉시 출력 완료 처리
                     if (cinematicObj.isTyping) {
                         cinematicObj.isTyping = false;
                         if(cinematicTimeout) clearTimeout(cinematicTimeout);
                         document.getElementById('cinematic-text').innerText = cinematicObj.text;
                         document.getElementById('cinematic-next-btn').style.display = 'block';
+                        document.getElementById('cinematic-next-hint').style.display = 'block';
                     } else if (document.getElementById('cinematic-next-btn').style.display === 'block') {
                         handleCinematicNext();
                     }
                 } else if (gameState === 'MARKET') {
-                    // 상점화면에서 스페이스바 누르면 다음으로 넘어가기
                     closeMarket();
+                } else if (gameState === 'RELIC_INFO') {
+                    closeRelicInfo();
                 }
             } 
             else if (gameState === 'DIFF') {
                 if (['1', '2', '3', '4'].includes(e.key)) handleDiffClick(parseInt(e.key));
+                if (e.key === 'r' || e.key === 'R') openRelicMenu();
             }
             else if (gameState === 'MARKET') {
                 if (['1', '2', '3'].includes(e.key)) openMarketInfo(parseInt(e.key) - 1);
@@ -503,6 +550,14 @@
             else if (gameState === 'MARKET_INFO') {
                 if (e.key === '1') buyItem();
                 if (e.key === '2') closeMarketInfo();
+            }
+            else if (gameState === 'RELIC_MENU') {
+                if (['1', '2', '3'].includes(e.key)) showRelicInfo(parseInt(e.key));
+            }
+            else if (gameState === 'GAME' || gameState === 'PAUSE' || gameState === 'DIALOGUE') {
+                if (e.key === 'F1') { e.preventDefault(); showRelicInfo(1); }
+                if (e.key === 'F2') { e.preventDefault(); showRelicInfo(2); }
+                if (e.key === 'F3') { e.preventDefault(); showRelicInfo(3); }
             }
         });
 
@@ -560,6 +615,8 @@
                 document.getElementById('market-layer').style.display = 'none';
                 document.getElementById('market-info-layer').style.display = 'none';
                 document.getElementById('cinematic-layer').style.display = 'none';
+                document.getElementById('relic-menu-layer').style.display = 'none';
+                document.getElementById('relic-info-layer').style.display = 'none';
                 switchScreen('diff-screen'); 
             }
         }
@@ -590,7 +647,11 @@
             else document.getElementById('popup-text').innerText = text;
             
             document.getElementById('popup-next-btn').style.display = (type === 'NEXT') ? 'block' : 'none';
+            document.getElementById('popup-next-hint').style.display = (type === 'NEXT') ? 'block' : 'none';
+            
             document.getElementById('popup-gameover-btn').style.display = (type === 'GAMEOVER') ? 'block' : 'none';
+            document.getElementById('popup-gameover-hint').style.display = (type === 'GAMEOVER') ? 'block' : 'none';
+            
             document.getElementById('popup-bg-img').src = 'Data/DR_Item_Popup.png';
         }
 
@@ -647,7 +708,6 @@
             document.getElementById('attack-time-gauge').style.clipPath = `inset(0 ${100 - (stageTimer/60000)*100}% 0 0)`;
         }
 
-        // [타이핑 기능 완] 몬스터와 플레이어 텍스트
         function playDialogue(mText, pText) {
             if (mText) {
                 let mEl = document.getElementById('monster-chat');
@@ -677,23 +737,24 @@
                         pEl.innerText += pText.charAt(i); i++;
                     } else {
                         clearInterval(pChatTypeInterval);
-                        pChatTimeout = setTimeout(() => { if (gameState !== 'GAMEOVER') pEl.style.display = 'none'; }, 3000); 
+                        pChatTimeout = setTimeout(() => { if (gameState !== 'GAMEOVER') pEl.style.display = 'none'; }, 2000); 
                     }
                 }, 50);
             }
         }
 
-        // [시네마틱 스킵 기능 완]
         function playCinematic(text, type) {
             gameState = 'CINEMATIC';
             inputEl.blur();
             const layer = document.getElementById('cinematic-layer');
             const textEl = document.getElementById('cinematic-text');
             const nextBtn = document.getElementById('cinematic-next-btn');
+            const nextHint = document.getElementById('cinematic-next-hint');
             
             layer.style.display = 'flex';
             textEl.innerText = '';
             nextBtn.style.display = 'none';
+            nextHint.style.display = 'none';
             nextCinematicType = type;
 
             cinematicObj = { text: text, i: 0, isTyping: true };
@@ -708,6 +769,7 @@
                 } else {
                     cinematicObj.isTyping = false;
                     nextBtn.style.display = 'block';
+                    nextHint.style.display = 'block';
                 }
             }
             typeChar();
@@ -716,12 +778,57 @@
         function handleCinematicNext(e) {
             if(e) e.stopPropagation();
             document.getElementById('cinematic-layer').style.display = 'none';
+            document.getElementById('cinematic-next-hint').style.display = 'none';
             
             if (nextCinematicType === 'INTRO') {
                 proceedStartGame();
             } else if (nextCinematicType === 'OUTRO' || nextCinematicType === 'CREDITS') {
                 switchScreen('diff-screen');
             }
+        }
+
+        /* =================================================================
+           유물(Relic) 시스템
+        ================================================================= */
+        function openRelicMenu() {
+            if(gameState !== 'DIFF') return;
+            gameState = 'RELIC_MENU';
+            document.getElementById('relic-menu-layer').style.display = 'block';
+            
+            for(let i=1; i<=3; i++) {
+                let rEl = document.getElementById(`rm-relic-${i}`);
+                if(gData.relics.includes(i)) rEl.classList.remove('relic-locked');
+                else rEl.classList.add('relic-locked');
+            }
+        }
+        function closeRelicMenu(e) {
+            if(e) e.stopPropagation();
+            if(gameState === 'RELIC_INFO') return;
+            gameState = 'DIFF';
+            document.getElementById('relic-menu-layer').style.display = 'none';
+        }
+        function showRelicInfo(idx, e) {
+            if(e) e.stopPropagation();
+            if(!gData.relics.includes(idx)) return; // 안 얻은건 클릭 불가
+            
+            let prevState = gameState;
+            gameState = 'RELIC_INFO';
+            document.getElementById('relic-info-layer').style.display = 'block';
+            
+            let text = "";
+            if(idx === 1) text = "자동 점검 : 자동 물리 공격한다. (랜덤)";
+            else if(idx === 2) text = "무한 도전 : 4초마다 체력 +1";
+            else if(idx === 3) text = "용의 심장 : 무한 마나";
+            
+            document.getElementById('relic-info-text').innerText = text;
+            document.getElementById('relic-info-layer').dataset.prevState = prevState;
+        }
+        function closeRelicInfo(e) {
+            if(e) e.stopPropagation();
+            let prev = document.getElementById('relic-info-layer').dataset.prevState;
+            gameState = prev || 'DIFF';
+            document.getElementById('relic-info-layer').style.display = 'none';
+            if(gameState === 'GAME') { lastTime = performance.now(); inputEl.focus(); }
         }
 
         /* =================================================================
@@ -732,7 +839,19 @@
             container.innerHTML = '';
             const positions = [495, 640, 785];
             
-            STORE_ITEMS.slice(0,3).forEach((item, idx) => {
+            let currentItems = [...STORE_ITEMS.slice(0,3)];
+            
+            // 듀라한 처치 후 3번째 상점 아이템 라이트닝으로 교체
+            if (monster && monster.id === 'dullahan' && !gData.lightningActive) {
+                currentItems[2] = {
+                    id: 4, name: '라이트닝', price: 20, desc: '강력한 번개 마법 습득', img: 'DR_Store_Item_4.png',
+                    action: () => { gData.lightningActive = true; }
+                };
+            }
+            
+            windowActiveMarketItems = currentItems;
+
+            currentItems.forEach((item, idx) => {
                 let x = positions[idx];
                 container.innerHTML += `
                     <img src="Data/${item.img}" class="ui-element clickable" style="left:${x}px; top:260px;" onclick="openMarketInfo(${idx})">
@@ -750,7 +869,7 @@
 
         function openMarketInfo(idx) {
             if(gameState !== 'MARKET') return;
-            selectedMarketItem = STORE_ITEMS[idx];
+            selectedMarketItem = windowActiveMarketItems[idx];
             
             document.getElementById('info-item-img').src = `Data/${selectedMarketItem.img}`;
             document.getElementById('info-item-name').innerText = selectedMarketItem.name;
@@ -786,7 +905,6 @@
             if(e) e.stopPropagation();
             document.getElementById('market-layer').style.display = 'none';
             
-            // [스테이지 2 진행 버그 픽스 완] 난이도 내의 모든 몬스터를 처치했는지 확인
             let isFinalBoss = (monsterIdx === STAGE_DATA[currentDiff].length - 1);
             
             if (isFinalBoss) {
@@ -835,6 +953,7 @@
             monsterIdx = 0;
             player.hp = player.maxHp; player.mp = player.maxMp; 
             sessionFlags = { poisoned: false };
+            relic1Timer = 0; relic2Timer = 0;
             
             let now = performance.now();
             Object.keys(SKILLS).forEach(k => player.cooldowns[k] = now - SKILLS[k].cd);
@@ -842,6 +961,7 @@
             document.getElementById('hp-gauge').classList.remove('poisoned-hp');
             document.getElementById('gold-val').innerText = gData.gold;
             updateStatusUI();
+            updateInGameRelics();
             
             switchScreen('game-screen');
             loadMonster();
@@ -849,6 +969,18 @@
             playAudio('bgm');
             if (gameLoopId) cancelAnimationFrame(gameLoopId);
             gameLoopId = requestAnimationFrame(gameLoop);
+        }
+
+        function updateInGameRelics() {
+            for(let i=1; i<=3; i++) {
+                let img = document.getElementById(`ig-relic-${i}`);
+                let hint = document.getElementById(`ig-relic-${i}-hint`);
+                if(gData.relics.includes(i)) {
+                    img.style.display = 'block'; hint.style.display = 'block';
+                } else {
+                    img.style.display = 'none'; hint.style.display = 'none';
+                }
+            }
         }
 
         function loadMonster() {
@@ -913,7 +1045,6 @@
                 gameState = 'DIALOGUE';
                 inputEl.blur();
                 playDialogue(dialog.intro.m, dialog.intro.p);
-                // [시작 대기 시간 2초로 단축]
                 setTimeout(() => {
                     if (gameState === 'DIALOGUE') {
                         gameState = 'GAME';
@@ -928,12 +1059,10 @@
             }
         }
 
-        // [듀라한 버그 픽스 완] 팝업 처리 로직 안전성 강화
         function handlePopupNext(e) {
             if(e) e.stopPropagation();
             document.getElementById('popup-layer').style.display = 'none';
             
-            // 아직 몬스터가 살아있을 때 뜬 팝업(예: 전투 중 연속 베기 습득)인 경우 게임 재개
             if (monster && monster.hp > 0) {
                 gameState = 'GAME';
                 lastTime = performance.now();
@@ -941,7 +1070,6 @@
                 return;
             }
 
-            // 전투 종료 후 뜬 팝업인 경우 진행 로직
             if (monster.id === 'demon') {
                 if (gData.unlockedDiff <= currentDiff) { gData.unlockedDiff = currentDiff + 1; saveData(); }
                 playCinematic(`이제 더 이상 나를 막을 수 있는 것은 없다.\n평화로워진 마을로 돌아가 나의 무용담을 전파해야겠어.\n아.. 이게 되네.\n\n지금까지 도구리의 여정을 함께 해주셔서 감사합니다.\n도구리는 돌아온다.`, "CREDITS");
@@ -958,7 +1086,7 @@
         }
 
         /* =================================================================
-           단일 메인 루프
+           단일 메인 루프 (유물 로직 포함)
         ================================================================= */
         function gameLoop(currentTime) {
             gameLoopId = requestAnimationFrame(gameLoop);
@@ -979,6 +1107,35 @@
                 return;
             }
 
+            // [유물 3] 마나 무한
+            if (gData.relics.includes(3)) {
+                if(player.mp < player.maxMp) { player.mp = player.maxMp; updateStatusUI(); }
+            }
+
+            // [유물 2] 4초마다 체력 1회복
+            if (gData.relics.includes(2) && player.hp > 0 && player.hp < player.maxHp) {
+                relic2Timer += dt;
+                if(relic2Timer >= 4000) {
+                    relic2Timer = 0; player.hp++; updateStatusUI();
+                }
+            } else { relic2Timer = 0; }
+
+            // [유물 1] 3초마다 랜덤 물리 공격
+            if (gData.relics.includes(1) && monster && monster.hp > 0 && player.stunTimer <= 0) {
+                relic1Timer += dt;
+                if (relic1Timer >= 3000) {
+                    relic1Timer = 0;
+                    let dmg = 1 + gData.bonusPyAtk; // 기본 공격 기반
+                    triggerMonsterShake();
+                    playSpriteVFX('attack-vfx');
+                    playSpriteVFX('hit-vfx'); 
+                    playAudio('sfx-atk');
+                    monster.hp -= dmg;
+                    updateMonsterHpUI();
+                    if (monster.hp <= 0) triggerMonsterDeath();
+                }
+            }
+
             if (sessionFlags.poisoned && player.hp > 0) {
                 poisonTimer += dt;
                 if (poisonTimer >= 2000) {
@@ -996,7 +1153,7 @@
             if (player.stunTimer > 0) player.stunTimer -= dt;
             if (monsterStunTimer > 0) monsterStunTimer -= dt;
 
-            if (monsterStunTimer <= 0 && monster.hp > 0) {
+            if (monsterStunTimer <= 0 && monster && monster.hp > 0) {
                 monsterAttackTimer += dt;
                 let ratio = Math.min(1, monsterAttackTimer / monster.cd);
                 document.getElementById('monster-gauge-img').style.clipPath = `inset(${100 - (ratio * 100)}% 0 0 0)`;
@@ -1008,8 +1165,11 @@
 
             mpRegenTimer += dt;
             if (mpRegenTimer >= 1000) {
-                player.mp = Math.min(player.maxMp, player.mp + 1);
-                updateStatusUI(); mpRegenTimer -= 1000;
+                if(player.mp < player.maxMp) {
+                    player.mp = Math.min(player.maxMp, player.mp + 1);
+                    updateStatusUI(); 
+                }
+                mpRegenTimer -= 1000;
             }
 
             for (const [sName, sData] of Object.entries(SKILLS)) {
@@ -1141,7 +1301,6 @@
         }
 
         function triggerMonsterDeath() {
-            // [쿨타임 초기화 완] 몬스터 사망 시 화면에서 쿨타임이 꽉 차 보이도록 즉시 리셋
             let now = performance.now();
             Object.keys(SKILLS).forEach(k => {
                 player.cooldowns[k] = now - SKILLS[k].cd;
@@ -1175,17 +1334,34 @@
             
             let popText = `골드 +${goldGained} 획득!`;
             
+            // [마법 해금 조건 적용 완]
             if (monster.dropItem) {
                 popText += `\n${monster.dropItem} 획득!`;
-                if (monster.dropItem === '마법 지팡이') { gData.hasStaff = true; gData.fireballActive = true; } 
+                if (monster.dropItem === '마법 지팡이') { 
+                    gData.hasStaff = true; 
+                    gData.fireballActive = true; 
+                } 
+                if (monster.dropItem === '매직 애로우 해금') gData.magicArrowActive = true;
                 if (monster.dropItem === '쉴드 해금') gData.shieldActive = true;
                 saveData();
             }
 
-            if (monster.id === 'dullahan' && !gData.lightningActive) {
-                popText += `\n라이트닝을 습득했다!`;
-                gData.lightningActive = true;
-                saveData();
+            // [어려움 마왕 클리어 시 유물 획득 완]
+            if (monster.id === 'demon') {
+                let newRelic = 0;
+                if (!gData.relics.includes(1)) {
+                    newRelic = 1;
+                } else {
+                    let available = [2, 3].filter(r => !gData.relics.includes(r));
+                    if (available.length > 0) newRelic = available[Math.floor(Math.random() * available.length)];
+                }
+                
+                if (newRelic > 0) {
+                    gData.relics.push(newRelic);
+                    saveData();
+                    let rNames = ["", "자동 점검", "무한 도전", "용의 심장"];
+                    popText += `\n\n유물 [${rNames[newRelic]}] 획득!`;
+                }
             }
 
             const dialog = STAGE_DIALOGUE[monster.id];
@@ -1224,34 +1400,40 @@
         }
 
         function updateSkillUI() {
+            // [베기 / 연속 베기 슬래시 적용 완]
             if (gData.hasCombo) {
                 document.getElementById('py-1').style.left = '190px';
+                document.getElementById('py-slash').style.display = 'block';
                 document.getElementById('py-1-extra').style.display = 'block';
             } else {
                 document.getElementById('py-1').style.left = '250px';
+                document.getElementById('py-slash').style.display = 'none';
                 document.getElementById('py-1-extra').style.display = 'none';
             }
             
-            if (currentDiff === 1) {
+            if (currentDiff === 1 && !gData.hasStaff) {
                 ['mp-1', 'mp-2', 'mp-3', 'mp-3-extra'].forEach(id => {
                     let el = document.getElementById(id);
                     el.innerText = '???'; el.classList.add('locked-skill');
                     if (id === 'mp-3-extra') el.style.display = 'none';
                 });
+                document.getElementById('mp-slash').style.display = 'none';
                 document.getElementById('weapon-staff').style.display = 'none';
             } else {
                 if (gData.hasStaff) {
                     document.getElementById('weapon-staff').style.display = 'block';
-                    document.getElementById('mp-1').innerText = '매직 애로우';
+                }
+                
+                if (gData.fireballActive) {
+                    document.getElementById('mp-1').innerText = '파이어볼';
                     document.getElementById('mp-1').classList.remove('locked-skill');
                 } else {
-                    document.getElementById('weapon-staff').style.display = 'none';
                     document.getElementById('mp-1').innerText = '???';
                     document.getElementById('mp-1').classList.add('locked-skill');
                 }
 
-                if (gData.fireballActive) {
-                    document.getElementById('mp-2').innerText = '파이어볼';
+                if (gData.magicArrowActive) {
+                    document.getElementById('mp-2').innerText = '매직 애로우';
                     document.getElementById('mp-2').classList.remove('locked-skill');
                 } else {
                     document.getElementById('mp-2').innerText = '???';
@@ -1266,13 +1448,16 @@
                     document.getElementById('mp-3').classList.add('locked-skill');
                 }
 
+                // [쉴드 / 라이트닝 슬래시 적용 완]
                 if (gData.lightningActive) {
                     document.getElementById('mp-3-extra').style.display = 'block';
+                    document.getElementById('mp-slash').style.display = 'block';
                     document.getElementById('mp-3-extra').innerText = '라이트닝';
                     document.getElementById('mp-3-extra').classList.remove('locked-skill');
                     document.getElementById('mp-3').style.left = '980px'; 
                 } else {
                     document.getElementById('mp-3-extra').style.display = 'none';
+                    document.getElementById('mp-slash').style.display = 'none';
                     document.getElementById('mp-3').style.left = '1030px'; 
                 }
             }
