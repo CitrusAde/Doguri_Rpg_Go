@@ -27,6 +27,7 @@
         .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; }
         .screen.active { display: block; }
         
+        /* 중심점 기준 절대 좌표 공통 클래스 */
         .ui-element { position: absolute; object-fit: none; transform: translate(-50%, -50%); }
         
         .clickable { cursor: pointer; transition: transform 0.1s ease; }
@@ -34,6 +35,7 @@
         
         .locked-diff { filter: brightness(0.3); }
 
+        /* 무기 UI 및 애니메이션 설정 */
         .weapon-ui {
             position: absolute; z-index: 0; transform: translate(-50%, -50%);
             transition: all 0.15s ease-out;
@@ -47,6 +49,7 @@
         #weapon-staff { left: 1196px; top: 600px; display: none; }
         #weapon-staff.active { left: 1075px; top: 486px; }
 
+        /* 이펙트 (시퀀스 스프라이트) */
         .vfx-sprite {
             position: absolute; left: 640px; top: 337px;
             width: 250px; height: 250px; transform: translate(-50%, -50%);
@@ -55,15 +58,19 @@
         #attack-vfx { background-image: url('Data/DR_Slash_Attack_fx.png'); }
         #hit-vfx { background-image: url('Data/DR_Hit_fx_1.png'); z-index: 16; }
 
+        /* 피격 시 붉은 화면 레이어 */
         #red-flash {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background-color: red; opacity: 0; z-index: 99; pointer-events: none;
             transition: opacity 0.1s ease;
         }
 
+        /* 몬스터 사망 효과 */
         .monster-dead { filter: brightness(0) !important; opacity: 0; transition: all 0.5s ease; }
 
         #hp-gauge, #mp-gauge, #monster-hp-gauge, #attack-time-gauge { transition: clip-path 0.2s ease-out; }
+        
+        /* 독 상태이상 게이지 색상 */
         .poisoned-hp { filter: hue-rotate(90deg) saturate(200%) brightness(0.8); }
 
         .status-text {
@@ -77,6 +84,7 @@
             clip-path: inset(100% 0 0 0); pointer-events: none;
         }
 
+        /* 몬스터/플레이어 대사 폰트 */
         #monster-chat {
             position: absolute; left: 700px; top: 250px; background: #fff; color: #000;
             padding: 15px 25px; border-radius: 20px; font-size: 19px; max-width: 300px;
@@ -109,6 +117,7 @@
             white-space: pre-wrap; line-height: 1.5;
         }
 
+        /* 시네마틱 크레딧 레이어 */
         #cinematic-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.95); z-index: 300; display: none; flex-direction: column;
@@ -118,6 +127,7 @@
             font-size: 30px; color: #fff; text-align: center; white-space: pre-wrap; line-height: 2; padding: 0 50px;
         }
 
+        /* 스킬 텍스트 공통 */
         .skill-text {
             position: absolute; transform: translate(-50%, -50%); font-size: 26px; font-weight: bold; z-index: 10;
             background: linear-gradient(to top, #fff var(--fill, 100%), #444 var(--fill, 100%));
@@ -140,6 +150,7 @@
         #mp-slash { left: 1015px; top: 640.5px; display: none; color: #aaa; background: none; -webkit-text-fill-color: #aaa; }
         #mp-3-extra { left: 1075px; top: 640.5px; display: none; } 
 
+        /* 흔들림 애니메이션 */
         @keyframes shake-anim {
             0%, 100% { margin-left: 0; }
             25% { margin-left: -10px; }
@@ -161,6 +172,7 @@
         .shake-screen { animation: shake-screen-anim 0.2s ease-in-out; }
         .block-screen { animation: block-screen-anim 0.15s ease-in-out; }
 
+        /* 정보 초기화 버튼 스타일 */
         #reset-btn {
             position: absolute; right: 20px; bottom: 20px; 
             font-size: 16px; color: #888; text-decoration: underline; 
@@ -200,16 +212,17 @@
 
         <div id="diff-screen" class="screen">
             <img src="Data/DR_Easy_Button.png" id="diff-1" class="ui-element clickable" style="left: 264.5px; top: 360px;" onclick="handleDiffClick(1)" alt="Easy">
-            <div class="key-hint" style="left: 264.5px; top: 400px;">[1]</div>
+            <div class="key-hint" style="left: 264.5px; top: 425px;">[1]</div>
             
             <img src="Data/DR_Normal_Button.png" id="diff-2" class="ui-element clickable" style="left: 514.5px; top: 360px;" onclick="handleDiffClick(2)" alt="Normal">
-            <div class="key-hint" style="left: 514.5px; top: 400px;">[2]</div>
+            <div class="key-hint" style="left: 514.5px; top: 425px;">[2]</div>
             
             <img src="Data/DR_Hard_Button.png" id="diff-3" class="ui-element clickable" style="left: 764.5px; top: 360px;" onclick="handleDiffClick(3)" alt="Hard">
-            <div class="key-hint" style="left: 764.5px; top: 400px;">[3]</div>
+            <div class="key-hint" style="left: 764.5px; top: 425px;">[3]</div>
             
-            <img src="Data/DR_Extreme_Button.png" id="diff-4" class="ui-element clickable" style="left: 1014.5px; top: 360px;" onclick="handleDiffClick(4)" alt="Extreme">
-            <div class="key-hint" style="left: 1014.5px; top: 400px;">[4]</div>
+            <!-- 난이도 4 완전 비활성화 -->
+            <img src="Data/DR_Extreme_Button.png" id="diff-4" class="ui-element locked-diff" style="left: 1014.5px; top: 360px;" onclick="handleDiffClick(4)" alt="Extreme">
+            <div class="key-hint" style="left: 1014.5px; top: 425px;">[4]</div>
             
             <img src="Data/DR_Play_Button.png" class="ui-element clickable" style="left: 640.5px; top: 614px;" onclick="checkAndStartGame()" alt="Play">
             <div class="key-hint" style="left: 640.5px; top: 654px;">[Space]</div>
@@ -230,6 +243,9 @@
                 <img id="ig-relic-3" src="Data/DR_Relic_3.png" class="ui-element clickable" style="left:264.5px; top:82.5px; transform:translate(-50%, -50%) scale(0.5); display:none;" onclick="showRelicInfo(3)">
                 <div id="ig-relic-3-hint" class="key-hint" style="left:264.5px; top:115px; display:none;">[F3]</div>
             </div>
+
+            <!-- 쉴드 전용 방어 이펙트 -->
+            <img id="magic-shield-fx" src="Data/DR_Shield.png" class="ui-element" style="left: 640px; top: 591px; transform: translate(-50%, -50%) scale(3); z-index: 12; display: none;">
 
             <img id="weapon-shield" src="Data/DR_Shield.png" class="weapon-ui" alt="Shield">
             <img id="weapon-sword" src="Data/DR_Sword.png" class="weapon-ui" alt="Sword">
@@ -322,9 +338,9 @@
             <div id="cinematic-next-hint" class="key-hint" style="left: 640px; top: 640px; display:none; z-index: 301;">[Space]</div>
         </div>
 
-        <!-- 유물 메뉴 레이어 -->
+        <!-- 유물 메뉴 레이어 (이미지 수정 완) -->
         <div id="relic-menu-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 200; display: none;" onclick="closeRelicMenu(event)">
-            <img src="Data/DR_Relic_popup.png" class="ui-element" style="left: 640px; top: 360px;">
+            <img src="Data/DR_Relic_button_popup.png" class="ui-element" style="left: 640px; top: 360px;">
             
             <img id="rm-relic-1" src="Data/DR_Relic_1.png" class="ui-element clickable relic-locked" style="left: 540px; top: 362px;" onclick="showRelicInfo(1, event)">
             <div class="key-hint" style="left: 540px; top: 412px;">[1]</div>
@@ -391,15 +407,16 @@
             }
         };
 
+        // [마법 고유 이펙트 매핑 추가]
         const SKILLS = {
-            '베기': { type: 'py', dmg: 1, cd: 1000, mp: 0, el: 'py-1' },
-            '연속 베기': { type: 'py', dmg: 3, cd: 2000, mp: 0, el: 'py-1-extra', reqFlag: 'hasCombo' },
-            '찌르기': { type: 'py', dmg: 1, cd: 2000, mp: 0, el: 'py-2' },
+            '베기': { type: 'py', dmg: 1, cd: 1000, mp: 0, el: 'py-1', vfx: 'DR_Slash_Attack_fx.png' },
+            '연속 베기': { type: 'py', dmg: 3, cd: 2000, mp: 0, el: 'py-1-extra', reqFlag: 'hasCombo', vfx: 'DR_Slash_Attack_fx.png' },
+            '찌르기': { type: 'py', dmg: 1, cd: 2000, mp: 0, el: 'py-2', vfx: 'DR_Slash_Attack_fx.png' },
             '방어': { type: 'py', dmg: 0, cd: 500, mp: 0, el: 'py-3' }, 
-            '파이어볼': { type: 'mp', dmg: 3, cd: 3000, mp: 3, el: 'mp-1', reqFlag: 'fireballActive' },
-            '매직 애로우': { type: 'mp', dmg: 2, cd: 2000, mp: 2, el: 'mp-2', reqFlag: 'magicArrowActive' },
+            '파이어볼': { type: 'mp', dmg: 3, cd: 3000, mp: 3, el: 'mp-1', reqFlag: 'fireballActive', vfx: 'DR_Fireball_Attack_fx.png' },
+            '매직 애로우': { type: 'mp', dmg: 2, cd: 2000, mp: 2, el: 'mp-2', reqFlag: 'magicArrowActive', vfx: 'DR_MA_Attack_fx.png' },
             '쉴드': { type: 'mp', dmg: 0, cd: 2000, mp: 2, el: 'mp-3', reqFlag: 'shieldActive' },
-            '라이트닝': { type: 'mp', dmg: 5, cd: 5000, mp: 5, el: 'mp-3-extra', reqFlag: 'lightningActive' }
+            '라이트닝': { type: 'mp', dmg: 5, cd: 5000, mp: 5, el: 'mp-3-extra', reqFlag: 'lightningActive', vfx: 'DR_Lightning_Attack_fx.png' }
         };
 
         const STAGE_DATA = {
@@ -583,6 +600,13 @@
         }
 
         function handleDiffClick(diff) {
+            // [난이도 4 잠금 완]
+            if (diff === 4) {
+                gameState = 'ALERT';
+                showPopup("현재 비활성화된\n난이도입니다.", "ALERT", true);
+                return;
+            }
+
             if (diff > gData.unlockedDiff) {
                 gameState = 'ALERT';
                 showPopup("이전 난이도<br>클리어 필요", "ALERT", true);
@@ -596,11 +620,13 @@
             for(let i=1; i<=4; i++) {
                 let btn = document.getElementById(`diff-${i}`);
                 if (!btn) continue;
-                if (i > gData.unlockedDiff) btn.classList.add('locked-diff');
+                
+                // [난이도 4 무조건 잠금 처리 완]
+                if (i === 4 || i > gData.unlockedDiff) btn.classList.add('locked-diff');
                 else btn.classList.remove('locked-diff');
                 
                 if (i === selectedDiff) btn.style.filter = 'drop-shadow(0 0 15px #ff0)';
-                else btn.style.filter = (i > gData.unlockedDiff) ? 'brightness(0.3)' : 'none';
+                else btn.style.filter = (i === 4 || i > gData.unlockedDiff) ? 'brightness(0.3)' : 'none';
             }
         }
 
@@ -788,7 +814,7 @@
         }
 
         /* =================================================================
-           유물(Relic) 시스템
+           유물(Relic) 시스템 (미획득 처리 포함 완)
         ================================================================= */
         function openRelicMenu() {
             if(gameState !== 'DIFF') return;
@@ -809,16 +835,20 @@
         }
         function showRelicInfo(idx, e) {
             if(e) e.stopPropagation();
-            if(!gData.relics.includes(idx)) return; // 안 얻은건 클릭 불가
             
             let prevState = gameState;
             gameState = 'RELIC_INFO';
             document.getElementById('relic-info-layer').style.display = 'block';
             
             let text = "";
-            if(idx === 1) text = "자동 점검 : 자동 물리 공격한다. (랜덤)";
-            else if(idx === 2) text = "무한 도전 : 4초마다 체력 +1";
-            else if(idx === 3) text = "용의 심장 : 무한 마나";
+            // [미획득 처리 로직 추가]
+            if(!gData.relics.includes(idx)) {
+                text = "미획득";
+            } else {
+                if(idx === 1) text = "자동 점검 : 자동 물리 공격한다. (랜덤)";
+                else if(idx === 2) text = "무한 도전 : 4초마다 체력 +1";
+                else if(idx === 3) text = "용의 심장 : 무한 마나";
+            }
             
             document.getElementById('relic-info-text').innerText = text;
             document.getElementById('relic-info-layer').dataset.prevState = prevState;
@@ -841,7 +871,6 @@
             
             let currentItems = [...STORE_ITEMS.slice(0,3)];
             
-            // 듀라한 처치 후 3번째 상점 아이템 라이트닝으로 교체
             if (monster && monster.id === 'dullahan' && !gData.lightningActive) {
                 currentItems[2] = {
                     id: 4, name: '라이트닝', price: 20, desc: '강력한 번개 마법 습득', img: 'DR_Store_Item_4.png',
@@ -963,6 +992,8 @@
             updateStatusUI();
             updateInGameRelics();
             
+            document.getElementById('magic-shield-fx').style.display = 'none';
+
             switchScreen('game-screen');
             loadMonster();
             
@@ -986,6 +1017,8 @@
         function loadMonster() {
             document.getElementById('player-chat-text').style.display = 'none';
             document.getElementById('monster-chat').style.display = 'none';
+            document.getElementById('magic-shield-fx').style.display = 'none';
+            
             if(pChatTimeout) clearTimeout(pChatTimeout);
             if(mChatTimeout) clearTimeout(mChatTimeout);
             if(pChatTypeInterval) clearInterval(pChatTypeInterval);
@@ -1086,7 +1119,7 @@
         }
 
         /* =================================================================
-           단일 메인 루프 (유물 로직 포함)
+           단일 메인 루프
         ================================================================= */
         function gameLoop(currentTime) {
             gameLoopId = requestAnimationFrame(gameLoop);
@@ -1107,12 +1140,10 @@
                 return;
             }
 
-            // [유물 3] 마나 무한
             if (gData.relics.includes(3)) {
                 if(player.mp < player.maxMp) { player.mp = player.maxMp; updateStatusUI(); }
             }
 
-            // [유물 2] 4초마다 체력 1회복
             if (gData.relics.includes(2) && player.hp > 0 && player.hp < player.maxHp) {
                 relic2Timer += dt;
                 if(relic2Timer >= 4000) {
@@ -1120,13 +1151,13 @@
                 }
             } else { relic2Timer = 0; }
 
-            // [유물 1] 3초마다 랜덤 물리 공격
             if (gData.relics.includes(1) && monster && monster.hp > 0 && player.stunTimer <= 0) {
                 relic1Timer += dt;
                 if (relic1Timer >= 3000) {
                     relic1Timer = 0;
-                    let dmg = 1 + gData.bonusPyAtk; // 기본 공격 기반
+                    let dmg = 1 + gData.bonusPyAtk; 
                     triggerMonsterShake();
+                    document.getElementById('attack-vfx').style.backgroundImage = `url('Data/DR_Slash_Attack_fx.png')`;
                     playSpriteVFX('attack-vfx');
                     playSpriteVFX('hit-vfx'); 
                     playAudio('sfx-atk');
@@ -1194,7 +1225,8 @@
                 if (SKILLS[word]) {
                     let s = SKILLS[word];
                     
-                    if (s.type === 'mp' && currentDiff === 1) { e.target.value = ''; return; }
+                    // [쉬움(1) 난이도여도 지팡이 있으면 마법 공격 가능하게 제약 해제 완]
+                    if (s.type === 'mp' && !gData.hasStaff) { e.target.value = ''; return; }
                     if (s.reqFlag && !gData[s.reqFlag]) { e.target.value = ''; return; }
                     
                     if (now - player.cooldowns[word] >= s.cd && player.mp >= s.mp) {
@@ -1203,11 +1235,17 @@
                         
                         player.isDefending = false;
                         document.getElementById('weapon-shield').classList.remove('active');
+                        document.getElementById('magic-shield-fx').style.display = 'none';
                         
                         if (word === '방어' || word === '쉴드') {
                             player.isDefending = true;
                             player.currentDefSkill = word;
-                            document.getElementById('weapon-shield').classList.add('active'); 
+                            if (word === '방어') {
+                                document.getElementById('weapon-shield').classList.add('active'); 
+                            } else if (word === '쉴드') {
+                                // [쉴드 이펙트 출력]
+                                document.getElementById('magic-shield-fx').style.display = 'block';
+                            }
                             playAudio('sfx-def');
                         } else {
                             if (s.type === 'py') {
@@ -1241,6 +1279,10 @@
             }
 
             triggerMonsterShake();
+            // [마법 고유 이펙트 처리 적용 완]
+            let vfxImg = skillData.vfx ? skillData.vfx : 'DR_Slash_Attack_fx.png';
+            document.getElementById('attack-vfx').style.backgroundImage = `url('Data/${vfxImg}')`;
+            
             playSpriteVFX('attack-vfx');
             playSpriteVFX('hit-vfx'); 
             playAudio('sfx-atk');
@@ -1267,6 +1309,7 @@
                 
                 player.isDefending = false; 
                 document.getElementById('weapon-shield').classList.remove('active');
+                document.getElementById('magic-shield-fx').style.display = 'none'; // 방어 해제 시 쉴드 이미지 제거
                 triggerBlockShake(); 
                 playAudio('sfx-def');
             }
@@ -1334,7 +1377,6 @@
             
             let popText = `골드 +${goldGained} 획득!`;
             
-            // [마법 해금 조건 적용 완]
             if (monster.dropItem) {
                 popText += `\n${monster.dropItem} 획득!`;
                 if (monster.dropItem === '마법 지팡이') { 
@@ -1346,7 +1388,6 @@
                 saveData();
             }
 
-            // [어려움 마왕 클리어 시 유물 획득 완]
             if (monster.id === 'demon') {
                 let newRelic = 0;
                 if (!gData.relics.includes(1)) {
@@ -1400,7 +1441,6 @@
         }
 
         function updateSkillUI() {
-            // [베기 / 연속 베기 슬래시 적용 완]
             if (gData.hasCombo) {
                 document.getElementById('py-1').style.left = '190px';
                 document.getElementById('py-slash').style.display = 'block';
@@ -1411,7 +1451,8 @@
                 document.getElementById('py-1-extra').style.display = 'none';
             }
             
-            if (currentDiff === 1 && !gData.hasStaff) {
+            // [지팡이만 있으면 마법공격 활성화 UI 처리 완]
+            if (!gData.hasStaff) {
                 ['mp-1', 'mp-2', 'mp-3', 'mp-3-extra'].forEach(id => {
                     let el = document.getElementById(id);
                     el.innerText = '???'; el.classList.add('locked-skill');
@@ -1420,9 +1461,7 @@
                 document.getElementById('mp-slash').style.display = 'none';
                 document.getElementById('weapon-staff').style.display = 'none';
             } else {
-                if (gData.hasStaff) {
-                    document.getElementById('weapon-staff').style.display = 'block';
-                }
+                document.getElementById('weapon-staff').style.display = 'block';
                 
                 if (gData.fireballActive) {
                     document.getElementById('mp-1').innerText = '파이어볼';
@@ -1448,7 +1487,6 @@
                     document.getElementById('mp-3').classList.add('locked-skill');
                 }
 
-                // [쉴드 / 라이트닝 슬래시 적용 완]
                 if (gData.lightningActive) {
                     document.getElementById('mp-3-extra').style.display = 'block';
                     document.getElementById('mp-slash').style.display = 'block';
