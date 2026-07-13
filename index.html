@@ -185,8 +185,9 @@
 </head>
 <body>
 
+    <!-- 오디오 설정 -->
     <audio id="bgm-main" src="Data/DR_Main_Sound_M3.mp3" loop></audio>
-    <audio id="bgm-fight" src="" loop></audio> 
+    <audio id="bgm-fight" src="" loop></audio>
     <audio id="bgm-ending" src="Data/DR_Ending_Sound_M3.mp3" loop></audio>
     
     <audio id="sfx-hit" src="Data/hit.mp3"></audio>
@@ -231,8 +232,7 @@
             <img src="Data/DR_Hard_Button.png" id="diff-3" class="ui-element clickable" style="left: 764.5px; top: 360px;" onclick="handleDiffClick(3)" alt="Hard">
             <div class="key-hint" style="left: 764.5px; top: 1258px;">[3]</div>
             
-            <!-- 익스트림 난이도: 조건 달성 시 이미지가 변경됨 -->
-            <img src="Data/DR_Extreme_Button.png" id="diff-4" class="ui-element locked-diff clickable" style="left: 1014.5px; top: 360px;" onclick="handleDiffClick(4)" alt="Extreme">
+            <img src="Data/DR_Extreme_Button.png" id="diff-4" class="ui-element locked-diff" style="left: 1014.5px; top: 360px;" onclick="handleDiffClick(4)" alt="Extreme">
             <div class="key-hint" style="left: 1014.5px; top: 1258px;">[4]</div>
             
             <img src="Data/DR_Play_Button.png" class="ui-element clickable" style="left: 640.5px; top: 614px;" onclick="checkAndStartGame()" alt="Play">
@@ -384,7 +384,7 @@
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             
-            osc.type = 'triangle'; 
+            osc.type = 'triangle';
             osc.frequency.setValueAtTime(400, audioCtx.currentTime);
             osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.03);
             
@@ -403,11 +403,12 @@
             if(el) { el.currentTime = 0; el.play().catch(()=>{}); }
         }
 
+        /* 스테이지별 배경음악 매핑 */
         const STAGE_BGM = {
-            1: ['DR_Fight_Sound_M3.mp3', 'DR_Easy_Stage2_Sound_M3.mp3'], 
-            2: ['DR_Normal_Stage1_Sound_M3.mp3', 'DR_Normal_Stage2_Sound_M3.mp3'], 
-            3: ['DR_Hard_Stage1_Sound_M3.mp3', 'DR_Hard_Stage2_Sound_M3.mp3'],
-            4: ['DR_Fight_Sound_M3.mp3', 'DR_Fight_Sound_M3.mp3', 'DR_Fight_Sound_M3.mp3'] // 익스트림 난이도 BGM
+            1: ['DR_Fight_Sound_M3.mp3', 'DR_Easy_Stage2_Sound_M3.mp3'], // 0: 마을, 1: 늪지대
+            2: ['DR_Normal_Stage1_Sound_M3.mp3', 'DR_Normal_Stage2_Sound_M3.mp3'], // 0: 동굴, 1: 들판
+            3: ['DR_Hard_Stage1_Sound_M3.mp3', 'DR_Hard_Stage2_Sound_M3.mp3'], // 0: 입구, 1: 내부
+            4: ['DR_Hard_Stage2_Sound_M3.mp3', 'DR_Hard_Stage2_Sound_M3.mp3', 'DR_Hard_Stage2_Sound_M3.mp3'] // 익스트림 모드 (기존 BGM 활용)
         };
 
         function playBGM(type, diff = 1, bgIdx = 0) {
@@ -536,10 +537,10 @@
                 { id: 'succubus', nameImg: 'DR_Monster_Succubus_Name.png', hp: 20, atk: 5, cd: 3000, img: 'DR_Monster_Succubus.png', bgIdx: 1 },
                 { id: 'demon', nameImg: 'DR_Monster_Demon_Name.png', hp: 40, atk: 10, cd: 3000, img: 'DR_Monster_Demon.png', isBoss: true, bgIdx: 1 }
             ],
-            4: [
-                { id: 'cerberus', nameImg: 'DR_Monster_Cerberus_Name.png', hp: 40, atk: 4, cd: 4000, img: 'DR_Monster_Cerberus.png', bgIdx: 0, isBoss: true },
-                { id: 'baphomet', nameImg: 'DR_Monster_Baphomet_Name.png', hp: 50, atk: 5, cd: 3500, img: 'DR_Monster_Baphomet.png', bgIdx: 1, isBoss: true },
-                { id: 'lucifer', nameImg: 'DR_Monster_Lucifer_Name.png', hp: 60, atk: 8, cd: 3000, img: 'DR_Monster_Lucifer.png', bgIdx: 2, isBoss: true }
+            4: [ 
+                { id: 'cerberus', nameImg: 'DR_Monster_Cerberus_Name.png', hp: 40, atk: 4, cd: 4000, img: 'DR_Monster_Cerberus.png', bgIdx: 0 },
+                { id: 'baphomet', nameImg: 'DR_Monster_Baphomet_Name.png', hp: 50, atk: 5, cd: 3500, img: 'DR_Monster_Baphomet.png', bgIdx: 1 },
+                { id: 'lucifer', nameImg: 'DR_Monster_Lucifer_Name.png', hp: 60, atk: 8, cd: 3000, img: 'DR_Monster_Lucifer.png', isBoss: true, bgIdx: 2 }
             ]
         };
 
@@ -565,9 +566,9 @@
             'dullahan': { intro: { m: "연속으로 베지 않는 이상 날 죽일수 없다.", p: "하지만 너의 공격을 막기만 한다면!?" }, outro: { p: "방패가 이겼다!" } },
             'succubus': { intro: { m: "나는 밤의 여왕..", p: "나에겐 빛이 있다!" }, outro: { p: "빛은 승리한다!" } },
             'demon': { intro: { m: "드디어 왔는가! 용사여!", p: "이제 끝낼때가 왔다!" }, outro: { p: "이제 좀 쉬고 싶네.." } },
-            'cerberus': { intro: { m: "크르르릉!", p: "머리가 세 개 달린 괴물!" }, outro: { p: "이제 좀 잠잠해졌군." } },
-            'baphomet': { intro: { m: "어리석은 놈...", p: "악마의 형상..!" }, outro: { p: "지옥으로 돌아가라!" } },
-            'lucifer': { intro: { m: "내가 바로 절망이다.", p: "진정한 악마의 왕!" }, outro: { p: "드디어 모든 것이 끝났다!" } }
+            'cerberus': { intro: { m: "크르릉... 멍멍멍!", p: "머리가 세 개라니!" }, outro: { p: "드디어 쓰러졌군." } },
+            'baphomet': { intro: { m: "마법은 나에게 통하지 않는다.", p: "그럼 물리로 패주지!" }, outro: { p: "역시 물리 치료가 최고야." } },
+            'lucifer': { intro: { m: "감히 내 앞을 막아서다니...", p: "여기가 끝이다!" }, outro: { p: "모든 것이 끝났다." } }
         };
 
         const HIT_PLAYER_LINES = ["크윽.. 강하군.", "젠장!", "질 수 없다!", "버틴다!", "누가 이기나 보자!", "이럴수가!", "도망치지 않아!", "칫, 이 정도야!"];
@@ -614,6 +615,70 @@
         document.getElementById('gold-val').innerText = gData.gold;
 
         /* =================================================================
+           키보드 조작
+        ================================================================= */
+        document.addEventListener('keydown', (e) => {
+            if (e.key === '0') {
+                if (gameState === 'GAME' && monster && monster.hp > 0) {
+                    monster.hp = 0;
+                    updateMonsterHpUI();
+                    triggerMonsterDeath();
+                }
+            }
+
+            if (e.code === 'Space') {
+                if (gameState === 'START') { playAudio('sfx-btn'); switchScreen('diff-screen'); } 
+                else if (gameState === 'DIFF') { playAudio('sfx-btn'); checkAndStartGame(); } 
+                else if (gameState === 'POPUP') {
+                    if (document.getElementById('popup-next-btn').style.display === 'block') { playAudio('sfx-btn'); handlePopupNext(); }
+                } else if (gameState === 'GAMEOVER') {
+                    if (document.getElementById('popup-gameover-btn').style.display === 'block') { playAudio('sfx-btn'); goBack(); }
+                } else if (gameState === 'ALERT') {
+                    playAudio('sfx-btn');
+                    document.getElementById('popup-layer').style.display = 'none';
+                    gameState = 'DIFF';
+                } else if (gameState === 'CINEMATIC') {
+                    if (cinematicObj.isTyping) {
+                        playAudio('sfx-btn');
+                        cinematicObj.isTyping = false;
+                        if(cinematicTimeout) clearTimeout(cinematicTimeout);
+                        document.getElementById('cinematic-text').innerText = cinematicObj.text;
+                        document.getElementById('cinematic-next-btn').style.display = 'block';
+                        document.getElementById('cinematic-next-hint').style.display = 'block';
+                    } else if (document.getElementById('cinematic-next-btn').style.display === 'block') {
+                        playAudio('sfx-btn');
+                        handleCinematicNext();
+                    }
+                } else if (gameState === 'MARKET') {
+                    playAudio('sfx-btn');
+                    closeMarket();
+                } else if (gameState === 'RELIC_INFO') {
+                    playAudio('sfx-btn');
+                    closeRelicInfo();
+                }
+            } 
+            else if (gameState === 'DIFF') {
+                if (['1', '2', '3', '4'].includes(e.key)) { playAudio('sfx-btn'); handleDiffClick(parseInt(e.key)); }
+                if (e.key === 'r' || e.key === 'R') { playAudio('sfx-btn'); openRelicMenu(); }
+            }
+            else if (gameState === 'MARKET') {
+                if (['1', '2', '3'].includes(e.key)) { playAudio('sfx-btn'); openMarketInfo(parseInt(e.key) - 1); }
+            }
+            else if (gameState === 'MARKET_INFO') {
+                if (e.key === '1') buyItem();
+                if (e.key === '2') { playAudio('sfx-btn'); closeMarketInfo(); }
+            }
+            else if (gameState === 'RELIC_MENU') {
+                if (['1', '2', '3'].includes(e.key)) { playAudio('sfx-btn'); showRelicInfo(parseInt(e.key)); }
+            }
+            else if (gameState === 'GAME' || gameState === 'PAUSE' || gameState === 'DIALOGUE') {
+                if (e.key === 'F1') { e.preventDefault(); playAudio('sfx-btn'); showRelicInfo(1); }
+                if (e.key === 'F2') { e.preventDefault(); playAudio('sfx-btn'); showRelicInfo(2); }
+                if (e.key === 'F3') { e.preventDefault(); playAudio('sfx-btn'); showRelicInfo(3); }
+            }
+        });
+
+        /* =================================================================
            UI 및 화면 전환 컨트롤
         ================================================================= */
         function switchScreen(screenId) {
@@ -637,46 +702,46 @@
         }
 
         function handleDiffClick(diff) {
-            let isExtremeUnlocked = (gData.unlockedDiff > 3 && gData.relics.length >= 3);
-            
-            if (diff === 4 && !isExtremeUnlocked) {
-                gameState = 'ALERT';
-                showPopup("어려움 클리어 및\n모든 유물 필요", "ALERT", true);
-                return;
-            }
-
-            if (diff !== 4 && diff > gData.unlockedDiff) {
-                gameState = 'ALERT';
-                showPopup("이전 난이도<br>클리어 필요", "ALERT", true);
-                return;
+            if (diff === 4) {
+                // Extreme 해금 조건: 난이도 3 클리어 및 모든 유물 획득
+                if (gData.unlockedDiff > 3 && gData.relics.length >= 3) {
+                    // 통과
+                } else {
+                    gameState = 'ALERT';
+                    showPopup("어려움 난이도 클리어 및\n모든 유물이 필요합니다.", "ALERT", true);
+                    return;
+                }
+            } else {
+                if (diff > gData.unlockedDiff) {
+                    gameState = 'ALERT';
+                    showPopup("이전 난이도<br>클리어 필요", "ALERT", true);
+                    return;
+                }
             }
             selectedDiff = diff;
             updateDiffButtons();
         }
 
         function updateDiffButtons() {
-            let isExtremeUnlocked = (gData.unlockedDiff > 3 && gData.relics.length >= 3);
+            let extremeUnlocked = (gData.unlockedDiff > 3 && gData.relics.length >= 3);
+
             for(let i=1; i<=4; i++) {
                 let btn = document.getElementById(`diff-${i}`);
                 if (!btn) continue;
                 
+                let isLocked = false;
                 if (i === 4) {
-                    if (isExtremeUnlocked) {
-                        btn.src = 'Data/DR_Extreme_Button_Open.png';
-                        btn.classList.remove('locked-diff');
-                        btn.style.filter = (i === selectedDiff) ? 'drop-shadow(0 0 15px #ff0)' : 'none';
-                    } else {
-                        btn.src = 'Data/DR_Extreme_Button.png';
-                        btn.classList.add('locked-diff');
-                        btn.style.filter = 'brightness(0.3)';
-                    }
+                    isLocked = !extremeUnlocked;
+                    btn.src = isLocked ? 'Data/DR_Extreme_Button.png' : 'Data/DR_Extreme_Button_Open.png';
                 } else {
-                    if (i > gData.unlockedDiff) btn.classList.add('locked-diff');
-                    else btn.classList.remove('locked-diff');
-                    
-                    if (i === selectedDiff) btn.style.filter = 'drop-shadow(0 0 15px #ff0)';
-                    else btn.style.filter = (i > gData.unlockedDiff) ? 'brightness(0.3)' : 'none';
+                    isLocked = (i > gData.unlockedDiff);
                 }
+
+                if (isLocked) btn.classList.add('locked-diff');
+                else btn.classList.remove('locked-diff');
+                
+                if (i === selectedDiff) btn.style.filter = 'drop-shadow(0 0 15px #ff0)';
+                else btn.style.filter = isLocked ? 'brightness(0.3)' : 'none';
             }
         }
 
@@ -782,6 +847,88 @@
             else timerEl.style.color = '#fff';
 
             document.getElementById('attack-time-gauge').style.clipPath = `inset(0 ${100 - (stageTimer/60000)*100}% 0 0)`;
+        }
+
+        function playDialogue(mText, pText) {
+            if (mText) {
+                let mEl = document.getElementById('monster-chat');
+                mEl.style.display = 'block'; mEl.innerText = '';
+                if(mChatTimeout) clearTimeout(mChatTimeout);
+                if(mChatTypeInterval) clearInterval(mChatTypeInterval);
+                
+                let i = 0;
+                mChatTypeInterval = setInterval(() => {
+                    if (i < mText.length) {
+                        mEl.innerText += mText.charAt(i); i++;
+                        playTypingSound(); 
+                    } else {
+                        clearInterval(mChatTypeInterval);
+                        mChatTimeout = setTimeout(() => { if (gameState !== 'GAMEOVER') mEl.style.display = 'none'; }, 2000);
+                    }
+                }, 50);
+            }
+            if (pText) {
+                let pEl = document.getElementById('player-chat-text');
+                pEl.style.display = 'flex'; pEl.innerText = '';
+                if(pChatTimeout) clearTimeout(pChatTimeout);
+                if(pChatTypeInterval) clearInterval(pChatTypeInterval);
+                
+                let i = 0;
+                pChatTypeInterval = setInterval(() => {
+                    if (i < pText.length) {
+                        pEl.innerText += pText.charAt(i); i++;
+                        playTypingSound();
+                    } else {
+                        clearInterval(pChatTypeInterval);
+                        pChatTimeout = setTimeout(() => { if (gameState !== 'GAMEOVER') pEl.style.display = 'none'; }, 2000); 
+                    }
+                }, 50);
+            }
+        }
+
+        function playCinematic(text, type) {
+            gameState = 'CINEMATIC';
+            inputEl.blur();
+            const layer = document.getElementById('cinematic-layer');
+            const textEl = document.getElementById('cinematic-text');
+            const nextBtn = document.getElementById('cinematic-next-btn');
+            const nextHint = document.getElementById('cinematic-next-hint');
+            
+            layer.style.display = 'flex';
+            textEl.innerText = '';
+            nextBtn.style.display = 'none';
+            nextHint.style.display = 'none';
+            nextCinematicType = type;
+
+            cinematicObj = { text: text, i: 0, isTyping: true };
+            if(cinematicTimeout) clearTimeout(cinematicTimeout);
+
+            function typeChar() {
+                if (!cinematicObj.isTyping || gameState !== 'CINEMATIC') return;
+                if (cinematicObj.i < cinematicObj.text.length) {
+                    textEl.innerText += cinematicObj.text.charAt(cinematicObj.i);
+                    cinematicObj.i++;
+                    playTypingSound();
+                    cinematicTimeout = setTimeout(typeChar, 70); 
+                } else {
+                    cinematicObj.isTyping = false;
+                    nextBtn.style.display = 'block';
+                    nextHint.style.display = 'block';
+                }
+            }
+            typeChar();
+        }
+
+        function handleCinematicNext(e) {
+            if(e) e.stopPropagation();
+            document.getElementById('cinematic-layer').style.display = 'none';
+            document.getElementById('cinematic-next-hint').style.display = 'none';
+            
+            if (nextCinematicType === 'INTRO') {
+                proceedStartGame();
+            } else if (nextCinematicType === 'OUTRO' || nextCinematicType === 'CREDITS') {
+                switchScreen('diff-screen');
+            }
         }
 
         /* =================================================================
@@ -932,17 +1079,20 @@
            게임 흐름 로직
         ================================================================= */
         function checkAndStartGame() {
-            let isExtremeUnlocked = (gData.unlockedDiff > 3 && gData.relics.length >= 3);
-            if (selectedDiff === 4 && !isExtremeUnlocked) {
-                gameState = 'ALERT';
-                showPopup("어려움 클리어 및\n모든 유물 필요", "ALERT", true);
-                return;
-            }
-
-            if (selectedDiff !== 4 && selectedDiff > gData.unlockedDiff) {
-                gameState = 'ALERT'; 
-                showPopup("이전 난이도<br>클리어 필요", "ALERT", true);
-                return;
+            if (selectedDiff === 4) {
+                if (gData.unlockedDiff > 3 && gData.relics.length >= 3) {
+                    // 해금 조건 통과
+                } else {
+                    gameState = 'ALERT'; 
+                    showPopup("어려움 난이도 클리어 및\n모든 유물이 필요합니다.", "ALERT", true);
+                    return;
+                }
+            } else {
+                if (selectedDiff > gData.unlockedDiff) {
+                    gameState = 'ALERT'; 
+                    showPopup("이전 난이도<br>클리어 필요", "ALERT", true);
+                    return;
+                }
             }
             
             let introText = "";
@@ -1014,9 +1164,7 @@
 
             let mData = STAGE_DATA[currentDiff] ? STAGE_DATA[currentDiff][monsterIdx] : null;
             if (!mData) { 
-                if (currentDiff < 4) {
-                    gData.unlockedDiff = Math.max(gData.unlockedDiff, currentDiff + 1); saveData();
-                }
+                gData.unlockedDiff = Math.max(gData.unlockedDiff, currentDiff + 1); saveData();
                 gameState = 'GAMEOVER'; inputEl.blur();
                 showPopup('난이도 클리어!', 'GAMEOVER'); return; 
             }
@@ -1101,8 +1249,9 @@
                 playBGM('ending');
                 playCinematic(`이제 더 이상 나를 막을 수 있는 것은 없다.\n평화로워진 마을로 돌아가 나의 무용담을 전파해야겠어.\n\n"지금까지 도구리의 여정을 함께 해주셔서 감사합니다."\n"도구리는 돌아온다."`, "CREDITS");
             } else if (monster.id === 'lucifer') {
+                if (gData.unlockedDiff <= currentDiff) { gData.unlockedDiff = currentDiff + 1; saveData(); }
                 playBGM('ending');
-                playCinematic(`여기까지 클리어한 사우분에게 경의를 표합니다.\n앞으로 승승장구 하시길 바랍니다.\n감사합니다.`, "CREDITS");
+                playCinematic(`여기까지 클리어한 사우분에게 경의를 표합니다. 앞으로 승승장구 하시길 바랍니다. 감사합니다.`, "CREDITS");
             } else if (monster.isBoss) {
                 let isFinalBoss = (monsterIdx === STAGE_DATA[currentDiff].length - 1);
                 if (isFinalBoss && gData.unlockedDiff <= currentDiff) {
@@ -1296,9 +1445,11 @@
                     if (skillData.type === 'mp') dmg = 1;
                     if (skillName === '매직 애로우' && Math.random() < 0.8) monsterStunTimer = 3000;
                 }
+                // 익스트림 난이도 바포메트: 마법 대미지 면역
                 else if (monster.id === 'baphomet') {
                     if (skillData.type === 'mp') dmg = 0;
                 }
+                // 익스트림 난이도 루시퍼: 기본 대미지 1, 마법 공격 시 30% 확률로 대미지 10배(10)
                 else if (monster.id === 'lucifer') {
                     dmg = 1;
                     if (skillData.type === 'mp' && Math.random() < 0.3) {
@@ -1362,6 +1513,8 @@
                             }
                         }
                     }
+                    
+                    // 익스트림 난이도 켈베로스: 쉴드로 방어 시 스턴
                     if (monster.id === 'cerberus' && player.currentDefSkill === '쉴드') {
                         monsterStunTimer = 3000;
                         playDialogue(null, "켈베로스가 쉴드에 부딪혀 기절했다!");
