@@ -1442,15 +1442,15 @@
                     dmg = 10; systemMsg = "파이어볼의 화염이 트롤의 약점을 찔렀다! (대미지 10)";
                 }
                 else if (monster.id === 'golem') {
-                    if (skillData.type === 'py') { dmg = 1; systemMsg = "단단한 피부 때문에 물리 공격이 통하지 않는다! (대미지 1)"; }
-                    if (skillName === '파이어볼') { dmg *= 2; systemMsg = "파이어볼이 골렘을 녹여버렸다! (대미지 2배)"; }
+                    if (skillData.type === 'py') { dmg = 1; systemMsg = "단단한 피부 때문에 물리 공격이 통하지 않는다!"; }
+                    if (skillName === '파이어볼') { dmg *= 2; systemMsg = "파이어볼이 골렘을 녹여버렸다!"; }
                 }
                 else if (monster.id === 'harpy') {
-                    if (skillData.type === 'mp') { dmg *= 2; systemMsg = "마법 공격이 약점을 제대로 찔렀다! (대미지 2배)"; }
+                    if (skillData.type === 'mp') { dmg *= 2; systemMsg = "마법 공격이 약점을 제대로 찔렀다!"; }
                 }
                 else if (monster.id === 'gargoyle') {
-                    if (skillData.type === 'py') { dmg = 1; systemMsg = "단단한 피부 때문에 물리 공격이 통하지 않는다! (대미지 1)"; }
-                    if (skillData.type === 'mp') { dmg *= 2; systemMsg = "마법 공격이 약점을 제대로 찔렀다! (대미지 2배)"; }
+                    if (skillData.type === 'py') { dmg = 1; systemMsg = "단단한 피부 때문에 물리 공격이 통하지 않는다!"; }
+                    if (skillData.type === 'mp') { dmg *= 2; systemMsg = "마법 공격이 약점을 제대로 찔렀다!"; }
                 }
                 else if (monster.id === 'succubus') {
                     if (skillData.type === 'mp' && skillName !== '라이트닝') dmg = 2;
@@ -1473,7 +1473,7 @@
                 else if (monster.id === 'lucifer') {
                     dmg = 1; systemMsg = "루시퍼의 권능으로 대미지가 1로 감소했다!";
                     if (skillData.type === 'mp' && Math.random() < 0.3) {
-                        dmg = 10; systemMsg = "마법이 루시퍼의 방어막을 뚫고 치명타를 입혔다! (대미지 10)";
+                        dmg = 10; systemMsg = "마법이 루시퍼의 방어막을 뚫고 치명타를 입혔다!";
                     }
                 }
             }
@@ -1525,7 +1525,7 @@
     if (player.isDefending) {
         if (monster.id === 'succubus') { dmg = 2; systemMsg = "방어했지만 가드 대미지를 입었다!"; isGuardHit = true; }
         else if (monster.id === 'demon' && player.currentDefSkill !== '쉴드') { dmg = monster.atk; systemMsg = "물리 방어로는 마왕의 공격을 막을 수 없다!"; isGuardHit = true; }
-        else if (monster.id === 'gargoyle') { dmg = 1; systemMsg = "방어했지만 가드 대미지를 입었다!"; isGuardHit = true; }
+        else if (monster.id === 'gargoyle' && player.currentDefSkill !== '쉴드') { dmg = 1; systemMsg = "방어했지만 가드 대미지를 입었다!"; isGuardHit = true; }
         else {
             dmg = 0; 
             
@@ -1534,7 +1534,7 @@
                 
                 if (monster.id === 'wolf') {
                     if (player.consecutiveDefends >= 3) {
-                        playDialogue(null, "방어 3번 성공! 늑대가 지쳐 도망갑니다.");
+                        playDialogue(null, "방어 3번 성공! 늑대가 지쳐 도망갔다!");
                         monster.hp = 0; updateMonsterHpUI(); triggerMonsterDeath(); return;
                     } else {
                         systemMsg = `방어 성공! (${player.consecutiveDefends}/3)`;
@@ -1542,7 +1542,7 @@
                 }
                 if (monster.id === 'dullahan') {
                     if (player.consecutiveDefends >= 5) {
-                        playDialogue(null, "방어 5번 성공! 듀라한이 제풀에 지쳐 쓰러집니다.");
+                        playDialogue(null, "방어 5번 성공! 듀라한이 제풀에 지쳐 쓰러졌다!");
                         monster.hp = 0; updateMonsterHpUI(); triggerMonsterDeath(); return;
                     } else {
                         systemMsg = `방어 성공! (${player.consecutiveDefends}/5)`;
