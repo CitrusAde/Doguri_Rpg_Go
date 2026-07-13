@@ -1419,163 +1419,186 @@
         });
 
         function playerAttacksMonster(skillName, skillData) {
-            player.consecutiveDefends = 0;
+    player.consecutiveDefends = 0;
+    let systemMsg = null; // 커스텀 알림을 띄우기 위한 변수 추가
 
-            let dmg = skillData.dmg;
-            if (skillData.type === 'py') dmg += gData.bonusPyAtk; 
-            if (skillData.type === 'mp') {
-                // 마법 지팡이 레벨에 따른 추가 데미지 부여
-                if (gData.staffLevel === 2) dmg += 2;
-                else if (gData.staffLevel === 3) dmg += 4;
-            }
-            
-            if (skillData.type === 'py') {
-                if (monster.id === 'harpy' && Math.random() < 0.5) dmg = 0;
-                if (monster.id === 'griffin' && Math.random() < 0.7) dmg = 0;
-                if (monster.id === 'succubus' && Math.random() < 0.5) dmg = 0;
-                if (monster.id === 'demon' && Math.random() < 0.8) dmg = 0;
-            }
+    let dmg = skillData.dmg;
+    if (skillData.type === 'py') dmg += gData.bonusPyAtk; 
+    if (skillData.type === 'mp') {
+        if (gData.staffLevel === 2) dmg += 2;
+        else if (gData.staffLevel === 3) dmg += 4;
+    }
+    
+    if (skillData.type === 'py') {
+        if (monster.id === 'harpy' && Math.random() < 0.5) { dmg = 0; systemMsg = "물리 공격을 날렵하게 피했다!"; }
+        if (monster.id === 'griffin' && Math.random() < 0.7) { dmg = 0; systemMsg = "물리 공격을 날렵하게 피했다!"; }
+        if (monster.id === 'succubus' && Math.random() < 0.5) { dmg = 0; systemMsg = "물리 공격을 날렵하게 피했다!"; }
+        if (monster.id === 'demon' && Math.random() < 0.8) { dmg = 0; systemMsg = "물리 공격을 날렵하게 피했다!"; }
+    }
 
-            if (dmg > 0) {
-                if (monster.id === 'troll' && skillName === '파이어볼') {
-                    dmg = 10;
-                }
-                else if (monster.id === 'golem') {
-                    if (skillData.type === 'py') dmg = 1;
-                    if (skillName === '파이어볼') dmg *= 2;
-                }
-                else if (monster.id === 'harpy') {
-                    if (skillData.type === 'mp') dmg *= 2;
-                }
-                else if (monster.id === 'gargoyle') {
-                    if (skillData.type === 'py') dmg = 1;
-                    if (skillData.type === 'mp') dmg *= 2;
-                }
-                else if (monster.id === 'succubus') {
-                    if (skillData.type === 'mp' && skillName !== '라이트닝') dmg = 2;
-                    if (skillName === '라이트닝') {
-                        dmg *= 3; 
-                        if(Math.random() < 0.8) monsterStunTimer = 3000;
-                    }
-                }
-                else if (monster.id === 'demon') {
-                    if (skillData.type === 'mp') dmg = 1;
-                    if (skillName === '매직 애로우' && Math.random() < 0.8) monsterStunTimer = 3000;
-                }
-                else if (monster.id === 'baphomet') {
-                    if (skillData.type === 'mp') dmg = 0;
-                }
-                else if (monster.id === 'lucifer') {
-                    dmg = 1;
-                    if (skillData.type === 'mp' && Math.random() < 0.3) {
-                        dmg = 10;
-                    }
-                }
-            }
-
-            triggerMonsterShake();
-            let vfxImg = skillData.vfx ? skillData.vfx : 'DR_Slash_Attack_fx.png';
-            document.getElementById('attack-vfx').style.backgroundImage = `url('Data/${vfxImg}')`;
-            
-            playSpriteVFX('attack-vfx');
-            playSpriteVFX('hit-vfx'); 
-            
-            if (skillName === '베기' || skillName === '찌르기') playAudio('sfx-slash');
-            else if (skillName === '연속 베기') playAudio('sfx-double-slash');
-            else if (skillName === '파이어볼') playAudio('sfx-fireball');
-            else if (skillName === '매직 애로우') playAudio('sfx-mgarrow');
-            else if (skillName === '라이트닝') playAudio('sfx-lightning');
-            else playAudio('sfx-slash');
-            
-            if (dmg > 0) {
-                const hitLines = ["크악!", "아프다!", "이놈이!", "제법이군.."];
-                playDialogue(hitLines[Math.floor(Math.random() * hitLines.length)], null);
-                monster.hp -= dmg;
-                updateMonsterHpUI();
-                if (monster.hp <= 0) triggerMonsterDeath();
-            } else {
-                playDialogue("빗나갔다!", null); 
+    if (dmg > 0) {
+        if (monster.id === 'troll' && skillName === '파이어볼') {
+            dmg = 10; systemMsg = "파이어볼의 화염이 트롤의 약점을 찔렀다! (대미지 10)";
+        }
+        else if (monster.id === 'golem') {
+            if (skillData.type === 'py') { dmg = 1; systemMsg = "단단한 피부 때문에 물리 공격이 통하지 않는다! (대미지 1)"; }
+            if (skillName === '파이어볼') { dmg *= 2; systemMsg = "파이어볼이 골렘을 녹여버렸다! (대미지 2배)"; }
+        }
+        else if (monster.id === 'harpy') {
+            if (skillData.type === 'mp') { dmg *= 2; systemMsg = "마법 공격이 약점을 제대로 찔렀다! (대미지 2배)"; }
+        }
+        else if (monster.id === 'gargoyle') {
+            if (skillData.type === 'py') { dmg = 1; systemMsg = "단단한 피부 때문에 물리 공격이 통하지 않는다! (대미지 1)"; }
+            if (skillData.type === 'mp') { dmg *= 2; systemMsg = "마법 공격이 약점을 제대로 찔렀다! (대미지 2배)"; }
+        }
+        else if (monster.id === 'succubus') {
+            if (skillData.type === 'mp' && skillName !== '라이트닝') dmg = 2;
+            if (skillName === '라이트닝') {
+                dmg *= 3; 
+                systemMsg = "라이트닝에 감전되어 서큐버스가 기절했다! (대미지 3배)";
+                if(Math.random() < 0.8) monsterStunTimer = 3000;
             }
         }
+        else if (monster.id === 'demon') {
+            if (skillData.type === 'mp') dmg = 1;
+            if (skillName === '매직 애로우' && Math.random() < 0.8) {
+                monsterStunTimer = 3000;
+                systemMsg = "매직 애로우가 마왕의 빈틈에 적중하여 기절했다!";
+            }
+        }
+        else if (monster.id === 'baphomet') {
+            if (skillData.type === 'mp') { dmg = 0; systemMsg = "바포메트에게 마법은 통하지 않는다!"; }
+        }
+        else if (monster.id === 'lucifer') {
+            dmg = 1; systemMsg = "루시퍼의 권능으로 대미지가 1로 감소했다!";
+            if (skillData.type === 'mp' && Math.random() < 0.3) {
+                dmg = 10; systemMsg = "마법이 루시퍼의 방어막을 뚫고 치명타를 입혔다! (대미지 10)";
+            }
+        }
+    }
+
+    triggerMonsterShake();
+    let vfxImg = skillData.vfx ? skillData.vfx : 'DR_Slash_Attack_fx.png';
+    document.getElementById('attack-vfx').style.backgroundImage = `url('Data/${vfxImg}')`;
+    
+    playSpriteVFX('attack-vfx');
+    playSpriteVFX('hit-vfx'); 
+    
+    if (skillName === '베기' || skillName === '찌르기') playAudio('sfx-slash');
+    else if (skillName === '연속 베기') playAudio('sfx-double-slash');
+    else if (skillName === '파이어볼') playAudio('sfx-fireball');
+    else if (skillName === '매직 애로우') playAudio('sfx-mgarrow');
+    else if (skillName === '라이트닝') playAudio('sfx-lightning');
+    else playAudio('sfx-slash');
+    
+    if (dmg > 0) {
+        if (systemMsg) {
+            playDialogue(null, systemMsg); // 특징 발동 시 플레이어 창에 알림
+        } else {
+            const hitLines = ["크악!", "아프다!", "이놈이!", "제법이군.."];
+            playDialogue(hitLines[Math.floor(Math.random() * hitLines.length)], null);
+        }
+        monster.hp -= dmg;
+        updateMonsterHpUI();
+        if (monster.hp <= 0) triggerMonsterDeath();
+    } else {
+        if (systemMsg) {
+            playDialogue(null, systemMsg); // 회피 또는 면역 알림
+        } else {
+            playDialogue("빗나갔다!", null); 
+        }
+    }
+}
 
         function monsterAttacksPlayer() {
-            let dmg = monster.atk;
+    let dmg = monster.atk;
+    let systemMsg = null;
+    let isGuardHit = false; // 방어 중 가드 대미지를 입었는지 체크
+    
+    if (player.isDefending) {
+        if (monster.id === 'succubus') { dmg = 2; systemMsg = "방어했지만 가드 대미지를 입었다!"; isGuardHit = true; }
+        else if (monster.id === 'demon' && player.currentDefSkill !== '쉴드') { dmg = monster.atk; systemMsg = "물리 방어로는 마왕의 공격을 막을 수 없다!"; isGuardHit = true; }
+        else if (monster.id === 'gargoyle') { dmg = 1; systemMsg = "방어했지만 가드 대미지를 입었다!"; isGuardHit = true; }
+        else {
+            dmg = 0; 
             
-            if (player.isDefending) {
-                if (monster.id === 'succubus') dmg = 2;
-                else if (monster.id === 'demon' && player.currentDefSkill !== '쉴드') dmg = monster.atk; 
-                else if (monster.id === 'gargoyle') dmg = 1;
-                else {
-                    dmg = 0; 
-                    
-                    if (monster.id === 'wolf' || monster.id === 'dullahan') {
-                        player.consecutiveDefends++;
-                        
-                        if (monster.id === 'wolf') {
-                            if (player.consecutiveDefends >= 3) {
-                                playDialogue(null, "방어 3번 성공! 늑대가 지쳐 도망갑니다.");
-                                monster.hp = 0; updateMonsterHpUI(); triggerMonsterDeath(); return;
-                            } else {
-                                playDialogue(null, `방어 성공! (${player.consecutiveDefends}/3)`);
-                            }
-                        }
-                        if (monster.id === 'dullahan') {
-                            if (player.consecutiveDefends >= 5) {
-                                playDialogue(null, "방어 5번 성공! 듀라한이 제풀에 지쳐 쓰러집니다.");
-                                monster.hp = 0; updateMonsterHpUI(); triggerMonsterDeath(); return;
-                            } else {
-                                playDialogue(null, `방어 성공! (${player.consecutiveDefends}/5)`);
-                            }
-                        }
-                    }
-                    
-                    if (monster.id === 'cerberus' && player.currentDefSkill === '쉴드') {
-                        monsterStunTimer = 3000;
-                        playDialogue(null, "켈베로스가 쉴드에 부딪혀 기절했다!");
+            if (monster.id === 'wolf' || monster.id === 'dullahan') {
+                player.consecutiveDefends++;
+                
+                if (monster.id === 'wolf') {
+                    if (player.consecutiveDefends >= 3) {
+                        playDialogue(null, "방어 3번 성공! 늑대가 지쳐 도망갑니다.");
+                        monster.hp = 0; updateMonsterHpUI(); triggerMonsterDeath(); return;
+                    } else {
+                        systemMsg = `방어 성공! (${player.consecutiveDefends}/3)`;
                     }
                 }
-                
-                player.isDefending = false; 
-                document.getElementById('weapon-shield').classList.remove('active');
-                document.getElementById('magic-shield-fx').style.display = 'none';
-                triggerBlockShake(); 
-                
-                if (player.currentDefSkill === '쉴드') playAudio('sfx-mgshield');
-                else playAudio('sfx-def');
-            } else {
-                player.consecutiveDefends = 0;
+                if (monster.id === 'dullahan') {
+                    if (player.consecutiveDefends >= 5) {
+                        playDialogue(null, "방어 5번 성공! 듀라한이 제풀에 지쳐 쓰러집니다.");
+                        monster.hp = 0; updateMonsterHpUI(); triggerMonsterDeath(); return;
+                    } else {
+                        systemMsg = `방어 성공! (${player.consecutiveDefends}/5)`;
+                    }
+                }
             }
-
-            if (dmg > 0) {
-                player.hp -= dmg;
-                updateStatusUI();
-                triggerScreenShake(); 
-                
-                if (Math.random() < 0.5) playAudio('sfx-monsterhit-1');
-                else playAudio('sfx-monsterhit-2');
-                
-                playDialogue(null, HIT_PLAYER_LINES[Math.floor(Math.random() * HIT_PLAYER_LINES.length)]);
-
-                if (monster.id === 'spider' && !sessionFlags.poisoned) {
-                    sessionFlags.poisoned = true;
-                    document.getElementById('hp-gauge').classList.add('poisoned-hp');
-                }
-                
-                if (monster.id === 'highorc' && !gData.hasCombo) {
-                    gData.hasCombo = true; saveData();
-                    updateSkillUI();
-                    gameState = 'POPUP';
-                    inputEl.blur();
-                    showPopup('연속 베기를\n습득했다!', 'NEXT');
-                    return; 
-                }
-
-                if (player.hp <= 0) {
-                    gameState = 'GAMEOVER'; inputEl.blur(); 
-                    showPopup('게임 오버!', 'GAMEOVER');
-                }
+            
+            if (monster.id === 'cerberus' && player.currentDefSkill === '쉴드') {
+                monsterStunTimer = 3000;
+                systemMsg = "켈베로스가 쉴드에 부딪혀 기절했다!";
             }
         }
+        
+        player.isDefending = false; 
+        document.getElementById('weapon-shield').classList.remove('active');
+        document.getElementById('magic-shield-fx').style.display = 'none';
+        triggerBlockShake(); 
+        
+        if (player.currentDefSkill === '쉴드') playAudio('sfx-mgshield');
+        else playAudio('sfx-def');
+
+        // 완벽 방어에 성공했을 때의 대사 출력
+        if (systemMsg && dmg === 0) playDialogue(null, systemMsg);
+
+    } else {
+        player.consecutiveDefends = 0;
+    }
+
+    if (dmg > 0) {
+        player.hp -= dmg;
+        updateStatusUI();
+        triggerScreenShake(); 
+        
+        if (Math.random() < 0.5) playAudio('sfx-monsterhit-1');
+        else playAudio('sfx-monsterhit-2');
+        
+        if (monster.id === 'spider' && !sessionFlags.poisoned) {
+            sessionFlags.poisoned = true;
+            document.getElementById('hp-gauge').classList.add('poisoned-hp');
+            playDialogue(null, "거미독에 중독되었다! (지속 대미지)");
+        } else if (isGuardHit && systemMsg) {
+            // 가드 대미지 관련 메시지 우선 출력
+            playDialogue(null, systemMsg);
+        } else {
+            // 일반 피격 대사
+            playDialogue(null, HIT_PLAYER_LINES[Math.floor(Math.random() * HIT_PLAYER_LINES.length)]);
+        }
+
+        if (monster.id === 'highorc' && !gData.hasCombo) {
+            gData.hasCombo = true; saveData();
+            updateSkillUI();
+            gameState = 'POPUP';
+            inputEl.blur();
+            showPopup('연속 베기를\n습득했다!', 'NEXT');
+            return; 
+        }
+
+        if (player.hp <= 0) {
+            gameState = 'GAMEOVER'; inputEl.blur(); 
+            showPopup('게임 오버!', 'GAMEOVER');
+        }
+    }
+}
 
         function triggerMonsterDeath() {
             let now = performance.now();
