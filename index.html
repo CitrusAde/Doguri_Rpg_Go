@@ -197,7 +197,7 @@
 </head>
 <body>
 
-    <!-- 오디오 설정 (추가 및 수정) -->
+    <!-- 오디오 설정 -->
     <audio id="bgm-main" src="Data/DR_Main_Sound_M3.mp3" loop></audio>
     <audio id="bgm-fight" src="Data/DR_Fight_Sound_M3.mp3" loop></audio>
     <audio id="bgm-ending" src="Data/DR_Ending_Sound_M3.mp3" loop></audio>
@@ -214,7 +214,13 @@
     <audio id="sfx-mgarrow" src="Data/DR_Mgarrow_Sound_M3.mp3"></audio>
     <audio id="sfx-lightning" src="Data/DR_Lightning_Sound_M3.mp3"></audio>
     <audio id="sfx-mgshield" src="Data/DR_MgShield_Sound_M3.mp3"></audio>
+    
+    <!-- 추가된 사운드 -->
+    <audio id="sfx-kill" src="Data/DR_Kill_Sound_M3.mp3"></audio>
     <audio id="sfx-getgold" src="Data/DR_Getgold_Sound_M3.mp3"></audio>
+    <audio id="sfx-typing" src="Data/DR_Typing_Sound_M3.mp3"></audio>
+    <audio id="sfx-monsterhit-1" src="Data/DR_Monsterhitme_01.mp3"></audio>
+    <audio id="sfx-monsterhit-2" src="Data/DR_Monsterhitme_02.mp3"></audio>
 
     <div id="game-container">
         <div id="red-flash"></div>
@@ -240,7 +246,6 @@
             <img src="Data/DR_Hard_Button.png" id="diff-3" class="ui-element clickable" style="left: 764.5px; top: 360px;" onclick="handleDiffClick(3)" alt="Hard">
             <div class="key-hint" style="left: 764.5px; top: 1258px;">[3]</div>
             
-            <!-- 난이도 4 완전 비활성화 -->
             <img src="Data/DR_Extreme_Button.png" id="diff-4" class="ui-element locked-diff" style="left: 1014.5px; top: 360px;" onclick="handleDiffClick(4)" alt="Extreme">
             <div class="key-hint" style="left: 1014.5px; top: 1258px;">[4]</div>
             
@@ -407,10 +412,8 @@
             if(!isMuted) playAudio('sfx-btn');
         }
 
-        // 클릭 가능한 요소 클릭 시 기본 버튼 효과음 재생
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('clickable')) {
-                // 특정 사운드가 겹치지 않게 필터링 (예: 구매 버튼은 sfx-buy가 재생됨)
                 if (e.target.id !== 'sound-toggle-btn' && e.target.id !== 'reset-btn' && e.target.alt !== 'Buy') {
                     playAudio('sfx-btn');
                 }
@@ -803,6 +806,7 @@
                 mChatTypeInterval = setInterval(() => {
                     if (i < mText.length) {
                         mEl.innerText += mText.charAt(i); i++;
+                        playAudio('sfx-typing');
                     } else {
                         clearInterval(mChatTypeInterval);
                         mChatTimeout = setTimeout(() => { if (gameState !== 'GAMEOVER') mEl.style.display = 'none'; }, 2000);
@@ -819,6 +823,7 @@
                 pChatTypeInterval = setInterval(() => {
                     if (i < pText.length) {
                         pEl.innerText += pText.charAt(i); i++;
+                        playAudio('sfx-typing');
                     } else {
                         clearInterval(pChatTypeInterval);
                         pChatTimeout = setTimeout(() => { if (gameState !== 'GAMEOVER') pEl.style.display = 'none'; }, 2000); 
@@ -849,6 +854,7 @@
                 if (cinematicObj.i < cinematicObj.text.length) {
                     textEl.innerText += cinematicObj.text.charAt(cinematicObj.i);
                     cinematicObj.i++;
+                    playAudio('sfx-typing');
                     cinematicTimeout = setTimeout(typeChar, 70); 
                 } else {
                     cinematicObj.isTyping = false;
@@ -1175,7 +1181,7 @@
             if (monster.id === 'demon') {
                 if (gData.unlockedDiff <= currentDiff) { gData.unlockedDiff = currentDiff + 1; saveData(); }
                 playBGM('ending');
-                playCinematic(`이제 더 이상 나를 막을 수 있는 것은 없다.\n평화로워진 마을로 돌아가 나의 무용담을 전파해야겠어.\n아.. 이게 되네.\n\n지금까지 도구리의 여정을 함께 해주셔서 감사합니다.\n도구리는 돌아온다.`, "CREDITS");
+                playCinematic(`이제 더 이상 나를 막을 수 있는 것은 없다.\n평화로워진 마을로 돌아가 나의 무용담을 전파해야겠어.\n\n"지금까지 도구리의 여정을 함께 해주셔서 감사합니다."\n"도구리는 돌아온다."`, "CREDITS");
             } else if (monster.isBoss) {
                 let isFinalBoss = (monsterIdx === STAGE_DATA[currentDiff].length - 1);
                 if (isFinalBoss && gData.unlockedDiff <= currentDiff) {
@@ -1378,7 +1384,6 @@
             playSpriteVFX('attack-vfx');
             playSpriteVFX('hit-vfx'); 
             
-            // 스킬 이름별 특수 사운드 재생
             if (skillName === '베기' || skillName === '찌르기') playAudio('sfx-slash');
             else if (skillName === '연속 베기') playAudio('sfx-double-slash');
             else if (skillName === '파이어볼') playAudio('sfx-fireball');
@@ -1442,7 +1447,10 @@
                 player.hp -= dmg;
                 updateStatusUI();
                 triggerScreenShake(); 
-                playAudio('sfx-hit');
+                
+                // [수정] 몬스터 피격 사운드 2종 중 랜덤 출력
+                if (Math.random() < 0.5) playAudio('sfx-monsterhit-1');
+                else playAudio('sfx-monsterhit-2');
                 
                 playDialogue(null, HIT_PLAYER_LINES[Math.floor(Math.random() * HIT_PLAYER_LINES.length)]);
 
@@ -1475,6 +1483,9 @@
                 if (el) el.style.setProperty('--fill', '100%');
             });
 
+            // [추가] 몬스터 처치 사운드
+            playAudio('sfx-kill');
+
             const mImg = document.getElementById('monster-img');
             const mGauge = document.getElementById('monster-gauge-img');
             
@@ -1498,9 +1509,6 @@
             gData.gold += goldGained; 
             document.getElementById('gold-val').innerText = gData.gold;
             saveData();
-            
-            // 골드 획득 사운드
-            playAudio('sfx-getgold');
             
             let popText = `골드 +${goldGained} 획득!`;
             
@@ -1541,11 +1549,15 @@
                     if (gameState === 'TRANSITION') {
                         gameState = 'POPUP';
                         showPopup(popText, 'NEXT');
+                        // [수정] 골드 획득 사운드를 팝업이 뜰 때 맞춤
+                        playAudio('sfx-getgold');
                     }
                 }, 3000); 
             } else {
                 gameState = 'POPUP'; inputEl.blur();
                 showPopup(popText, 'NEXT');
+                // [수정] 골드 획득 사운드를 팝업이 뜰 때 맞춤
+                playAudio('sfx-getgold');
             }
         }
 
