@@ -385,18 +385,20 @@
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.03);
+            // 소리 질감을 조금 더 선명하게(square) 변경
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(500, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.02);
             
-            gain.gain.setValueAtTime(0.1 * GLOBAL_VOLUME, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
+            // 🔊 볼륨을 확실하게 들리도록 대폭 키움 (0.1 -> 0.5)
+            gain.gain.setValueAtTime(0.5 * GLOBAL_VOLUME, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.02);
             
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             
             osc.start();
-            osc.stop(audioCtx.currentTime + 0.03);
+            osc.stop(audioCtx.currentTime + 0.02);
         }
 
         function playAudio(id) {
@@ -449,6 +451,11 @@
         });
 
         document.addEventListener('click', (e) => {
+            // 브라우저 오디오 차단 강제 해제 (사용자가 화면을 클릭하면 오디오 시스템이 깨어남)
+            if(audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
             if (e.target.classList.contains('clickable')) {
                 if (e.target.id !== 'sound-toggle-btn' && e.target.id !== 'reset-btn' && e.target.alt !== 'Buy') {
                     playAudio('sfx-btn');
