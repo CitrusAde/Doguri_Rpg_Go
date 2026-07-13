@@ -523,12 +523,12 @@
                 { id: 'orc', nameImg: 'DR_Monster_Orc_Name.png', hp: 9, atk: 1, cd: 4000, img: 'DR_Monster_Orc.png', bgIdx: 0 },
                 { id: 'highorc', nameImg: 'DR_Monster_High_Orc_Name.png', hp: 12, atk: 2, cd: 4000, img: 'DR_Monster_High_Orc.png', isBoss: true, bgIdx: 0 },
                 { id: 'slime', nameImg: 'DR_Monster_Slime_Name.png', hp: 5, atk: 1, cd: 5000, img: 'DR_Monster_Slime.png', bgIdx: 1 },
-                { id: 'swarm1', nameImg: 'DR_Monster_Mosquito_Name.png', hp: 5, atk: 2, cd: 4000, img: 'DR_Monster_Swarm.png', bgIdx: 1 },
+                { id: 'Mosquito', nameImg: 'DR_Monster_Mosquito_Name.png', hp: 5, atk: 2, cd: 4000, img: 'DR_Monster_Mosquito.png', bgIdx: 1 },
                 { id: 'ghoul', nameImg: 'DR_Monster_Ghoul_Name.png', hp: 9, atk: 1, cd: 4000, img: 'DR_Monster_Ghoul.png', dropItem: '마법 지팡이', bgIdx: 1 },
                 { id: 'troll', nameImg: 'DR_Monster_Troll_Name.png', hp: 20, atk: 2, cd: 3000, img: 'DR_Monster_Troll.png', isBoss: true, bgIdx: 1 }
             ],
             2: [ 
-                { id: 'swarm2', nameImg: 'DR_Monster_Swarm_Name.png', hp: 8, atk: 3, cd: 4000, img: 'DR_Monster_Swarm.png', bgIdx: 0 },
+                { id: 'swarm', nameImg: 'DR_Monster_Swarm_Name.png', hp: 8, atk: 3, cd: 4000, img: 'DR_Monster_Swarm.png', bgIdx: 0 },
                 { id: 'golem', nameImg: 'DR_Monster_Golem_Name.png', hp: 15, atk: 2, cd: 4000, img: 'DR_Monster_Golem.png', bgIdx: 0 },
                 { id: 'spider', nameImg: 'DR_Monster_Spider_Name.png', hp: 10, atk: 1, cd: 3000, img: 'DR_Monster_Spider.png', bgIdx: 0 },
                 { id: 'scorpion', nameImg: 'DR_Monster_Scorpion_Name.png', hp: 25, atk: 3, cd: 3000, img: 'DR_Monster_Scorpion.png', dropItem: '매직 애로우 해금', isBoss: true, bgIdx: 0 },
@@ -552,30 +552,30 @@
         };
 
         const STAGE_DIALOGUE = {
-            'kobold': { intro: { m: "키킥, 약탈!", p: "갑자기 마을에 몬스터라니..?" }, outro: { p: "뭔가 이상해.. 다른 곳으로 가봐야겠어!" } },
-            'goblin': { intro: { m: "어딜 그리 급히 가시나!", p: "넌 또 뭐야!" }, outro: { p: "이런 잡몹이 내 앞길을 막다니!" } },
-            'orc': { intro: { m: "죽인다!", p: "이런.. 오크까지..!" }, outro: { p: "슬슬 적응이 되는걸?" } },
-            'highorc': { intro: { m: "넌 못 지나간다!", p: "비켜!" }, outro: { p: "마을은 정리 됐으니 다른 곳으로!!" } },
-            'slime': { intro: { m: "꾸르릉...", p: "뭐야 이 액체는?" }, outro: { p: "옷이 더러워졌어!!" } },
-            'swarm1': { intro: { m: "위이이잉!!", p: "벌레라니 제일 싫어!" }, outro: { p: "여름이었다." } },
-            'ghoul': { intro: { m: "구울은 울지 않아.", p: "아이고 부장님" }, outro: { p: "지팡이? 이것만 있다면 나도 마검사?" } },
-            'troll': { intro: { m: "나는 불에 약할지도!!", p: "그렇다면..!" }, outro: { p: "몬스터마다 약점이 존재하는걸까?" } },
-            'swarm2': { intro: { m: "피를 빨아주마!!", p: "박쥐가 말을 한다!!" }, outro: { p: "헌혈은 사람의 생명을 살릴 수 있습니다." } },
-            'golem': { intro: { m: "나는 물리 공격으론 1밖에 안깍기지", p: "하지만 마법 공격으론 어떨까!" }, outro: { p: "어쩌면 나 소질 있을지도..?" } },
-            'spider': { intro: { m: "내 독으로 널 녹여주마.", p: "히익! 방어를 잘 해야겠어!" }, outro: { p: "독한 놈.." } },
-            'scorpion': { intro: { m: "반짝반짝 보석 좋아.", p: "나도!" }, outro: { p: "왜 보석 드랍을 안 하지?" } },
-            'wolf': { intro: { m: "내 공격을 방어해봐라!", p: "방어만 해볼까?" }, outro: { p: "늑구야 아프지마" } },
-            'harpy': { intro: { m: "물리 공격은 나에게 통하지 않지!", p: "통하긴 하는데.." }, outro: { p: "힘든 전투였다!" } },
-            'mandragora': { intro: { m: "끼에에에에에!!!", p: "스턴 걸릴 것 같아!!" }, outro: { p: "후우.. 귀가 너무 아프군" } },
-            'griffin': { intro: { m: "나는 모든 공격을 피할 수 있지!", p: "그렇다면 마법은 어떠냐!" }, outro: { p: "바람이 부는군.." } },
-            'skeleton': { intro: { m: "달그닥 달그닥", p: "뼈다귀 주제에!" }, outro: { p: "이제 거의 다 온 건가!" } },
-            'gargoyle': { intro: { m: "나는 매우 튼튼하다.", p: "손가락이 아프겠는걸!" }, outro: { p: "여행이 끝나면 물리치료를 받아야겠어." } },
-            'dullahan': { intro: { m: "연속으로 베지 않는 이상 날 죽일수 없다.", p: "하지만 너의 공격을 막기만 한다면!?" }, outro: { p: "방패가 이겼다!" } },
-            'succubus': { intro: { m: "나는 밤의 여왕..", p: "나에겐 빛이 있다!" }, outro: { p: "빛은 승리한다!" } },
-            'demon': { intro: { m: "드디어 왔는가! 용사여!", p: "이제 끝낼때가 왔다!" }, outro: { p: "이제 좀 쉬고 싶네.." } },
-            'cerberus': { intro: { m: "크르릉... 멍멍멍!", p: "머리가 세 개라니!" }, outro: { p: "무서웠다..." } },
-            'baphomet': { intro: { m: "마법은 나에게 통하지 않는다.", p: "그럼 물리로 패주지!" }, outro: { p: "역시 물리 치료가 최고야." } },
-            'lucifer': { intro: { m: "감히 내 앞을 막아서다니...", p: "비켜줄게 지나가!!" }, outro: { p: "모든 것이 끝났다." } }
+            'kobold': { intro: { m: "키킥, 약탈!", p: "갑자기 마을에 몬스터라니..?" }, outro: { p: "뭔가 이상해.. 다른 곳으로 가봐야겠어!" }, death: "키에엑!" },
+            'goblin': { intro: { m: "어딜 그리 급히 가시나!", p: "넌 또 뭐야!" }, outro: { p: "이런 잡몹이 내 앞길을 막다니!" }, death: "아.. 아파!" },
+            'orc': { intro: { m: "죽인다!", p: "이런.. 오크까지..!" }, outro: { p: "슬슬 적응이 되는걸?" }, death: "형님이 이겨줄꺼야!" },
+            'highorc': { intro: { m: "넌 못 지나간다!", p: "비켜!" }, outro: { p: "마을은 정리 됐으니 다른 곳으로!!" }, death: "바이 오크..." },
+            'slime': { intro: { m: "꾸르릉...", p: "뭐야 이 액체는?" }, outro: { p: "옷이 더러워졌어!!" }, death: "퉤퉷" },
+            'mosquito': { intro: { m: "위이이잉!!", p: "벌레라니 제일 싫어!" }, outro: { p: "여름이었다." }, death: "삼디다스!!" },
+            'ghoul': { intro: { m: "구울은 울지 않아.", p: "아이고 부장님" }, outro: { p: "지팡이? 이것만 있다면 나도 마검사?" }, death: "우울하다.." },
+            'troll': { intro: { m: "나는 불에 약할지도!!", p: "그렇다면..!" }, outro: { p: "몬스터마다 약점이 존재하는걸까?" }, death: "트롤롤로.." },
+            'swarm': { intro: { m: "피를 빨아주마!!", p: "박쥐가 말을 한다!!" }, outro: { p: "헌혈은 사람의 생명을 살릴 수 있습니다." }, death: "바이러스 조심해라!" },
+            'golem': { intro: { m: "나는 물리 공격으론 1밖에 안깍기지", p: "하지만 마법 공격으론 어떨까!" }, outro: { p: "어쩌면 나 소질 있을지도..?" }, death: "프로틴이 부족했다!" },
+            'spider': { intro: { m: "내 독으로 널 녹여주마.", p: "히익! 방어를 잘 해야겠어!" }, outro: { p: "어쩌면 나 소질 있을지도..?" }, death: "해독제 없었는데.." },
+            'scorpion': { intro: { m: "반짝반짝 보석 좋아.", p: "나도!" }, outro: { p: "왜 보석 드랍을 안 하지?" }, death: "사실 보석 가짜에요." },
+            'wolf': { intro: { m: "내 공격을 방어해봐라!", p: "방어만 해볼까?" }, outro: { p: "늑구야 아프지마" }, death: "끼이잉.." },
+            'harpy': { intro: { m: "물리 공격은 나에게 통하지 않지!", p: "통하긴 하는데.." }, outro: { p: "힘든 전투였다!" }, death: "하아아피.." },
+            'mandragora': { intro: { m: "끼에에에에에!!!", p: "스턴 걸릴 것 같아!!" }, outro: { p: "후우.. 귀가 너무 아프군" }, death: "끼에에엑!" },
+            'griffin': { intro: { m: "나는 모든 공격을 피할 수 있지!", p: "그렇다면 마법은 어떠냐!" }, outro: { p: "바람이 부는군.." }, death: "스핑스크 아닙니다." },
+            'skeleton': { intro: { m: "달그닥 달그닥", p: "뼈다귀 주제에!" }, outro: { p: "이제 거의 다 온건가!" }, death: "골다공증만 아녔어도!" },
+            'gargoyle': { intro: { m: "나는 매우 튼튼하다.", p: "손가락이 아프겠는걸!" }, outro: { p: "여행이 끝나면 물리치료를 받아야겠어." }, death: "철근이 부족했다!" },
+            'dullahan': { intro: { m: "연속으로 베지 않는 이상 날 죽일수 없다.", p: "하지만 너의 공격을 막기만 한다면!?" }, outro: { p: "방패가 이겼다!" }, death: "너 진짜 얌생이구나!" },
+            'succubus': { intro: { m: "나는 밤의 여왕..", p: "나에겐 빛이 있다!" }, outro: { p: "빛은 승리한다!" }, death: "달달하지 못했다." },
+            'demon': { intro: { m: "드디어 왔는가! 용사여!", p: "이제 끝낼때가 왔다!" }, outro: { p: "이제 좀 쉬고 싶네.." }, death: "크아아악!" },
+            'cerberus': { intro: { m: "크르릉... 멍멍멍!", p: "머리가 세 개라니!" }, outro: { p: "드디어 쓰러졌군." }, death: "낑!" },
+            'baphomet': { intro: { m: "마법은 나에게 통하지 않는다.", p: "그럼 물리로 패주지!" }, outro: { p: "역시 물리 치료가 최고야." }, death: "내가 지다니!" },
+            'lucifer': { intro: { m: "감히 내 앞을 막아서다니...", p: "여기가 끝이다!" }, outro: { p: "모든 것이 끝났다." }, death: "거부할 수 없는 도구리의 마력은!!" }
         };
 
         const HIT_PLAYER_LINES = ["크윽.. 강하군.", "젠장!", "질 수 없다!", "버틴다!", "누가 이기나 보자!", "이럴수가!", "도망치지 않아!", "칫, 이 정도야!"];
@@ -1419,96 +1419,103 @@
         });
 
         function playerAttacksMonster(skillName, skillData) {
-    player.consecutiveDefends = 0;
-    let systemMsg = null; // 커스텀 알림을 띄우기 위한 변수 추가
+            player.consecutiveDefends = 0;
+            let systemMsg = null;
 
-    let dmg = skillData.dmg;
-    if (skillData.type === 'py') dmg += gData.bonusPyAtk; 
-    if (skillData.type === 'mp') {
-        if (gData.staffLevel === 2) dmg += 2;
-        else if (gData.staffLevel === 3) dmg += 4;
-    }
-    
-    if (skillData.type === 'py') {
-        if (monster.id === 'harpy' && Math.random() < 0.5) { dmg = 0; systemMsg = "물리 공격을 날렵하게 피했다!"; }
-        if (monster.id === 'griffin' && Math.random() < 0.7) { dmg = 0; systemMsg = "물리 공격을 날렵하게 피했다!"; }
-        if (monster.id === 'succubus' && Math.random() < 0.5) { dmg = 0; systemMsg = "물리 공격을 날렵하게 피했다!"; }
-        if (monster.id === 'demon' && Math.random() < 0.8) { dmg = 0; systemMsg = "물리 공격을 날렵하게 피했다!"; }
-    }
+            let dmg = skillData.dmg;
+            if (skillData.type === 'py') dmg += gData.bonusPyAtk; 
+            if (skillData.type === 'mp') {
+                // 마법 지팡이 레벨에 따른 추가 데미지 부여
+                if (gData.staffLevel === 2) dmg += 2;
+                else if (gData.staffLevel === 3) dmg += 4;
+            }
+            
+            if (skillData.type === 'py') {
+                if (monster.id === 'harpy' && Math.random() < 0.5) { dmg = 0; systemMsg = "물리 공격을 날렵하게 피했다!"; }
+                if (monster.id === 'griffin' && Math.random() < 0.7) { dmg = 0; systemMsg = "물리 공격을 날렵하게 피했다!"; }
+                if (monster.id === 'succubus' && Math.random() < 0.5) { dmg = 0; systemMsg = "물리 공격을 날렵하게 피했다!"; }
+                if (monster.id === 'demon' && Math.random() < 0.8) { dmg = 0; systemMsg = "물리 공격을 날렵하게 피했다!"; }
+            }
 
-    if (dmg > 0) {
-        if (monster.id === 'troll' && skillName === '파이어볼') {
-            dmg = 10; systemMsg = "파이어볼의 화염이 트롤의 약점을 찔렀다! (대미지 10)";
-        }
-        else if (monster.id === 'golem') {
-            if (skillData.type === 'py') { dmg = 1; systemMsg = "단단한 피부 때문에 물리 공격이 통하지 않는다! (대미지 1)"; }
-            if (skillName === '파이어볼') { dmg *= 2; systemMsg = "파이어볼이 골렘을 녹여버렸다! (대미지 2배)"; }
-        }
-        else if (monster.id === 'harpy') {
-            if (skillData.type === 'mp') { dmg *= 2; systemMsg = "마법 공격이 약점을 제대로 찔렀다! (대미지 2배)"; }
-        }
-        else if (monster.id === 'gargoyle') {
-            if (skillData.type === 'py') { dmg = 1; systemMsg = "단단한 피부 때문에 물리 공격이 통하지 않는다! (대미지 1)"; }
-            if (skillData.type === 'mp') { dmg *= 2; systemMsg = "마법 공격이 약점을 제대로 찔렀다! (대미지 2배)"; }
-        }
-        else if (monster.id === 'succubus') {
-            if (skillData.type === 'mp' && skillName !== '라이트닝') dmg = 2;
-            if (skillName === '라이트닝') {
-                dmg *= 3; 
-                systemMsg = "라이트닝에 감전되어 서큐버스가 기절했다! (대미지 3배)";
-                if(Math.random() < 0.8) monsterStunTimer = 3000;
+            if (dmg > 0) {
+                if (monster.id === 'troll' && skillName === '파이어볼') {
+                    dmg = 10; systemMsg = "파이어볼의 화염이 트롤의 약점을 찔렀다! (대미지 10)";
+                }
+                else if (monster.id === 'golem') {
+                    if (skillData.type === 'py') { dmg = 1; systemMsg = "단단한 피부 때문에 물리 공격이 통하지 않는다! (대미지 1)"; }
+                    if (skillName === '파이어볼') { dmg *= 2; systemMsg = "파이어볼이 골렘을 녹여버렸다! (대미지 2배)"; }
+                }
+                else if (monster.id === 'harpy') {
+                    if (skillData.type === 'mp') { dmg *= 2; systemMsg = "마법 공격이 약점을 제대로 찔렀다! (대미지 2배)"; }
+                }
+                else if (monster.id === 'gargoyle') {
+                    if (skillData.type === 'py') { dmg = 1; systemMsg = "단단한 피부 때문에 물리 공격이 통하지 않는다! (대미지 1)"; }
+                    if (skillData.type === 'mp') { dmg *= 2; systemMsg = "마법 공격이 약점을 제대로 찔렀다! (대미지 2배)"; }
+                }
+                else if (monster.id === 'succubus') {
+                    if (skillData.type === 'mp' && skillName !== '라이트닝') dmg = 2;
+                    if (skillName === '라이트닝') {
+                        dmg *= 3; 
+                        systemMsg = "라이트닝에 감전되어 서큐버스가 기절했다! (대미지 3배)";
+                        if(Math.random() < 0.8) monsterStunTimer = 3000;
+                    }
+                }
+                else if (monster.id === 'demon') {
+                    if (skillData.type === 'mp') dmg = 1;
+                    if (skillName === '매직 애로우' && Math.random() < 0.8) {
+                        monsterStunTimer = 3000;
+                        systemMsg = "매직 애로우가 마왕의 빈틈에 적중하여 기절했다!";
+                    }
+                }
+                else if (monster.id === 'baphomet') {
+                    if (skillData.type === 'mp') { dmg = 0; systemMsg = "바포메트에게 마법은 통하지 않는다!"; }
+                }
+                else if (monster.id === 'lucifer') {
+                    dmg = 1; systemMsg = "루시퍼의 권능으로 대미지가 1로 감소했다!";
+                    if (skillData.type === 'mp' && Math.random() < 0.3) {
+                        dmg = 10; systemMsg = "마법이 루시퍼의 방어막을 뚫고 치명타를 입혔다! (대미지 10)";
+                    }
+                }
+            }
+
+            triggerMonsterShake();
+            let vfxImg = skillData.vfx ? skillData.vfx : 'DR_Slash_Attack_fx.png';
+            document.getElementById('attack-vfx').style.backgroundImage = `url('Data/${vfxImg}')`;
+            
+            playSpriteVFX('attack-vfx');
+            playSpriteVFX('hit-vfx'); 
+            
+            if (skillName === '베기' || skillName === '찌르기') playAudio('sfx-slash');
+            else if (skillName === '연속 베기') playAudio('sfx-double-slash');
+            else if (skillName === '파이어볼') playAudio('sfx-fireball');
+            else if (skillName === '매직 애로우') playAudio('sfx-mgarrow');
+            else if (skillName === '라이트닝') playAudio('sfx-lightning');
+            else playAudio('sfx-slash');
+            
+            if (dmg > 0) {
+                if (monster.hp - dmg <= 0) {
+                    // 💀 사망 시 유언과 시스템 메시지를 동시 출력
+                    const deathMsg = (STAGE_DIALOGUE[monster.id] && STAGE_DIALOGUE[monster.id].death) ? STAGE_DIALOGUE[monster.id].death : "크아아악!";
+                    playDialogue(deathMsg, systemMsg ? systemMsg : null);
+                } else if (systemMsg) {
+                    // ⚡ 특징 및 약점 발동 시
+                    playDialogue(null, systemMsg); 
+                } else {
+                    // ⚔️ 평소 일반 피격 시
+                    const hitLines = ["크악!", "아프다!", "이놈이!", "제법이군.."];
+                    playDialogue(hitLines[Math.floor(Math.random() * hitLines.length)], null);
+                }
+                monster.hp -= dmg;
+                updateMonsterHpUI();
+                if (monster.hp <= 0) triggerMonsterDeath();
+            } else {
+                if (systemMsg) {
+                    playDialogue(null, systemMsg); // 회피 또는 면역 알림
+                } else {
+                    playDialogue("빗나갔다!", null); 
+                }
             }
         }
-        else if (monster.id === 'demon') {
-            if (skillData.type === 'mp') dmg = 1;
-            if (skillName === '매직 애로우' && Math.random() < 0.8) {
-                monsterStunTimer = 3000;
-                systemMsg = "매직 애로우가 마왕의 빈틈에 적중하여 기절했다!";
-            }
-        }
-        else if (monster.id === 'baphomet') {
-            if (skillData.type === 'mp') { dmg = 0; systemMsg = "바포메트에게 마법은 통하지 않는다!"; }
-        }
-        else if (monster.id === 'lucifer') {
-            dmg = 1; systemMsg = "루시퍼의 권능으로 대미지가 1로 감소했다!";
-            if (skillData.type === 'mp' && Math.random() < 0.3) {
-                dmg = 10; systemMsg = "마법이 루시퍼의 방어막을 뚫고 치명타를 입혔다! (대미지 10)";
-            }
-        }
-    }
-
-    triggerMonsterShake();
-    let vfxImg = skillData.vfx ? skillData.vfx : 'DR_Slash_Attack_fx.png';
-    document.getElementById('attack-vfx').style.backgroundImage = `url('Data/${vfxImg}')`;
-    
-    playSpriteVFX('attack-vfx');
-    playSpriteVFX('hit-vfx'); 
-    
-    if (skillName === '베기' || skillName === '찌르기') playAudio('sfx-slash');
-    else if (skillName === '연속 베기') playAudio('sfx-double-slash');
-    else if (skillName === '파이어볼') playAudio('sfx-fireball');
-    else if (skillName === '매직 애로우') playAudio('sfx-mgarrow');
-    else if (skillName === '라이트닝') playAudio('sfx-lightning');
-    else playAudio('sfx-slash');
-    
-    if (dmg > 0) {
-        if (systemMsg) {
-            playDialogue(null, systemMsg); // 특징 발동 시 플레이어 창에 알림
-        } else {
-            const hitLines = ["크악!", "아프다!", "이놈이!", "제법이군.."];
-            playDialogue(hitLines[Math.floor(Math.random() * hitLines.length)], null);
-        }
-        monster.hp -= dmg;
-        updateMonsterHpUI();
-        if (monster.hp <= 0) triggerMonsterDeath();
-    } else {
-        if (systemMsg) {
-            playDialogue(null, systemMsg); // 회피 또는 면역 알림
-        } else {
-            playDialogue("빗나갔다!", null); 
-        }
-    }
-}
 
         function monsterAttacksPlayer() {
     let dmg = monster.atk;
