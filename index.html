@@ -27,7 +27,6 @@
         .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; }
         .screen.active { display: block; }
         
-        /* 중심점 기준 절대 좌표 공통 클래스 */
         .ui-element { position: absolute; object-fit: none; transform: translate(-50%, -50%); }
         
         .clickable { cursor: pointer; transition: transform 0.1s ease; }
@@ -35,7 +34,6 @@
         
         .locked-diff { filter: brightness(0.3); }
 
-        /* 무기 UI 및 애니메이션 설정 */
         .weapon-ui {
             position: absolute; z-index: 0; transform: translate(-50%, -50%);
             transition: all 0.15s ease-out;
@@ -49,7 +47,6 @@
         #weapon-staff { left: 1196px; top: 600px; display: none; }
         #weapon-staff.active { left: 1075px; top: 486px; }
 
-        /* 이펙트 (시퀀스 스프라이트) */
         .vfx-sprite {
             position: absolute; left: 640px; top: 337px;
             width: 250px; height: 250px; transform: translate(-50%, -50%);
@@ -58,19 +55,15 @@
         #attack-vfx { background-image: url('Data/DR_Slash_Attack_fx.png'); }
         #hit-vfx { background-image: url('Data/DR_Hit_fx_1.png'); z-index: 16; }
 
-        /* 피격 시 붉은 화면 레이어 */
         #red-flash {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background-color: red; opacity: 0; z-index: 99; pointer-events: none;
             transition: opacity 0.1s ease;
         }
 
-        /* 몬스터 사망 효과 */
         .monster-dead { filter: brightness(0) !important; opacity: 0; transition: all 0.5s ease; }
 
         #hp-gauge, #mp-gauge, #monster-hp-gauge, #attack-time-gauge { transition: clip-path 0.2s ease-out; }
-        
-        /* 독 상태이상 게이지 색상 */
         .poisoned-hp { filter: hue-rotate(90deg) saturate(200%) brightness(0.8); }
 
         .status-text {
@@ -84,7 +77,6 @@
             clip-path: inset(100% 0 0 0); pointer-events: none;
         }
 
-        /* 몬스터/플레이어 대사 폰트 */
         #monster-chat {
             position: absolute; left: 700px; top: 250px; background: #fff; color: #000;
             padding: 15px 25px; border-radius: 20px; font-size: 19px; max-width: 300px;
@@ -117,7 +109,6 @@
             white-space: pre-wrap; line-height: 1.5;
         }
 
-        /* 시네마틱 크레딧 레이어 */
         #cinematic-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.95); z-index: 300; display: none; flex-direction: column;
@@ -127,7 +118,6 @@
             font-size: 30px; color: #fff; text-align: center; white-space: pre-wrap; line-height: 2; padding: 0 50px;
         }
 
-        /* 스킬 텍스트 공통 */
         .skill-text {
             position: absolute; transform: translate(-50%, -50%); font-size: 26px; font-weight: bold; z-index: 10;
             background: linear-gradient(to top, #fff var(--fill, 100%), #444 var(--fill, 100%));
@@ -150,7 +140,6 @@
         #mp-slash { left: 1015px; top: 640.5px; display: none; color: #aaa; background: none; -webkit-text-fill-color: #aaa; }
         #mp-3-extra { left: 1075px; top: 640.5px; display: none; } 
 
-        /* 흔들림 애니메이션 */
         @keyframes shake-anim {
             0%, 100% { margin-left: 0; }
             25% { margin-left: -10px; }
@@ -172,7 +161,6 @@
         .shake-screen { animation: shake-screen-anim 0.2s ease-in-out; }
         .block-screen { animation: block-screen-anim 0.15s ease-in-out; }
 
-        /* 사운드/초기화 버튼 스타일 */
         #sound-toggle-btn {
             position: absolute; left: 20px; bottom: 20px; 
             font-size: 16px; color: #888; text-decoration: underline; 
@@ -199,11 +187,12 @@
 
     <!-- 오디오 설정 -->
     <audio id="bgm-main" src="Data/DR_Main_Sound_M3.mp3" loop></audio>
-    <audio id="bgm-fight" src="Data/DR_Fight_Sound_M3.mp3" loop></audio>
+    <audio id="bgm-fight" src="" loop></audio> <!-- src는 스크립트에서 동적 할당됨 -->
     <audio id="bgm-ending" src="Data/DR_Ending_Sound_M3.mp3" loop></audio>
     
     <audio id="sfx-hit" src="Data/hit.mp3"></audio>
-    <audio id="sfx-def" src="Data/defend.mp3"></audio>
+    <!-- [수정] 방어 사운드 파일명 변경 -->
+    <audio id="sfx-def" src="Data/DR_Shield_Sound_M3.mp3"></audio>
     <audio id="sfx-buy" src="Data/buy.mp3"></audio>
     <audio id="sfx-err" src="Data/error.mp3"></audio>
 
@@ -215,10 +204,8 @@
     <audio id="sfx-lightning" src="Data/DR_Lightning_Sound_M3.mp3"></audio>
     <audio id="sfx-mgshield" src="Data/DR_MgShield_Sound_M3.mp3"></audio>
     
-    <!-- 추가된 사운드 -->
     <audio id="sfx-kill" src="Data/DR_Kill_Sound_M3.mp3"></audio>
     <audio id="sfx-getgold" src="Data/DR_Getgold_Sound_M3.mp3"></audio>
-    <audio id="sfx-typing" src="Data/DR_Typing_Sound_M3.mp3"></audio>
     <audio id="sfx-monsterhit-1" src="Data/DR_Monsterhitme_01.mp3"></audio>
     <audio id="sfx-monsterhit-2" src="Data/DR_Monsterhitme_02.mp3"></audio>
 
@@ -271,7 +258,7 @@
 
             <img id="magic-shield-fx" src="Data/DR_MG_Shield.png" class="ui-element" style="left: 640px; top: 591px; transform: translate(-50%, -50%) scale(3); z-index: 12; display: none;">
 
-            <img id="weapon-shield" src="Data/DR_Shield.png" class="weapon-ui" alt="Shield">
+            <img id="weapon-shield" src="Data/DR_MG_Shield.png" class="weapon-ui" alt="Shield">
             <img id="weapon-sword" src="Data/DR_Sword.png" class="weapon-ui" alt="Sword">
             <img id="weapon-staff" src="Data/DR_Staff.png" class="weapon-ui" alt="Staff">
 
@@ -387,22 +374,67 @@
            오디오 설정 및 사운드 토글
         ================================================================= */
         let isMuted = false;
+        
+        // [추가] 타이핑 사운드 생성용 Web Audio API (파일 불필요!)
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+
+        function playTypingSound() {
+            if(isMuted) return;
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.type = 'triangle'; // 타자기와 비슷한 짧고 둔탁한 소리
+            osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.03);
+            
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.03);
+        }
 
         function playAudio(id) {
             const el = document.getElementById(id);
             if(el) { el.currentTime = 0; el.play().catch(()=>{}); }
         }
 
-        function playBGM(type) {
+        /* [수정] 스테이지별 배경음악 매핑 */
+        const STAGE_BGM = {
+            1: ['DR_Fight_Sound_M3.mp3', 'DR_Easy_Stage2_Sound_M3.mp3'], // 0: 마을, 1: 늪지대
+            2: ['DR_Normal_Stage1_Sound_M3.mp3', 'DR_Normal_Stage2_Sound_M3.mp3'], // 0: 동굴, 1: 들판
+            3: ['DR_Hard_Stage1_Sound_M3.mp3', 'DR_Hard_Stage2_Sound_M3.mp3'] // 0: 입구, 1: 내부
+        };
+
+        function playBGM(type, diff = 1, bgIdx = 0) {
             let mainBgm = document.getElementById('bgm-main');
             let fightBgm = document.getElementById('bgm-fight');
             let endingBgm = document.getElementById('bgm-ending');
             if(!mainBgm || !fightBgm || !endingBgm) return;
             
-            mainBgm.pause(); fightBgm.pause(); endingBgm.pause();
-            if (type === 'main') mainBgm.play().catch(()=>{});
-            else if (type === 'fight') fightBgm.play().catch(()=>{});
-            else if (type === 'ending') endingBgm.play().catch(()=>{});
+            if (type === 'main') {
+                fightBgm.pause(); endingBgm.pause();
+                mainBgm.play().catch(()=>{});
+            } else if (type === 'fight') {
+                mainBgm.pause(); endingBgm.pause();
+                
+                let targetSrc = 'Data/' + STAGE_BGM[diff][bgIdx];
+                // 현재 재생 중인 음악과 다르면 교체해서 재생
+                if (!fightBgm.src.includes(targetSrc)) {
+                    fightBgm.src = targetSrc;
+                    fightBgm.load();
+                }
+                fightBgm.play().catch(()=>{});
+            } else if (type === 'ending') {
+                mainBgm.pause(); fightBgm.pause();
+                endingBgm.play().catch(()=>{});
+            }
         }
 
         function toggleSound() {
@@ -806,7 +838,7 @@
                 mChatTypeInterval = setInterval(() => {
                     if (i < mText.length) {
                         mEl.innerText += mText.charAt(i); i++;
-                        playAudio('sfx-typing');
+                        playTypingSound(); // [수정] 합성된 타이핑 소리
                     } else {
                         clearInterval(mChatTypeInterval);
                         mChatTimeout = setTimeout(() => { if (gameState !== 'GAMEOVER') mEl.style.display = 'none'; }, 2000);
@@ -823,7 +855,7 @@
                 pChatTypeInterval = setInterval(() => {
                     if (i < pText.length) {
                         pEl.innerText += pText.charAt(i); i++;
-                        playAudio('sfx-typing');
+                        playTypingSound(); // [수정] 합성된 타이핑 소리
                     } else {
                         clearInterval(pChatTypeInterval);
                         pChatTimeout = setTimeout(() => { if (gameState !== 'GAMEOVER') pEl.style.display = 'none'; }, 2000); 
@@ -854,7 +886,7 @@
                 if (cinematicObj.i < cinematicObj.text.length) {
                     textEl.innerText += cinematicObj.text.charAt(cinematicObj.i);
                     cinematicObj.i++;
-                    playAudio('sfx-typing');
+                    playTypingSound(); // [수정] 합성된 타이핑 소리
                     cinematicTimeout = setTimeout(typeChar, 70); 
                 } else {
                     cinematicObj.isTyping = false;
@@ -1071,7 +1103,6 @@
             switchScreen('game-screen');
             loadMonster();
             
-            playBGM('fight');
             if (gameLoopId) cancelAnimationFrame(gameLoopId);
             gameLoopId = requestAnimationFrame(gameLoop);
         }
@@ -1147,6 +1178,9 @@
             container.style.backgroundImage = BG_MAP.bgList[currentDiff][monster.bgIdx];
             
             updateSkillUI(); updateMonsterHpUI(); updateTimerUI();
+            
+            // [수정] 몬스터 등장 시 스테이지 배경음악 재생
+            playBGM('fight', currentDiff, monster.bgIdx);
             
             const dialog = STAGE_DIALOGUE[monster.id];
             if (dialog && dialog.intro) {
@@ -1438,7 +1472,10 @@
                 document.getElementById('weapon-shield').classList.remove('active');
                 document.getElementById('magic-shield-fx').style.display = 'none';
                 triggerBlockShake(); 
-                playAudio('sfx-def');
+                
+                // [수정] 방어 시 효과음
+                if (player.currentDefSkill === '쉴드') playAudio('sfx-mgshield');
+                else playAudio('sfx-def');
             } else {
                 player.consecutiveDefends = 0;
             }
@@ -1448,7 +1485,6 @@
                 updateStatusUI();
                 triggerScreenShake(); 
                 
-                // [수정] 몬스터 피격 사운드 2종 중 랜덤 출력
                 if (Math.random() < 0.5) playAudio('sfx-monsterhit-1');
                 else playAudio('sfx-monsterhit-2');
                 
@@ -1483,7 +1519,6 @@
                 if (el) el.style.setProperty('--fill', '100%');
             });
 
-            // [추가] 몬스터 처치 사운드
             playAudio('sfx-kill');
 
             const mImg = document.getElementById('monster-img');
@@ -1549,14 +1584,12 @@
                     if (gameState === 'TRANSITION') {
                         gameState = 'POPUP';
                         showPopup(popText, 'NEXT');
-                        // [수정] 골드 획득 사운드를 팝업이 뜰 때 맞춤
                         playAudio('sfx-getgold');
                     }
                 }, 3000); 
             } else {
                 gameState = 'POPUP'; inputEl.blur();
                 showPopup(popText, 'NEXT');
-                // [수정] 골드 획득 사운드를 팝업이 뜰 때 맞춤
                 playAudio('sfx-getgold');
             }
         }
