@@ -212,17 +212,18 @@
 
         <div id="diff-screen" class="screen">
             <img src="Data/DR_Easy_Button.png" id="diff-1" class="ui-element clickable" style="left: 264.5px; top: 360px;" onclick="handleDiffClick(1)" alt="Easy">
-            <div class="key-hint" style="left: 264.5px; top: 560px;">[1]</div>
+            <!-- [수정] 단축키 힌트를 y=1258px로 내려서 시야에서 숨김 처리 -->
+            <div class="key-hint" style="left: 264.5px; top: 1258px;">[1]</div>
             
             <img src="Data/DR_Normal_Button.png" id="diff-2" class="ui-element clickable" style="left: 514.5px; top: 360px;" onclick="handleDiffClick(2)" alt="Normal">
-            <div class="key-hint" style="left: 514.5px; top: 560px;">[2]</div>
+            <div class="key-hint" style="left: 514.5px; top: 1258px;">[2]</div>
             
             <img src="Data/DR_Hard_Button.png" id="diff-3" class="ui-element clickable" style="left: 764.5px; top: 360px;" onclick="handleDiffClick(3)" alt="Hard">
-            <div class="key-hint" style="left: 764.5px; top: 560px;">[3]</div>
+            <div class="key-hint" style="left: 764.5px; top: 1258px;">[3]</div>
             
             <!-- 난이도 4 완전 비활성화 -->
             <img src="Data/DR_Extreme_Button.png" id="diff-4" class="ui-element locked-diff" style="left: 1014.5px; top: 360px;" onclick="handleDiffClick(4)" alt="Extreme">
-            <div class="key-hint" style="left: 1014.5px; top: 560px;">[4]</div>
+            <div class="key-hint" style="left: 1014.5px; top: 1258px;">[4]</div>
             
             <img src="Data/DR_Play_Button.png" class="ui-element clickable" style="left: 640.5px; top: 614px;" onclick="checkAndStartGame()" alt="Play">
             <div class="key-hint" style="left: 640.5px; top: 654px;">[Space]</div>
@@ -244,9 +245,10 @@
                 <div id="ig-relic-3-hint" class="key-hint" style="left:264.5px; top:115px; display:none;">[F3]</div>
             </div>
 
-            <!-- 쉴드 전용 방어 이펙트 -->
+            <!-- [수정] 쉴드 전용 방어 이펙트 (DR_MG_Shield 이미지 적용) -->
             <img id="magic-shield-fx" src="Data/DR_MG_Shield.png" class="ui-element" style="left: 640px; top: 591px; transform: translate(-50%, -50%) scale(3); z-index: 12; display: none;">
 
+            <!-- 무기 아이콘은 원래 설정된대로 유지 -->
             <img id="weapon-shield" src="Data/DR_Shield.png" class="weapon-ui" alt="Shield">
             <img id="weapon-sword" src="Data/DR_Sword.png" class="weapon-ui" alt="Sword">
             <img id="weapon-staff" src="Data/DR_Staff.png" class="weapon-ui" alt="Staff">
@@ -338,7 +340,7 @@
             <div id="cinematic-next-hint" class="key-hint" style="left: 640px; top: 640px; display:none; z-index: 301;">[Space]</div>
         </div>
 
-        <!-- 유물 메뉴 레이어 (이미지 수정 완) -->
+        <!-- 유물 메뉴 레이어 -->
         <div id="relic-menu-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 200; display: none;" onclick="closeRelicMenu(event)">
             <img src="Data/DR_Relic_button_popup.png" class="ui-element" style="left: 640px; top: 360px;">
             
@@ -368,6 +370,7 @@
             unlockedDiff: 1,
             gold: 0,
             bonusPyAtk: 0,
+            bonusMaxHp: 0, // 영구 사과 체력
             hasCombo: false,
             hasStaff: false,
             magicArrowActive: false,
@@ -407,7 +410,7 @@
             }
         };
 
-        // [마법 고유 이펙트 매핑 추가]
+        // [수정] 마법 고유 이펙트 매핑 완벽 적용
         const SKILLS = {
             '베기': { type: 'py', dmg: 1, cd: 1000, mp: 0, el: 'py-1', vfx: 'DR_Slash_Attack_fx.png' },
             '연속 베기': { type: 'py', dmg: 3, cd: 2000, mp: 0, el: 'py-1-extra', reqFlag: 'hasCombo', vfx: 'DR_Slash_Attack_fx.png' },
@@ -459,8 +462,8 @@
             'ghoul': { intro: { m: "구울은 울지 않아.", p: "아이고 부장님" }, outro: { p: "지팡이? 이것만 있다면 나도 마검사?" } },
             'troll': { intro: { m: "나는 불에 약할지도!!", p: "그렇다면..!" }, outro: { p: "몬스터마다 약점이 존재하는걸까?" } },
             'swarm2': { intro: { m: "피를 빨아주마!!", p: "박쥐가 말을 한다!!" }, outro: { p: "헌혈은 사람의 생명을 살릴 수 있습니다." } },
-            'golem': { intro: { m: "나는 물리 공격으론 1밖에 안깍기지", p: "하지만 마법 공격으론 어떨까!" }, outro: { p: "마검사의 길을 가겠어!" } },
-            'spider': { intro: { m: "내 독으로 널 녹여주마.", p: "히익! 방어를 잘 해야겠어!" }, outro: { p: "독은 위험해.." } },
+            'golem': { intro: { m: "나는 물리 공격으론 1밖에 안깍기지", p: "하지만 마법 공격으론 어떨까!" }, outro: { p: "어쩌면 나 소질 있을지도..?" } },
+            'spider': { intro: { m: "내 독으로 널 녹여주마.", p: "히익! 방어를 잘 해야겠어!" }, outro: { p: "어쩌면 나 소질 있을지도..?" } },
             'scorpion': { intro: { m: "반짝반짝 보석 좋아.", p: "나도!" }, outro: { p: "왜 보석 드랍을 안 하지?" } },
             'wolf': { intro: { m: "내 공격을 방어해봐라!", p: "방어만 해볼까?" }, outro: { p: "늑구야 아프지마" } },
             'harpy': { intro: { m: "물리 공격은 나에게 통하지 않지!", p: "통하긴 하는데.." }, outro: { p: "힘든 전투였다!" } },
@@ -478,7 +481,9 @@
         const STORE_ITEMS = [
             { id: 1, name: '물약', price: 5, desc: '체력 완전 회복', img: 'DR_Store_Item_1.png', action: () => { player.hp = player.maxHp; } },
             { id: 2, name: '공격력 +1', price: 9, desc: '모든 물리 공격력 1 증가', img: 'DR_Store_Item_2.png', action: () => { gData.bonusPyAtk += 1; saveData(); } },
-            { id: 3, name: '공격력 +2', price: 15, desc: '모든 물리 공격력 2 증가', img: 'DR_Store_Item_3.png', action: () => { gData.bonusPyAtk += 2; saveData(); } }
+            { id: 3, name: '공격력 +2', price: 15, desc: '모든 물리 공격력 2 증가', img: 'DR_Store_Item_3.png', action: () => { gData.bonusPyAtk += 2; saveData(); } },
+            { id: 4, name: '라이트닝', price: 20, desc: '강력한 번개 마법 습득', img: 'DR_Store_Item_4.png', action: () => { gData.lightningActive = true; saveData(); } },
+            { id: 5, name: '영구 사과', price: 10, desc: '최대 체력 2 증가', img: 'DR_Store_Item_Apple.png', action: () => { gData.bonusMaxHp += 2; player.maxHp += 2; player.hp += 2; updateStatusUI(); saveData(); } }
         ];
 
         /* =================================================================
@@ -489,7 +494,7 @@
         let selectedDiff = 1;
         let monsterIdx = 0;
         
-        let player = { maxHp: 10, hp: 10, maxMp: 10, mp: 10, cooldowns: {}, isDefending: false, currentDefSkill: '', stunTimer: 0 };
+        let player = { maxHp: 10, hp: 10, maxMp: 10, mp: 10, cooldowns: {}, isDefending: false, currentDefSkill: '', stunTimer: 0, consecutiveDefends: 0 };
         let sessionFlags = { poisoned: false };
         let monster = null;
         let selectedMarketItem = null;
@@ -600,7 +605,6 @@
         }
 
         function handleDiffClick(diff) {
-            // [난이도 4 잠금 완]
             if (diff === 4) {
                 gameState = 'ALERT';
                 showPopup("현재 비활성화된\n난이도입니다.", "ALERT", true);
@@ -621,7 +625,6 @@
                 let btn = document.getElementById(`diff-${i}`);
                 if (!btn) continue;
                 
-                // [난이도 4 무조건 잠금 처리 완]
                 if (i === 4 || i > gData.unlockedDiff) btn.classList.add('locked-diff');
                 else btn.classList.remove('locked-diff');
                 
@@ -814,7 +817,7 @@
         }
 
         /* =================================================================
-           유물(Relic) 시스템 (미획득 처리 포함 완)
+           유물(Relic) 시스템
         ================================================================= */
         function openRelicMenu() {
             if(gameState !== 'DIFF') return;
@@ -841,7 +844,6 @@
             document.getElementById('relic-info-layer').style.display = 'block';
             
             let text = "";
-            // [미획득 처리 로직 추가]
             if(!gData.relics.includes(idx)) {
                 text = "미획득";
             } else {
@@ -862,7 +864,7 @@
         }
 
         /* =================================================================
-           상점 시스템
+           상점 시스템 (영구 사과 로직 추가 완)
         ================================================================= */
         function renderMarket() {
             const container = document.getElementById('market-items-container');
@@ -871,11 +873,20 @@
             
             let currentItems = [...STORE_ITEMS.slice(0,3)];
             
+            let hasLightningInShop = false;
             if (monster && monster.id === 'dullahan' && !gData.lightningActive) {
-                currentItems[2] = {
-                    id: 4, name: '라이트닝', price: 20, desc: '강력한 번개 마법 습득', img: 'DR_Store_Item_4.png',
-                    action: () => { gData.lightningActive = true; }
-                };
+                currentItems[2] = STORE_ITEMS[3]; // 라이트닝 교체
+                hasLightningInShop = true;
+            }
+            
+            // [영구 사과 30% 확률 등장 로직]
+            if (Math.random() < 0.3) {
+                if (hasLightningInShop) {
+                    currentItems[1] = STORE_ITEMS[4]; // 라이트닝이 있으면 무조건 2번자리
+                } else {
+                    let slot = Math.random() < 0.5 ? 1 : 2; // 없으면 2번 or 3번자리
+                    currentItems[slot] = STORE_ITEMS[4];
+                }
             }
             
             windowActiveMarketItems = currentItems;
@@ -963,14 +974,14 @@
             let introText = "";
             if (selectedDiff === 1) introText = `평화로운 도구리의 마을, 갑자기 나타난 몬스터들로 인해 사람들이 혼비백산하였다.
 나는 가만히 두고 볼 수 없었기에,
-지하창고에 있는 무적의 방패와 칼을 장비하고 거리로 나섰다.`;
+지하창고에 있는 개쩌는 방패와 칼을 장비하고 거리로 나섰다.`;
             else if (selectedDiff === 2) introText = `흔해 빠진 몬스터들도 지겹다.
 더 강한 몬스터를 처치하기 위해 나는 여정을 떠났고,
 내 눈앞에 나의 제물들이 등장하기 시작했다.`;
-            else if (selectedDiff === 3) introText = `여긴가, 나의 힘을 표출할 마지막 장소.
+            else if (selectedDiff === 3) introText = `여긴가, 나의 힘을 표출할 마지막 장이.
 스산한 기운이 마치 나를 감싸고 있는 듯한 기분...
 나쁘지 않아.
-드디어 여정의 끝이 보이는군.`;
+드디어 여정의 끝이 보이는군. 좋아.`;
             
             if(introText) playCinematic(introText, 'INTRO');
             else proceedStartGame();
@@ -980,9 +991,13 @@
             inputEl.value = ''; 
             currentDiff = selectedDiff;
             monsterIdx = 0;
-            player.hp = player.maxHp; player.mp = player.maxMp; 
+            // [영구 사과 체력 적용]
+            player.maxHp = 10 + (gData.bonusMaxHp || 0);
+            player.hp = player.maxHp; 
+            player.mp = player.maxMp; 
             sessionFlags = { poisoned: false };
             relic1Timer = 0; relic2Timer = 0;
+            player.consecutiveDefends = 0;
             
             let now = performance.now();
             Object.keys(SKILLS).forEach(k => player.cooldowns[k] = now - SKILLS[k].cd);
@@ -1034,6 +1049,7 @@
             monster = { ...mData, maxHp: mData.hp }; 
             monsterAttackTimer = 0; monsterStunTimer = 0; stageTimer = 60000; poisonTimer = 0;
             sessionFlags.poisoned = false;
+            player.consecutiveDefends = 0;
             document.getElementById('hp-gauge').classList.remove('poisoned-hp');
             
             const scale = monster.isBoss ? 1.3 : 1;
@@ -1105,7 +1121,7 @@
 
             if (monster.id === 'demon') {
                 if (gData.unlockedDiff <= currentDiff) { gData.unlockedDiff = currentDiff + 1; saveData(); }
-                playCinematic(`이제 더 이상 나를 막을 수 있는 것은 없다.\n평화로워진 마을로 돌아가 나의 무용담을 전파해야겠어. \n\n"지금까지 도구리의 여정을 함께 해주셔서 감사합니다."\n"도구리는 돌아온다."`, "CREDITS");
+                playCinematic(`이제 더 이상 나를 막을 수 있는 것은 없다.\n평화로워진 마을로 돌아가 나의 무용담을 전파해야겠어.\n아.. 이게 되네.\n\n지금까지 도구리의 여정을 함께 해주셔서 감사합니다.\n도구리는 돌아온다.`, "CREDITS");
             } else if (monster.isBoss) {
                 let isFinalBoss = (monsterIdx === STAGE_DATA[currentDiff].length - 1);
                 if (isFinalBoss && gData.unlockedDiff <= currentDiff) {
@@ -1225,7 +1241,6 @@
                 if (SKILLS[word]) {
                     let s = SKILLS[word];
                     
-                    // [쉬움(1) 난이도여도 지팡이 있으면 마법 공격 가능하게 제약 해제 완]
                     if (s.type === 'mp' && !gData.hasStaff) { e.target.value = ''; return; }
                     if (s.reqFlag && !gData[s.reqFlag]) { e.target.value = ''; return; }
                     
@@ -1243,7 +1258,6 @@
                             if (word === '방어') {
                                 document.getElementById('weapon-shield').classList.add('active'); 
                             } else if (word === '쉴드') {
-                                // [쉴드 이펙트 출력]
                                 document.getElementById('magic-shield-fx').style.display = 'block';
                             }
                             playAudio('sfx-def');
@@ -1264,22 +1278,48 @@
             }
         });
 
+        // [마법/물리 기믹 완벽 구현 완]
         function playerAttacksMonster(skillName, skillData) {
+            player.consecutiveDefends = 0; // 공격 시 연속 방어 초기화
+
             let dmg = skillData.dmg;
             if (skillData.type === 'py') dmg += gData.bonusPyAtk; 
             
-            if (monster.id === 'succubus') {
-                if (skillData.type === 'py' && Math.random() < 0.5) dmg = 0;
-                if (skillData.type === 'mp') dmg = 2; 
-                if (skillName === '라이트닝' && Math.random() < 0.8) monsterStunTimer = 3000;
-            } else if (monster.id === 'demon') {
-                if (skillData.type === 'py' && Math.random() < 0.8) dmg = 0;
-                if (skillData.type === 'mp') dmg = 1;
-                if (skillName === '매직 애로우' && Math.random() < 0.8) monsterStunTimer = 3000;
+            // 1. 회피 기믹
+            if (skillData.type === 'py') {
+                if (monster.id === 'harpy' && Math.random() < 0.5) dmg = 0;
+                if (monster.id === 'griffin' && Math.random() < 0.7) dmg = 0;
+                if (monster.id === 'succubus' && Math.random() < 0.5) dmg = 0;
+                if (monster.id === 'demon' && Math.random() < 0.8) dmg = 0;
+            }
+
+            // 2. 대미지 변환 기믹
+            if (dmg > 0) {
+                if (monster.id === 'golem') {
+                    if (skillData.type === 'py') dmg = 1;
+                    if (skillName === '파이어볼') dmg *= 2;
+                }
+                else if (monster.id === 'harpy') {
+                    if (skillData.type === 'mp') dmg *= 2;
+                }
+                else if (monster.id === 'gargoyle') {
+                    if (skillData.type === 'py') dmg = 1;
+                    if (skillData.type === 'mp') dmg *= 2;
+                }
+                else if (monster.id === 'succubus') {
+                    if (skillData.type === 'mp' && skillName !== '라이트닝') dmg = 2;
+                    if (skillName === '라이트닝') {
+                        dmg *= 3; 
+                        if(Math.random() < 0.8) monsterStunTimer = 3000;
+                    }
+                }
+                else if (monster.id === 'demon') {
+                    if (skillData.type === 'mp') dmg = 1;
+                    if (skillName === '매직 애로우' && Math.random() < 0.8) monsterStunTimer = 3000;
+                }
             }
 
             triggerMonsterShake();
-            // [마법 고유 이펙트 처리 적용 완]
             let vfxImg = skillData.vfx ? skillData.vfx : 'DR_Slash_Attack_fx.png';
             document.getElementById('attack-vfx').style.backgroundImage = `url('Data/${vfxImg}')`;
             
@@ -1290,12 +1330,12 @@
             if (dmg > 0) {
                 const hitLines = ["크악!", "아프다!", "이놈이!", "제법이군.."];
                 playDialogue(hitLines[Math.floor(Math.random() * hitLines.length)], null);
+                monster.hp -= dmg;
+                updateMonsterHpUI();
+                if (monster.hp <= 0) triggerMonsterDeath();
+            } else {
+                playDialogue("빗나갔다!", null); 
             }
-
-            monster.hp -= dmg;
-            updateMonsterHpUI();
-
-            if (monster.hp <= 0) triggerMonsterDeath();
         }
 
         function monsterAttacksPlayer() {
@@ -1305,13 +1345,39 @@
                 if (monster.id === 'succubus') dmg = 2;
                 else if (monster.id === 'demon' && player.currentDefSkill !== '쉴드') dmg = monster.atk; 
                 else if (monster.id === 'gargoyle') dmg = 1;
-                else dmg = 0; 
+                else {
+                    dmg = 0; 
+                    
+                    // [연속 방어 클리어 기믹]
+                    if (monster.id === 'wolf' || monster.id === 'dullahan') {
+                        player.consecutiveDefends++;
+                        
+                        if (monster.id === 'wolf') {
+                            if (player.consecutiveDefends >= 3) {
+                                playDialogue(null, "방어 3번 성공! 늑대가 지쳐 도망갑니다.");
+                                monster.hp = 0; updateMonsterHpUI(); triggerMonsterDeath(); return;
+                            } else {
+                                playDialogue(null, `방어 성공! (${player.consecutiveDefends}/3)`);
+                            }
+                        }
+                        if (monster.id === 'dullahan') {
+                            if (player.consecutiveDefends >= 5) {
+                                playDialogue(null, "방어 5번 성공! 듀라한이 제풀에 지쳐 쓰러집니다.");
+                                monster.hp = 0; updateMonsterHpUI(); triggerMonsterDeath(); return;
+                            } else {
+                                playDialogue(null, `방어 성공! (${player.consecutiveDefends}/5)`);
+                            }
+                        }
+                    }
+                }
                 
                 player.isDefending = false; 
                 document.getElementById('weapon-shield').classList.remove('active');
-                document.getElementById('magic-shield-fx').style.display = 'none'; // 방어 해제 시 쉴드 이미지 제거
+                document.getElementById('magic-shield-fx').style.display = 'none';
                 triggerBlockShake(); 
                 playAudio('sfx-def');
+            } else {
+                player.consecutiveDefends = 0;
             }
 
             if (dmg > 0) {
@@ -1451,7 +1517,6 @@
                 document.getElementById('py-1-extra').style.display = 'none';
             }
             
-            // [지팡이만 있으면 마법공격 활성화 UI 처리 완]
             if (!gData.hasStaff) {
                 ['mp-1', 'mp-2', 'mp-3', 'mp-3-extra'].forEach(id => {
                     let el = document.getElementById(id);
