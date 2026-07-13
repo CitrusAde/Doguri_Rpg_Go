@@ -562,7 +562,7 @@
             'troll': { intro: { m: "나는 불에 약할지도!!", p: "그렇다면..!" }, outro: { p: "몬스터마다 약점이 존재하는걸까?" } },
             'swarm2': { intro: { m: "피를 빨아주마!!", p: "박쥐가 말을 한다!!" }, outro: { p: "헌혈은 사람의 생명을 살릴 수 있습니다." } },
             'golem': { intro: { m: "나는 물리 공격으론 1밖에 안깍기지", p: "하지만 마법 공격으론 어떨까!" }, outro: { p: "어쩌면 나 소질 있을지도..?" } },
-            'spider': { intro: { m: "내 독으로 널 녹여주마.", p: "히익! 방어를 잘 해야겠어!" }, outro: { p: "어쩌면 나 소질 있을지도..?" } },
+            'spider': { intro: { m: "내 독으로 널 녹여주마.", p: "히익! 방어를 잘 해야겠어!" }, outro: { p: "독한 놈.." } },
             'scorpion': { intro: { m: "반짝반짝 보석 좋아.", p: "나도!" }, outro: { p: "왜 보석 드랍을 안 하지?" } },
             'wolf': { intro: { m: "내 공격을 방어해봐라!", p: "방어만 해볼까?" }, outro: { p: "늑구야 아프지마" } },
             'harpy': { intro: { m: "물리 공격은 나에게 통하지 않지!", p: "통하긴 하는데.." }, outro: { p: "힘든 전투였다!" } },
@@ -573,9 +573,9 @@
             'dullahan': { intro: { m: "연속으로 베지 않는 이상 날 죽일수 없다.", p: "하지만 너의 공격을 막기만 한다면!?" }, outro: { p: "방패가 이겼다!" } },
             'succubus': { intro: { m: "나는 밤의 여왕..", p: "나에겐 빛이 있다!" }, outro: { p: "빛은 승리한다!" } },
             'demon': { intro: { m: "드디어 왔는가! 용사여!", p: "이제 끝낼때가 왔다!" }, outro: { p: "이제 좀 쉬고 싶네.." } },
-            'cerberus': { intro: { m: "크르릉... 멍멍멍!", p: "머리가 세 개라니!" }, outro: { p: "드디어 쓰러졌군." } },
+            'cerberus': { intro: { m: "크르릉... 멍멍멍!", p: "머리가 세 개라니!" }, outro: { p: "무서웠다..." } },
             'baphomet': { intro: { m: "마법은 나에게 통하지 않는다.", p: "그럼 물리로 패주지!" }, outro: { p: "역시 물리 치료가 최고야." } },
-            'lucifer': { intro: { m: "감히 내 앞을 막아서다니...", p: "여기가 끝이다!" }, outro: { p: "모든 것이 끝났다." } }
+            'lucifer': { intro: { m: "감히 내 앞을 막아서다니...", p: "비켜줄게 지나가!!" }, outro: { p: "모든 것이 끝났다." } }
         };
 
         const HIT_PLAYER_LINES = ["크윽.. 강하군.", "젠장!", "질 수 없다!", "버틴다!", "누가 이기나 보자!", "이럴수가!", "도망치지 않아!", "칫, 이 정도야!"];
@@ -1257,7 +1257,7 @@
             } else if (monster.id === 'lucifer') {
                 if (gData.unlockedDiff <= currentDiff) { gData.unlockedDiff = currentDiff + 1; saveData(); }
                 playBGM('ending');
-                playCinematic(`여기까지 클리어한 사우분에게 경의를 표합니다. 앞으로 승승장구 하시길 바랍니다. 감사합니다.`, "CREDITS");
+                playCinematic(`여기까지 클리어 한 사우분에게 경의를 표합니다. \n앞으로 승승장구 하시길 바랍니다. \n감사합니다.`, "CREDITS");
             } else if (monster.isBoss) {
                 let isFinalBoss = (monsterIdx === STAGE_DATA[currentDiff].length - 1);
                 if (isFinalBoss && gData.unlockedDiff <= currentDiff) {
