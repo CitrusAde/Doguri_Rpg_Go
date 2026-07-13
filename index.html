@@ -190,7 +190,9 @@
 </head>
 <body>
 
-    <audio id="bgm" src="Data/bgm.mp3" loop></audio>
+    <!-- [수정] 전투용/비전투용 오디오 분리 -->
+    <audio id="bgm-main" src="Data/DR_Main_Sound_M3.mp3" loop></audio>
+    <audio id="bgm-fight" src="Data/DR_Fight_Sound_M3.mp3" loop></audio>
     <audio id="sfx-atk" src="Data/attack.mp3"></audio>
     <audio id="sfx-hit" src="Data/hit.mp3"></audio>
     <audio id="sfx-def" src="Data/defend.mp3"></audio>
@@ -245,11 +247,11 @@
                 <div id="ig-relic-3-hint" class="key-hint" style="left:264.5px; top:115px; display:none;">[F3]</div>
             </div>
 
-            <!-- [수정] 쉴드 전용 방어 이펙트 (DR_MG_Shield 이미지 적용) -->
+            <!-- [수정] 쉴드 전용 방어 이펙트 이미지 DR_MG_Shield 적용 -->
             <img id="magic-shield-fx" src="Data/DR_MG_Shield.png" class="ui-element" style="left: 640px; top: 591px; transform: translate(-50%, -50%) scale(3); z-index: 12; display: none;">
 
-            <!-- 무기 아이콘은 원래 설정된대로 유지 -->
-            <img id="weapon-shield" src="Data/DR_Shield.png" class="weapon-ui" alt="Shield">
+            <!-- [수정] 무기 UI 방패 이미지 DR_MG_Shield 적용 -->
+            <img id="weapon-shield" src="Data/DR_MG_Shield.png" class="weapon-ui" alt="Shield">
             <img id="weapon-sword" src="Data/DR_Sword.png" class="weapon-ui" alt="Sword">
             <img id="weapon-staff" src="Data/DR_Staff.png" class="weapon-ui" alt="Staff">
 
@@ -340,7 +342,6 @@
             <div id="cinematic-next-hint" class="key-hint" style="left: 640px; top: 640px; display:none; z-index: 301;">[Space]</div>
         </div>
 
-        <!-- 유물 메뉴 레이어 -->
         <div id="relic-menu-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 200; display: none;" onclick="closeRelicMenu(event)">
             <img src="Data/DR_Relic_button_popup.png" class="ui-element" style="left: 640px; top: 360px;">
             
@@ -354,7 +355,6 @@
             <div class="key-hint" style="left: 740px; top: 412px;">[3]</div>
         </div>
 
-        <!-- 유물 정보 팝업 레이어 -->
         <div id="relic-info-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 250; display: none;" onclick="closeRelicInfo(event)">
             <img src="Data/DR_Relic_info_popup.png" class="ui-element" style="left: 640px; top: 190px;">
             <div id="relic-info-text" style="position: absolute; left: 640px; top: 190px; transform: translate(-50%, -50%); font-size: 20px; font-weight: bold; color: #fff; text-align: center; white-space: pre-wrap; width: 300px;"></div>
@@ -370,7 +370,7 @@
             unlockedDiff: 1,
             gold: 0,
             bonusPyAtk: 0,
-            bonusMaxHp: 0, // 영구 사과 체력
+            bonusMaxHp: 0, 
             hasCombo: false,
             hasStaff: false,
             magicArrowActive: false,
@@ -410,7 +410,6 @@
             }
         };
 
-        // [수정] 마법 고유 이펙트 매핑 완벽 적용
         const SKILLS = {
             '베기': { type: 'py', dmg: 1, cd: 1000, mp: 0, el: 'py-1', vfx: 'DR_Slash_Attack_fx.png' },
             '연속 베기': { type: 'py', dmg: 3, cd: 2000, mp: 0, el: 'py-1-extra', reqFlag: 'hasCombo', vfx: 'DR_Slash_Attack_fx.png' },
@@ -524,6 +523,21 @@
             if(el) { el.currentTime = 0; el.play().catch(()=>{}); }
         }
 
+        // [추가] BGM 전환 함수
+        function playBGM(type) {
+            let mainBgm = document.getElementById('bgm-main');
+            let fightBgm = document.getElementById('bgm-fight');
+            if(!mainBgm || !fightBgm) return;
+            
+            if (type === 'main') {
+                fightBgm.pause();
+                mainBgm.play().catch(()=>{});
+            } else if (type === 'fight') {
+                mainBgm.pause();
+                fightBgm.play().catch(()=>{});
+            }
+        }
+
         /* =================================================================
            키보드 조작
         ================================================================= */
@@ -597,10 +611,12 @@
 
             if (screenId === 'start-screen') {
                 gameState = 'START'; container.style.backgroundImage = BG_MAP.main;
+                playBGM('main');
             } else if (screenId === 'diff-screen') {
                 gameState = 'DIFF'; container.style.backgroundImage = BG_MAP.select;
                 updateDiffButtons();
                 document.getElementById('gold-val').innerText = gData.gold;
+                playBGM('main');
             }
         }
 
@@ -864,7 +880,7 @@
         }
 
         /* =================================================================
-           상점 시스템 (영구 사과 로직 추가 완)
+           상점 시스템
         ================================================================= */
         function renderMarket() {
             const container = document.getElementById('market-items-container');
@@ -875,16 +891,15 @@
             
             let hasLightningInShop = false;
             if (monster && monster.id === 'dullahan' && !gData.lightningActive) {
-                currentItems[2] = STORE_ITEMS[3]; // 라이트닝 교체
+                currentItems[2] = STORE_ITEMS[3]; 
                 hasLightningInShop = true;
             }
             
-            // [영구 사과 30% 확률 등장 로직]
             if (Math.random() < 0.3) {
                 if (hasLightningInShop) {
-                    currentItems[1] = STORE_ITEMS[4]; // 라이트닝이 있으면 무조건 2번자리
+                    currentItems[1] = STORE_ITEMS[4]; 
                 } else {
-                    let slot = Math.random() < 0.5 ? 1 : 2; // 없으면 2번 or 3번자리
+                    let slot = Math.random() < 0.5 ? 1 : 2; 
                     currentItems[slot] = STORE_ITEMS[4];
                 }
             }
@@ -991,7 +1006,6 @@
             inputEl.value = ''; 
             currentDiff = selectedDiff;
             monsterIdx = 0;
-            // [영구 사과 체력 적용]
             player.maxHp = 10 + (gData.bonusMaxHp || 0);
             player.hp = player.maxHp; 
             player.mp = player.maxMp; 
@@ -1012,7 +1026,7 @@
             switchScreen('game-screen');
             loadMonster();
             
-            playAudio('bgm');
+            playBGM('fight');
             if (gameLoopId) cancelAnimationFrame(gameLoopId);
             gameLoopId = requestAnimationFrame(gameLoop);
         }
@@ -1278,14 +1292,12 @@
             }
         });
 
-        // [마법/물리 기믹 완벽 구현 완]
         function playerAttacksMonster(skillName, skillData) {
-            player.consecutiveDefends = 0; // 공격 시 연속 방어 초기화
+            player.consecutiveDefends = 0;
 
             let dmg = skillData.dmg;
             if (skillData.type === 'py') dmg += gData.bonusPyAtk; 
             
-            // 1. 회피 기믹
             if (skillData.type === 'py') {
                 if (monster.id === 'harpy' && Math.random() < 0.5) dmg = 0;
                 if (monster.id === 'griffin' && Math.random() < 0.7) dmg = 0;
@@ -1293,7 +1305,6 @@
                 if (monster.id === 'demon' && Math.random() < 0.8) dmg = 0;
             }
 
-            // 2. 대미지 변환 기믹
             if (dmg > 0) {
                 if (monster.id === 'golem') {
                     if (skillData.type === 'py') dmg = 1;
@@ -1348,7 +1359,6 @@
                 else {
                     dmg = 0; 
                     
-                    // [연속 방어 클리어 기믹]
                     if (monster.id === 'wolf' || monster.id === 'dullahan') {
                         player.consecutiveDefends++;
                         
