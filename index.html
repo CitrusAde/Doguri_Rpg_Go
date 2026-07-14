@@ -385,20 +385,18 @@
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             
-            // 소리 질감을 조금 더 선명하게(square) 변경
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(500, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.02);
+            osc.type = 'sine'; // 부드러운 사인파
+            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.015);
             
-            // 🔊 볼륨을 확실하게 들리도록 대폭 키움 (0.1 -> 0.5)
             gain.gain.setValueAtTime(0.5 * GLOBAL_VOLUME, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.015);
             
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             
             osc.start();
-            osc.stop(audioCtx.currentTime + 0.02);
+            osc.stop(audioCtx.currentTime + 0.015);
         }
 
         function playAudio(id) {
