@@ -385,18 +385,18 @@
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             
-            osc.type = 'sine'; // 부드러운 사인파
-            osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.015);
+            osc.type = 'square'; // 거친 스퀘어파 (8비트 느낌)
+            osc.frequency.setValueAtTime(600, audioCtx.currentTime); // 음높이 고정
             
-            gain.gain.setValueAtTime(0.5 * GLOBAL_VOLUME, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.015);
+            // 스퀘어파는 소리가 날카로우므로 볼륨을 0.2로 낮춤
+            gain.gain.setValueAtTime(0.2 * GLOBAL_VOLUME, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
             
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             
             osc.start();
-            osc.stop(audioCtx.currentTime + 0.015);
+            osc.stop(audioCtx.currentTime + 0.03);
         }
 
         function playAudio(id) {
